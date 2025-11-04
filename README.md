@@ -2,9 +2,11 @@
 
 **DXRP** is a roleplaying game built on **s&box** with a global economy, and session-based gameplay. In this game, players engage in a dynamic world where currency is the only global factor, and each session creates an unique roleplaying experience.
 
+This repository is the public counterpart to the DXRP repository and includes the SDK, Server Image, and issue/project tracking.
+
 - [Website](https://dxrp.net)
 - [Roadmap](https://github.com/orgs/dxura/projects/11)
-- [Join our Discord](https://discord.gg/uBwQ2QHP2D)
+- [Discord](https://discord.gg/uBwQ2QHP2D)
 - [s&box Link](https://sbox.game/dxura/rp)
 
 ## Features
