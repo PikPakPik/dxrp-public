@@ -73,6 +73,7 @@
   "tabmenu.players.sanctions.by": "Przez {0}",
   "tabmenu.players.sanctions.expires": "Wygasa {0}",
   "tabmenu.players.sanctions.permanent": "Permanentny",
+  "tabmenu.players.sanctions.duration": "Czas {0}",
   "tabmenu.players.name_copied": "Nazwa skopiowana do schowka",
   "tabmenu.steamid_copied": "SteamID skopiowane do schowka",
   "tabmenu.discord": "Discord",

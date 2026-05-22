@@ -73,6 +73,7 @@
   "tabmenu.players.sanctions.by": "담당자: {0}",
   "tabmenu.players.sanctions.expires": "만료일: {0}",
   "tabmenu.players.sanctions.permanent": "영구",
+  "tabmenu.players.sanctions.duration": "기간 {0}",
   "tabmenu.name_copied": "클립보드에 이름 복사 완료!",
   "tabmenu.steamid_copied": "클립보드에 고유번호 복사 완료!",
   "tabmenu.discord": "디스코드",

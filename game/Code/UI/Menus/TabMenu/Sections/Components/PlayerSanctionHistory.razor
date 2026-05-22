@@ -1,5 +1,6 @@
 @namespace Dxura.RP.Game.UI
 @using Dxura.RP.Shared
+@using Sandbox.Services
 @inherits Panel
 
 @attribute [StyleSheet]
@@ -26,6 +27,10 @@
 							<span class="type-marker type-@GetSanctionTypeClass( sanction.Type )"></span>
 							<span class="type-label">@GetSanctionTypeText( sanction )</span>
 						</span>
+						@if ( TryGetSanctionDurationText( sanction, out var durationText ) )
+						{
+							<span class="duration">@durationText</span>
+						}
 					</div>
 					<span class="issued-at" tooltip="@FormatAbsoluteTimestamp( sanction.Created )">@FormatCreatedTimestamp( sanction.Created )</span>
 				</div>
@@ -102,6 +107,22 @@
 	private static string GetSanctionTypeText( PlayerSanctionHistoryDto sanction )
 	{
 		return SplitPascalCase( sanction.Type.ToString() );
+	}
+
+	private static bool TryGetSanctionDurationText( PlayerSanctionHistoryDto sanction, out string durationText )
+	{
+		durationText = string.Empty;
+
+		if ( sanction.Type is not (SanctionType.Jail or SanctionType.Ban or SanctionType.Gag) )
+		{
+			return false;
+		}
+
+		durationText = sanction.Duration == null
+			? Language.GetPhrase( "tabmenu.players.sanctions.permanent" )
+			: sanction.Duration.Value.Humanize( 1 );
+
+		return true;
 	}
 
 	private static string GetSanctionTypeClass( SanctionType type ) => type switch

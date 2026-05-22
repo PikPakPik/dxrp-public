@@ -73,6 +73,7 @@
   "tabmenu.players.sanctions.by": "By {0}",
   "tabmenu.players.sanctions.expires": "Expires {0}",
   "tabmenu.players.sanctions.permanent": "Permanent",
+  "tabmenu.players.sanctions.duration": "Duration {0}",
   "tabmenu.name_copied": "Name copied to clipboard",
   "tabmenu.steamid_copied": "SteamID copied to clipboard",
   "tabmenu.discord": "Discord",
