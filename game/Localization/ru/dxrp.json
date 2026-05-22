@@ -73,7 +73,6 @@
   "tabmenu.players.sanctions.by": "Кем: {0}",
   "tabmenu.players.sanctions.expires": "Истекает {0}",
   "tabmenu.players.sanctions.permanent": "Постоянно",
-  "tabmenu.players.sanctions.duration": "Срок {0}",
   "tabmenu.name_copied": "Имя скопировано в буфер обмена",
   "tabmenu.steamid_copied": "SteamID скопирован в буфер обмена",
   "tabmenu.discord": "Discord",
