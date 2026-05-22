@@ -12,6 +12,7 @@ public abstract partial class GameConfig
 	public virtual bool GovernanceLawEnabled { get; set; } = true;
 	public virtual bool GovernanceMayorAnnounceEnabled { get; set; } = true;
 	public virtual bool GovernanceWantedEnabled { get; set; } = true;
+	public virtual float GovernanceMayorPoliceDamageMultiplier { get; set; } = 0f;
 
 
 	// Laws
