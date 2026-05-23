@@ -1015,6 +1015,7 @@
   "notify.construct.not_found": "Could not find construct",
   "notify.construct.limit": "You have reached your limit",
   "notify.construct.blocked_by_player": "Spawn blocked by player in the area",
+  "notify.construct.text_empty": "At least one line must have text",
   "notify.stacker.invalid_count": "Invalid stack count",
   "notify.stacker.invalid_offset": "Invalid stack offset",
   "notify.stacker.invalid_target": "You must target a valid prop to stack",

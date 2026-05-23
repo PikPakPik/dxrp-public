@@ -68,4 +68,15 @@ public class TextTool() : BaseConstructTool<TextData>( ConstructType.Text )
 		Data = new TextData();
 		_proxies.Clear();
 	}
+
+	public override void PrimaryUseStart()
+	{
+		if ( Lines.All( l => string.IsNullOrEmpty( l.Text ) ) )
+		{
+			Notify.Error( "#notify.construct.text_empty" );
+			return;
+		}
+
+		base.PrimaryUseStart();
+	}
 }

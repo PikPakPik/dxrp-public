@@ -22,10 +22,6 @@ public sealed class Text() : BaseConstruct( ConstructType.Text )
 
 		GameObject.Name = $"Text ({lines[0].Text})";
 
-		// Disable the root renderer — all lines are rendered via child GameObjects
-		if ( TextRenderer.IsValid() )
-			TextRenderer.Enabled = false;
-
 		// Clean up previous line child objects
 		foreach ( var obj in _lineObjects )
 		{
@@ -37,14 +33,28 @@ public sealed class Text() : BaseConstruct( ConstructType.Text )
 		// Only render lines with content — empty lines are invisible placeholders
 		var visibleLines = lines.Where( l => !string.IsNullOrEmpty( l.Text ) ).ToList();
 
+		// When all lines are empty show the prefab's default "Hello! ❤" as a placeholder
+		if ( visibleLines.Count == 0 )
+		{
+			if ( TextRenderer.IsValid() )
+			{
+				TextRenderer.Enabled = true;
+				TextRenderer.Scale = 0.1f;
+			}
+
+			const float fallbackFontSize = 32f;
+			const string fallbackText = "Hello! ❤";
+			( Collider as BoxCollider )!.Scale = new Vector3( 2f, fallbackText.Length * fallbackFontSize * 0.06f, fallbackFontSize * 0.1f );
+			return;
+		}
+
+		if ( TextRenderer.IsValid() )
+			TextRenderer.Enabled = false;
+
 		const float lineGap = 2f;
 		var lineHeights = visibleLines.Select( l => l.FontSize * 0.1f ).ToList();
-		float totalHeight = visibleLines.Count > 0
-			? lineHeights.Sum() + ( visibleLines.Count - 1 ) * lineGap
-			: 1f;
-		float maxWidth = visibleLines.Count > 0
-			? visibleLines.Max( l => MathF.Max( 1f, l.Text.Length * l.FontSize * 0.06f ) )
-			: 1f;
+		float totalHeight = lineHeights.Sum() + ( visibleLines.Count - 1 ) * lineGap;
+		float maxWidth = visibleLines.Max( l => MathF.Max( 1f, l.Text.Length * l.FontSize * 0.06f ) );
 
 		( Collider as BoxCollider )!.Scale = new Vector3( 2f, maxWidth, totalHeight );
 

@@ -924,6 +924,7 @@
   "notify.construct.not_found": "Impossible de trouver la construction",
   "notify.construct.limit": "Vous avez atteint votre limite",
   "notify.construct.blocked_by_player": "Apparition bloquée par un joueur dans la zone",
+  "notify.construct.text_empty": "Au moins une ligne doit contenir du texte",
   "notify.stacker.invalid_count": "Nombre d'empilement invalide",
   "notify.stacker.invalid_offset": "Décalage d'empilement invalide",
   "notify.stacker.invalid_target": "Vous devez cibler un prop valide pour empiler",

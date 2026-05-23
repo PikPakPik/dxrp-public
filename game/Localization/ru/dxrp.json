@@ -924,6 +924,7 @@
   "notify.construct.not_found": "Постройка не найдена",
   "notify.construct.limit": "Достигнут предел построек",
   "notify.construct.blocked_by_player": "Игрок в зоне спавна блокирует постройку",
+  "notify.construct.text_empty": "Хотя бы одна строка должна содержать текст",
   "notify.stacker.invalid_count": "Неверное количество стаков",
   "notify.stacker.invalid_offset": "Неверное смещение стака",
   "notify.stacker.invalid_target": "Нужно выбрать верный проп для стака",

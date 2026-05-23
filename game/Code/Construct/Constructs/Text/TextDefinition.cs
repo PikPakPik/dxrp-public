@@ -62,15 +62,10 @@ public class TextDefinition : ConstructDefinition<Text, TextData>
 		if ( lines.Count > MaxLines )
 			return ConstructDataValidationResult.Failure( $"Maximum {MaxLines} text lines allowed" );
 
-		// Empty lines are allowed — they are simply skipped at render time.
-		// Only validate lines that have content.
-		bool hasContent = false;
-
+		// Empty lines are allowed — they are skipped at render time and show the "Hello! ❤" fallback.
 		foreach ( var line in lines )
 		{
 			if ( string.IsNullOrEmpty( line.Text ) ) continue;
-
-			hasContent = true;
 
 			if ( line.Text.Length > MaxTextLength )
 				return ConstructDataValidationResult.Failure( $"Text exceeds maximum of {MaxTextLength} characters" );
@@ -93,9 +88,6 @@ public class TextDefinition : ConstructDefinition<Text, TextData>
 			if ( line.FontWeight > MaxFontWeight )
 				return ConstructDataValidationResult.Failure( $"Font weight exceeds maximum of {MaxFontWeight}" );
 		}
-
-		if ( !hasContent )
-			return ConstructDataValidationResult.Failure( "At least one line must have text" );
 
 		return ConstructDataValidationResult.Success();
 	}

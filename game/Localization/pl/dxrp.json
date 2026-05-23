@@ -924,6 +924,7 @@
   "notify.construct.not_found": "Nie można znaleźć konstrukcji",
   "notify.construct.limit": "Osiągnięto limit",
   "notify.construct.blocked_by_player": "Tworzenie zablokowane przez gracza w okolicy",
+  "notify.construct.text_empty": "Co najmniej jedna linia musi zawierać tekst",
   "notify.stacker.invalid_count": "Nieprawidłowa liczba stosów",
   "notify.stacker.invalid_offset": "Nieprawidłowe przesunięcie stosu",
   "notify.stacker.invalid_target": "Musisz celować w prawidłowy obiekt, aby go ułożyć",
