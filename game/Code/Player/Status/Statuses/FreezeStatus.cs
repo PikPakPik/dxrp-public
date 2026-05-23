@@ -20,11 +20,7 @@ public class FreezeStatus : BaseStatus
 	{
 		player.CantSwitch = true;
 
-		// Block all movement
-		player.Controller.WalkSpeed = 0f;
-		player.Controller.RunSpeed = 0f;
-		player.Controller.DuckedSpeed = 0f;
-		player.Controller.JumpSpeed = 0f;
+		ApplyFreeze( player );
 	}
 
 	public override void OnRemovedOwner( Player player )
@@ -36,6 +32,11 @@ public class FreezeStatus : BaseStatus
 		player.Controller.RunSpeed = GameConfig.RunSpeed;
 		player.Controller.DuckedSpeed = GameConfig.DuckedSpeed;
 		player.Controller.JumpSpeed = GameConfig.JumpSpeed;
+	}
+
+	public override void OnUpdateOwner( Player player )
+	{
+		ApplyFreeze( player );
 	}
 
 	public override void OnAddedBroadcast( Player player )
@@ -51,6 +52,23 @@ public class FreezeStatus : BaseStatus
 		if ( player.AnimationHelper.IsValid() )
 		{
 			player.AnimationHelper.HoldTypePose = 0;
+		}
+	}
+
+	private static void ApplyFreeze( Player player )
+	{
+		player.CantSwitch = true;
+
+		player.Controller.WalkSpeed = 0f;
+		player.Controller.RunSpeed = 0f;
+		player.Controller.DuckedSpeed = 0f;
+		player.Controller.JumpSpeed = 0f;
+		player.Controller.WishVelocity = Vector3.Zero;
+		player.Controller.GroundVelocity = Vector3.Zero;
+
+		if ( player.Controller.Body.IsValid() )
+		{
+			player.Controller.Body.Velocity = Vector3.Zero;
 		}
 	}
 }
