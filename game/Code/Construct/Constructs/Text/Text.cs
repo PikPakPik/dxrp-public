@@ -16,8 +16,8 @@ public sealed class Text() : BaseConstruct( ConstructType.Text )
 
 	protected override void OnDataChanged( IConstructData oldData, IConstructData newData )
 	{
-		var textData = newData is TextData data ? data : default;
-		var oldTextData = oldData is TextData old ? old : default;
+		var textData = newData is TextData data ? data : new TextData();
+		var oldTextData = oldData is TextData old ? old : new TextData();
 		var lines = textData.Lines ?? new List<TextLineData> { new() };
 
 		GameObject.Name = $"Text ({lines[0].Text})";

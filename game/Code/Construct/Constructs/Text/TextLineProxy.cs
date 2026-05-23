@@ -1,9 +1,5 @@
 namespace Dxura.RP.Game.Tools;
 
-/// <summary>
-/// Helper class with [Property] attributes for each TextLineData field.
-/// Used by TextToolInspector to render per-line controls via TypeLibrary.GetSerializedObject.
-/// </summary>
 public class TextLineProxy( TextTool tool, int index )
 {
 	[Property]
@@ -43,6 +39,7 @@ public class TextLineProxy( TextTool tool, int index )
 	[Property]
 	[Title( "Font Weight" )]
 	[Range( TextDefinition.MinFontWeight, TextDefinition.MaxFontWeight )]
+	[Step( 100 )]
 	public int FontWeight
 	{
 		get => tool.GetLine( index ).FontWeight;

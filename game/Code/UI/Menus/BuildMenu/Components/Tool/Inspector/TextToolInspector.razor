@@ -163,7 +163,8 @@
 
 	protected override int BuildHash()
 	{
-		return ( ToolEquipment?.CurrentTool as TextTool )?.LineCount ?? 0;
+		var tool = ToolEquipment?.CurrentTool as TextTool;
+		return HashCode.Combine( tool?.LineCount ?? 0, tool?.SelectedLine ?? 0 );
 	}
 
 	private void SelectLine( TextTool tool, int index )

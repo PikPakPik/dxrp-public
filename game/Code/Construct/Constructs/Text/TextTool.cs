@@ -41,7 +41,6 @@ public class TextTool() : BaseConstructTool<TextData>( ConstructType.Text )
 
 		var newLines = new List<TextLineData>( Lines ) { new TextLineData() };
 		Data = Data with { Lines = newLines };
-		_proxies.Add( new TextLineProxy( this, _proxies.Count ) );
 	}
 
 	public void RemoveLine( int index )
@@ -51,9 +50,7 @@ public class TextTool() : BaseConstructTool<TextData>( ConstructType.Text )
 		var newLines = new List<TextLineData>( Lines );
 		newLines.RemoveAt( index );
 		Data = Data with { Lines = newLines };
-
-		if ( _proxies.Count > 0 )
-			_proxies.RemoveAt( _proxies.Count - 1 );
+		_proxies.Clear();
 	}
 
 	public TextLineProxy GetLineProxy( int index )
