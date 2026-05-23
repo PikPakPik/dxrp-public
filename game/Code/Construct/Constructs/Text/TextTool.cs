@@ -5,6 +5,9 @@ public class TextTool() : BaseConstructTool<TextData>( ConstructType.Text )
 {
 	protected override bool FlatSurface => true;
 
+	protected override TextData GetPreviewDisplayData() =>
+		string.IsNullOrEmpty( Data.Text ) ? Data with { Text = "Hello! ❤" } : Data;
+
 	[Property]
 	[Title( "Text" )]
 	[Range( TextDefinition.MinTextLength, TextDefinition.MaxTextLength )]
