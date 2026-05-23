@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Dxura.RP.Shared;
 namespace Dxura.RP.Game;
 
@@ -51,6 +52,8 @@ public abstract class ConstructDefinition<TConstruct, TData> : IConstructDefinit
 
 		return construct;
 	}
+
+	public virtual IConstructData? Migrate( uint fromVersion, JsonElement data, ConstructDataSerializer serializer ) => null;
 
 	protected virtual bool CanOwnerPlace( long owner ) => true;
 	protected abstract ConstructDataValidationResult ValidateTyped( TData data );

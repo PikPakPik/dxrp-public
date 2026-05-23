@@ -5,6 +5,8 @@ public class TextTool() : BaseConstructTool<TextData>( ConstructType.Text )
 {
 	protected override bool FlatSurface => true;
 
+	private readonly List<TextLineProxy> _proxies = new();
+
 	protected override TextData GetPreviewDisplayData()
 	{
 		if ( !string.IsNullOrEmpty( Data.Text ) ) return Data;
@@ -12,96 +14,58 @@ public class TextTool() : BaseConstructTool<TextData>( ConstructType.Text )
 		return Data with { Text = string.Format( Language.GetPhrase( "tool.text.preview_placeholder" ), key ) };
 	}
 
-	[Property]
-	[Title( "Text" )]
-	[Range( TextDefinition.MinTextLength, TextDefinition.MaxTextLength )]
-	public string Text
+	public int SelectedLine { get; set; } = 0;
+
+	public List<TextLineData> Lines => Data.Lines ?? new List<TextLineData> { new() };
+	public int LineCount => Lines.Count;
+
+	public TextLineData GetLine( int index )
 	{
-		get => Data.Text;
-		set => Data = Data with
-		{
-			Text = value
-		};
+		var lines = Lines;
+		return index >= 0 && index < lines.Count ? lines[index] : new TextLineData();
 	}
 
-	[Property]
-	[Title( "Size" )]
-	[Range( TextDefinition.MinFontSize, TextDefinition.MaxFontSize )]
-	public float Size
+	public void UpdateLine( int index, TextLineData line )
 	{
-		get => Data.FontSize;
-		set => Data = Data with
+		var newLines = new List<TextLineData>( Lines );
+		if ( index >= 0 && index < newLines.Count )
 		{
-			FontSize = value
-		};
+			newLines[index] = line;
+			Data = Data with { Lines = newLines };
+		}
 	}
 
-	[Property]
-	[Title( "Color" )]
-	public Color Color
+	public void AddLine()
 	{
-		get => Data.Color;
-		set => Data = Data with
-		{
-			Color = value
-		};
+		if ( LineCount >= TextDefinition.MaxLines ) return;
+
+		var newLines = new List<TextLineData>( Lines ) { new TextLineData() };
+		Data = Data with { Lines = newLines };
+		_proxies.Add( new TextLineProxy( this, _proxies.Count ) );
 	}
 
-	[Property]
-	[Title( "Italic" )]
-	public bool Italic
+	public void RemoveLine( int index )
 	{
-		get => Data.Italic;
-		set => Data = Data with
-		{
-			Italic = value
-		};
+		if ( LineCount <= 1 || index < 0 || index >= LineCount ) return;
+
+		var newLines = new List<TextLineData>( Lines );
+		newLines.RemoveAt( index );
+		Data = Data with { Lines = newLines };
+
+		if ( _proxies.Count > 0 )
+			_proxies.RemoveAt( _proxies.Count - 1 );
 	}
 
-	[Property]
-	[Title( "Font Weight" )]
-	[Range( TextDefinition.MinFontWeight, TextDefinition.MaxFontWeight )]
-	public int FontWeight
+	public TextLineProxy GetLineProxy( int index )
 	{
-		get => Data.FontWeight;
-		set => Data = Data with
-		{
-			FontWeight = value
-		};
+		while ( _proxies.Count <= index )
+			_proxies.Add( new TextLineProxy( this, _proxies.Count ) );
+		return _proxies[index];
 	}
 
-	[Property]
-	[Title( "Outline" )]
-	public bool Outline
+	public void ResetLines()
 	{
-		get => Data.Outline;
-		set => Data = Data with
-		{
-			Outline = value
-		};
-	}
-
-	[Property]
-	[Title( "Outline Color" )]
-	public Color OutlineColor
-	{
-		get => Data.OutlineColor;
-		set => Data = Data with
-		{
-			OutlineColor = value
-		};
-	}
-
-	[Property]
-	[Title( "Outline Size" )]
-	[Range( TextDefinition.MinOutlineSize, TextDefinition.MaxOutlineSize )]
-	[Step( 1 )]
-	public float OutlineSize
-	{
-		get => Data.OutlineSize;
-		set => Data = Data with
-		{
-			OutlineSize = value
-		};
+		Data = new TextData();
+		_proxies.Clear();
 	}
 }

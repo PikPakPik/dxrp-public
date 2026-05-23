@@ -1,0 +1,191 @@
+@inherits Panel
+@using Dxura.RP.Game.Equipments
+@using Dxura.RP.Game.Tools
+@using Sandbox.UI
+@implements IToolInspector
+@namespace Dxura.RP.Game.UI
+@attribute [StyleSheet]
+@attribute [ToolInspector( typeof(TextTool) )]
+
+<root>
+
+	@if ( ToolEquipment == null || ToolEquipment.CurrentTool is not TextTool textTool ) return;
+
+	<label class="header">@textTool.GetName()</label>
+
+	<div class="tabs">
+		@foreach ( var idx in Enumerable.Range( 0, textTool.LineCount ) )
+		{
+			var i = idx;
+			<div class="tab-btn @( textTool.SelectedLine == i ? "active" : "" )"
+			     @onclick="@(() => SelectLine( textTool, i ))">
+				Line @( i + 1 )
+			</div>
+		}
+		<div style="flex: 1;"></div>
+		<div class="tab-action @( textTool.LineCount >= TextDefinition.MaxLines ? "disabled" : "" )"
+		     @onclick="@(() => AddLine( textTool ))">
+			+
+		</div>
+		<div class="tab-action danger @( textTool.LineCount <= 1 ? "disabled" : "" )"
+		     @onclick="@(() => RemoveSelectedLine( textTool ))">
+			−
+		</div>
+	</div>
+
+	<div class="content" style="padding-bottom: 60px;">
+		@{
+			var proxy = textTool.GetLineProxy( textTool.SelectedLine );
+		}
+		<div class="controls">
+			@foreach ( var property in TypeLibrary.GetSerializedObject( proxy ) )
+			{
+				if ( !property.HasAttribute<PropertyAttribute>() ) continue;
+				property.TryGetAttribute<TitleAttribute>( out var title );
+				var name = title?.Value ?? property.Name;
+
+				@if ( property.PropertyType == typeof(float) )
+				{
+					<div class="control control-column">
+						<div class="control-label-top">
+							<p>@( name )</p>
+						</div>
+						@{
+							property.TryGetAttribute<RangeAttribute>( out var range );
+							property.TryGetAttribute<StepAttribute>( out var step );
+						}
+						<div class="control-input-row">
+							<SliderControl Min=@( range?.Min ?? 0 ) Max=@( range?.Max ?? 1 ) Step=@( step?.Step ?? 0.01f )
+							               Value="@( property.GetValue<float>() )"
+							               OnValueChanged=@( ( float value ) => { property.SetValue( value ); } )
+							               ShowTextEntry=@( false )
+							               style="flex: 1; min-width: 50px;" />
+							<TextEntry
+								Value="@( property.GetValue<float>().ToString("F2") )"
+								class="text-tertiary"
+								style="width: 60px; flex-shrink: 0;"
+								OnTextEdited=@( ( string value ) => {
+									if ( float.TryParse( value, out var floatValue ) )
+									{
+										if ( range != null ) floatValue = Math.Clamp( floatValue, range.Min, range.Max );
+										property.SetValue( floatValue );
+									}
+								} ) />
+						</div>
+					</div>
+				}
+				else if ( property.PropertyType == typeof(int) )
+				{
+					<div class="control control-column">
+						<div class="control-label-top">
+							<p>@( name )</p>
+						</div>
+						@{
+							property.TryGetAttribute<RangeAttribute>( out var range );
+							property.TryGetAttribute<StepAttribute>( out var step );
+						}
+						<div class="control-input-row">
+							<SliderControl Min=@( range?.Min ?? 0 ) Max=@( range?.Max ?? 1 ) Step=@( step?.Step ?? 0.01f )
+							               Value="@( property.GetValue<int>() )"
+							               OnValueChanged=@( ( float value ) => { property.SetValue( (int)value ); } )
+							               ShowTextEntry=@( false )
+							               style="flex: 1; min-width: 50px;" />
+							<TextEntry
+								Value="@( property.GetValue<int>().ToString() )"
+								class="text-tertiary"
+								style="width: 60px; flex-shrink: 0;"
+								OnTextEdited=@( ( string value ) => {
+									if ( int.TryParse( value, out var intValue ) )
+									{
+										if ( range != null ) intValue = Math.Clamp( intValue, (int)range.Min, (int)range.Max );
+										property.SetValue( intValue );
+									}
+								} ) />
+						</div>
+					</div>
+				}
+				else if ( property.PropertyType == typeof(bool) )
+				{
+					<div class="control control-inline">
+						<div class="control-label-inline">
+							<p>@( name )</p><span class="colon">:</span>
+						</div>
+						<div class="control-input-inline">
+							<SwitchControl Value="@( property.GetValue<bool>() )" OnValueChanged=@( ( bool _value ) => { property.SetValue( _value ); } ) />
+						</div>
+					</div>
+				}
+				else if ( property.PropertyType == typeof(Color) )
+				{
+					<div class="control control-inline">
+						<div class="control-label-inline">
+							<p>@( name )</p><span class="colon">:</span>
+						</div>
+						<div class="control-input-inline">
+							<ColorControl Property=@property />
+						</div>
+					</div>
+				}
+				else if ( property.PropertyType == typeof(string) )
+				{
+					<div class="control control-column">
+						<div class="control-label-top">
+							<p>@( name )</p>
+						</div>
+						@{
+							property.TryGetAttribute<RangeAttribute>( out var range );
+						}
+						<div class="control-input-full">
+							<TextEntry class="text-tertiary"
+							           style="width: 100%;"
+							           MaxLength="@( range?.Max.CeilToInt() ?? Config.Current.Game.DefaultTextEntryMaxLength )"
+							           Value="@( property.GetValue<string>() )"
+							           OnTextEdited=@( ( string value ) => { property.SetValue( value ); } ) />
+						</div>
+					</div>
+				}
+			}
+		</div>
+	</div>
+
+	<div class="bottom-actions">
+		<button class="btn btn-secondary" style="width: 200px;"
+		        @onclick="@(() => { textTool.ResetLines(); textTool.SelectedLine = 0; ToolMenu.Instance?.UpdateInspector(); })">
+			<span>#tool.inspector.reset_settings</span>
+		</button>
+	</div>
+
+</root>
+
+@code
+{
+	public ToolEquipment? ToolEquipment { get; set; }
+
+	protected override int BuildHash()
+	{
+		return ( ToolEquipment?.CurrentTool as TextTool )?.LineCount ?? 0;
+	}
+
+	private void SelectLine( TextTool tool, int index )
+	{
+		tool.SelectedLine = index;
+		ToolMenu.Instance?.UpdateInspector();
+	}
+
+	private void AddLine( TextTool tool )
+	{
+		if ( tool.LineCount >= TextDefinition.MaxLines ) return;
+		tool.AddLine();
+		tool.SelectedLine = tool.LineCount - 1;
+		ToolMenu.Instance?.UpdateInspector();
+	}
+
+	private void RemoveSelectedLine( TextTool tool )
+	{
+		if ( tool.LineCount <= 1 ) return;
+		tool.RemoveLine( tool.SelectedLine );
+		if ( tool.SelectedLine >= tool.LineCount )
+			tool.SelectedLine = tool.LineCount - 1;
+		ToolMenu.Instance?.UpdateInspector();
+	}
+}
