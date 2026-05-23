@@ -46,11 +46,54 @@ public partial class Player
 
 	void IDamageEvents.OnModifyDamageTaken( Component victim, ref DamageInfo damageInfo )
 	{
+		if ( ApplyGovernanceDamageMultipliers( ref damageInfo ) )
+		{
+			return;
+		}
+
 		var multiplier = Status.Current.ModifyDamageTaken( this );
 		if ( multiplier < 1f )
 		{
 			damageInfo = damageInfo with { Damage = damageInfo.Damage * multiplier };
 		}
+	}
+
+	private bool ApplyGovernanceDamageMultipliers( ref DamageInfo damageInfo )
+	{
+		var attackerPlayer = GameUtils.GetPlayerFromComponent( damageInfo.Attacker );
+		if ( !attackerPlayer.IsValid() )
+		{
+			return false;
+		}
+
+		if ( Job.IsMayoralRole() && attackerPlayer.Job.IsPoliceRole() )
+		{
+			return ApplyDamageMultiplier( ref damageInfo, Config.Current.Game.GovernanceMayorPoliceDamageMultiplier );
+		}
+
+		if ( Job.IsPoliceRole() && attackerPlayer.Job.IsPoliceRole() )
+		{
+			return ApplyDamageMultiplier( ref damageInfo, Config.Current.Game.GovernancePoliceDamageMultiplier );
+		}
+
+		return false;
+	}
+
+	private static bool ApplyDamageMultiplier( ref DamageInfo damageInfo, float damageMultiplier )
+	{
+		var multiplier = MathF.Max( 0f, damageMultiplier );
+		if ( multiplier <= 0f )
+		{
+			DamageExtensions.ClearDamage( ref damageInfo );
+			return true;
+		}
+
+		if ( multiplier != 1f )
+		{
+			DamageExtensions.ScaleDamage( ref damageInfo, multiplier );
+		}
+
+		return false;
 	}
 
 	void IDamageEvents.OnDamageTakenHost( Component victim, DamageInfo damageInfo )
