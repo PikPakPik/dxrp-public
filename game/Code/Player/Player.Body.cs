@@ -4,6 +4,8 @@ namespace Dxura.RP.Game;
 
 public partial class Player
 {
+	private const Clothing.Slots HeadwearSlots = Clothing.Slots.HeadTop | Clothing.Slots.HeadBottom;
+
 	[Property] [Feature( "Body" )] public required GameObject BodyRoot { get; set; }
 	[Property] [Feature( "Body" )] public required GameObject HatRoot { get; set; }
 
@@ -141,7 +143,8 @@ public partial class Player
 		// 5: Apply job clothing (only if civilian job clothing is enabled or not a civilian job)
 		if ( DxCivilianJobClothing || !Job.IsInGroup( "civilian" ) )
 		{
-			Dresser.Clothing.AddRange( Job.GetClothingEntries() );
+			var shouldPreserveAvatarHat = DxPreferAvatarHat && HasHeadwear( userClothing.Clothing );
+			Dresser.Clothing.AddRange( GetVisibleJobClothing( shouldPreserveAvatarHat ) );
 		}
 
 		_ = ApplyClothingAsync();
@@ -186,4 +189,35 @@ public partial class Player
 
 	[ConVar( "dx_civilian_job_clothing", ConVarFlags.Saved )]
 	private static bool DxCivilianJobClothing { get; set; } = true;
+
+	[ConVar( "dx_prefer_avatar_hat", ConVarFlags.Saved )]
+	private static bool DxPreferAvatarHat { get; set; } = false;
+
+	private IEnumerable<ClothingContainer.ClothingEntry> GetVisibleJobClothing( bool preserveAvatarHat )
+	{
+		foreach ( var entry in Job.GetClothingEntries() )
+		{
+			if ( preserveAvatarHat && IsHeadwear( entry.Clothing ) )
+			{
+				continue;
+			}
+
+			yield return entry;
+		}
+	}
+
+	private static bool HasHeadwear( IEnumerable<ClothingContainer.ClothingEntry> entries )
+	{
+		return entries.Any( entry => IsHeadwear( entry.Clothing ) );
+	}
+
+	private static bool IsHeadwear( Clothing? clothing )
+	{
+		if ( clothing == null )
+		{
+			return false;
+		}
+
+		return (clothing.SlotsOver & HeadwearSlots) != 0 || (clothing.SlotsUnder & HeadwearSlots) != 0;
+	}
 }

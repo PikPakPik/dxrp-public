@@ -37,7 +37,14 @@
 	<div class="flex gap-2">
 		<p class="text-base">#settings.misc.civilian_clothing</p>
 		<SwitchControl Value="@( bool.Parse(ConsoleSystem.GetValue( "dx_civilian_job_clothing")) )" 
-		               OnValueChanged=@( ( bool value ) => { ConsoleSystem.SetValue( "dx_civilian_job_clothing", value); } 
+		               OnValueChanged=@( ( bool value ) => { ApplyClothingSetting( "dx_civilian_job_clothing", value ); } 
+		                              )/>
+	</div>
+
+	<div class="flex gap-2">
+		<p class="text-base">#settings.misc.prefer_avatar_hat</p>
+		<SwitchControl Value="@( bool.Parse(ConsoleSystem.GetValue( "dx_prefer_avatar_hat", "false")) )"
+		               OnValueChanged=@( ( bool value ) => { ApplyClothingSetting( "dx_prefer_avatar_hat", value ); }
 		                              )/>
 	</div>
 	
@@ -61,3 +68,19 @@
 
 
 </root>
+
+@code
+{
+	private static void ApplyClothingSetting( string setting, bool value )
+	{
+		ConsoleSystem.SetValue( setting, value );
+
+		foreach ( var player in GameUtils.Players )
+		{
+			if ( player.IsValid() )
+			{
+				player.ApplyClothing();
+			}
+		}
+	}
+}
