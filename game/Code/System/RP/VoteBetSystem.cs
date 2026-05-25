@@ -155,7 +155,7 @@ public class VoteBetSystem : SingletonComponent<VoteBetSystem>
 				return;
 			}
 
-			if ( caller.BankBalance + caller.WalletBalance < betAmount )
+			if ( (ulong)caller.BankBalance + caller.WalletBalance < betAmount )
 			{
 				caller.SendMessage( "#notify.cash.poor" );
 				return;

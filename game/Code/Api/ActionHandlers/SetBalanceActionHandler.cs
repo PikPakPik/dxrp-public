@@ -11,7 +11,7 @@ public class SetBalanceActionHandler : ActionHandler<SetBalanceActionDto>
 			return;
 		}
 
-		player.SetBankBalanceHost( action.Balance );
+		_ = player.SetBankBalanceHost( action.Balance );
 		Log.Info( $"Set balance for {player.DisplayName} ({player.SteamId}) to ${action.Balance}" );
 	}
 }
