@@ -14,6 +14,9 @@ public class EmoteResource : GameResource
 	[Property] [Category( "Animation" )]
 	public float Duration { get; set; } = 3f;
 
+	[Property] [Category( "Animation" )]
+	public bool HoldLastFrame { get; set; } = false;
+
 	[Property] [Category( "Behaviour" )]
 	public bool CancelOnMove { get; set; } = true;
 

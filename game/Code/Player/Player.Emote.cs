@@ -128,7 +128,7 @@ public partial class Player
 				_emotePositionCheck = 1f;
 			}
 
-			if ( !CurrentEmote.Repeat && _emoteTimeRemaining <= 0 )
+			if ( !CurrentEmote.Repeat && !CurrentEmote.HoldLastFrame && _emoteTimeRemaining <= 0 )
 			{
 				StopEmoteHost();
 			}
