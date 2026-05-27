@@ -10,6 +10,7 @@ public class CloakStatus : BaseStatus
 	public override bool RemoveOnDeath => true;
 	public override bool RemoveOnRespawn => true;
 	public override bool RemoveOnJobChange => true;
+	public override float ModifyDamageTaken( Player player ) => 0f;
 
 	public override void OnAddedBroadcast( Player player )
 	{
