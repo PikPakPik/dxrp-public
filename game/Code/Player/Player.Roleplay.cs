@@ -115,7 +115,7 @@ public partial class Player
 				}
 				else
 				{
-					if ( BankBalance + WalletBalance < amount )
+					if ( (ulong)BankBalance + WalletBalance < amount )
 					{
 						this.Error( "#notify.cash.poor" );
 						return false;
@@ -127,6 +127,12 @@ public partial class Player
 					didCharge = await ServerApiClient.ModifyPlayerBalance( SteamId, -(int)bankPortion, $"{reason} (${amount} total, ${walletPortion} from wallet)" );
 					if ( didCharge )
 					{
+						if ( WalletBalance < walletPortion )
+						{
+							_ = ServerApiClient.ModifyPlayerBalance( SteamId, (int)bankPortion, $"Refund: wallet balance changed during charge ({reason})" );
+							return false;
+						}
+
 						BankBalance -= bankPortion;
 						WalletBalance -= walletPortion;
 						this.Money( -(int)bankPortion, true );
@@ -183,6 +189,12 @@ public partial class Player
 
 			if ( inBank ) // Deposit directly into bank
 			{
+				if ( uint.MaxValue - BankBalance < amount )
+				{
+					this.Error( "#generic.error" );
+					return false;
+				}
+
 				if ( await ServerApiClient.ModifyPlayerBalance( SteamId, (int)amount, reason ) )
 				{
 					didPay = true;
@@ -192,6 +204,12 @@ public partial class Player
 			}
 			else // Pay into wallet
 			{
+				if ( uint.MaxValue - WalletBalance < amount )
+				{
+					this.Error( "#generic.error" );
+					return false;
+				}
+
 				WalletBalance += amount;
 				didPay = true;
 				this.Money( (int)amount );
@@ -248,23 +266,59 @@ public partial class Player
 
 			await GameTask.MainThread();
 
-			BankBalance = initResponse.Balance;
+			await _transactionLock.WaitAsync();
+			try
+			{
+				BankBalance = initResponse.Balance;
+			}
+			finally
+			{
+				_transactionLock.Release();
+			}
+
 			Level = initResponse.Level;
 			PlayTime = initResponse.Playtime;
 		} );
 	}
 
-	public void ClearWalletHost()
+	public async Task<uint> ClearWalletHost()
 	{
 		Assert.True( Networking.IsHost );
-		this.Money( -(int)WalletBalance );
-		WalletBalance = 0;
+		await _transactionLock.WaitAsync();
+		try
+		{
+			var amount = WalletBalance;
+			this.Money( -(int)WalletBalance );
+			WalletBalance = 0;
+			return amount;
+		}
+		finally
+		{
+			_transactionLock.Release();
+		}
 	}
 
-	public void SetBankBalanceHost( uint balance )
+	public async Task ClearWalletAndDropHost( Vector3 position, string reason )
+	{
+		var amount = await ClearWalletHost();
+		if ( amount > 0 )
+		{
+			GameManager.Instance.DropMoneyHost( amount, position, reason );
+		}
+	}
+
+	public async Task SetBankBalanceHost( uint balance )
 	{
 		Assert.True( Networking.IsHost );
-		BankBalance = balance;
+		await _transactionLock.WaitAsync();
+		try
+		{
+			BankBalance = balance;
+		}
+		finally
+		{
+			_transactionLock.Release();
+		}
 	}
 
 	private bool CanSit()

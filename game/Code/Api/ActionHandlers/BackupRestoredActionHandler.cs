@@ -17,7 +17,7 @@ public class BackupRestoredActionHandler : ActionHandler<BackupRestoredActionDto
 			var player = GameUtils.GetPlayerById( data.PlayerId );
 			if ( !player.IsValid() ) continue;
 
-			player.SetBankBalanceHost( data.Balance );
+			_ = player.SetBankBalanceHost( data.Balance );
 
 			if ( data.Level.HasValue )
 				player.Level = data.Level.Value;

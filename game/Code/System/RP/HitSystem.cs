@@ -271,7 +271,7 @@ public class HitSystem : SingletonComponent<HitSystem>, IGameEvents
 		NotifyRequestRemoved( hitman.SteamId, req.Id );
 
 		var requester = GameUtils.GetPlayerById( req.RequesterSteamId );
-		if ( !requester.IsValid() || requester.WalletBalance + requester.BankBalance < req.Price )
+		if ( !requester.IsValid() || (ulong)requester.WalletBalance + requester.BankBalance < req.Price )
 		{
 			_hitmenAcceptingRequests.Remove( hitman.SteamId );
 			return;

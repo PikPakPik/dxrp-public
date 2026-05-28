@@ -233,9 +233,7 @@ public partial class Player : IDescription
 		// Drop wallet on job change
 		if ( Networking.IsHost && WalletBalance > 0 && Config.Current.Game.DropWalletOnJobChange && !Restricted )
 		{
-			var moneyToDrop = WalletBalance;
-			ClearWalletHost();
-			GameManager.Instance.DropMoneyHost( moneyToDrop, WorldPosition + Vector3.Up * 30f, $"Job change: {SteamName} ({SteamId})" );
+			_ = ClearWalletAndDropHost( WorldPosition + Vector3.Up * 30f, $"Job change: {SteamName} ({SteamId})" );
 		}
 
 		var handler = JobChangedSound.Play( WorldPosition );
@@ -379,11 +377,9 @@ public partial class Player : IDescription
 		}
 
 		// Drop money if the player has any
-		var moneyToDrop = WalletBalance;
-		if ( moneyToDrop != 0 && !Restricted )
+		if ( WalletBalance != 0 && !Restricted )
 		{
-			ClearWalletHost();
-			GameManager.Instance.DropMoneyHost( moneyToDrop, WorldPosition + Vector3.Up * 30f, $"Player disconnect: {SteamName} ({SteamId})" );
+			_ = ClearWalletAndDropHost( WorldPosition + Vector3.Up * 30f, $"Player disconnect: {SteamName} ({SteamId})" );
 		}
 	}
 
