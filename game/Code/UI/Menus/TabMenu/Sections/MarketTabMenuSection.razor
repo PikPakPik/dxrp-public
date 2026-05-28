@@ -109,13 +109,19 @@
 
 	private string GetLimitText( GameModeMarketItemDto item )
 	{
-		if ( !Player.Local.IsValid() || item.Limit <= 0 )
+		var limit = item.Type switch
+		{
+			GameModeMarketItemType.Equipment => GameModeMarketItems.ResolveEquipment( item )?.Limit ?? 0,
+			GameModeMarketItemType.Entity => GameModeMarketItems.ResolveEntity( item )?.Limit ?? 0,
+			_ => 0
+		};
+		if ( !Player.Local.IsValid() || limit <= 0 )
 		{
 			return "Unlimited";
 		}
 
 		var owned = GameModeMarketItems.GetOwnedCount( Player.Local, item );
-		return $"{owned}/{item.Limit}";
+		return $"{owned}/{limit}";
 	}
 
 	private string GetPriceText( GameModeMarketItemDto item )

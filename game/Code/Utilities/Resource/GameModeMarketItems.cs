@@ -172,7 +172,8 @@ public static class GameModeMarketItems
 			}
 		}
 
-		return item.Type != GameModeMarketItemType.Equipment || item.Limit <= 0 || GetOwnedCount( player, item ) < item.Limit;
+		var equipmentLimit = ResolveEquipment( item )?.Limit ?? 0;
+		return item.Type != GameModeMarketItemType.Equipment || equipmentLimit <= 0 || GetOwnedCount( player, item ) < equipmentLimit;
 	}
 
 	private static string GetEquipmentDisplayName( GameModeEquipmentDto equipment, int quantity )
