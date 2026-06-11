@@ -48,10 +48,7 @@ public partial class Prop() : BaseConstruct( ConstructType.Prop ), IDamageEvents
 			SetTint( newPropData.Tint );
 		}
 
-		if ( oldPropData.Scale != newPropData.Scale )
-		{
-			SetScale( newPropData.Scale );
-		}
+		SetScale( newPropData.Scale, oldPropData.Scale != newPropData.Scale );
 
 		SetNoCollide( newPropData.NoCollide, oldPropData.NoCollide != newPropData.NoCollide );
 
