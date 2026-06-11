@@ -1,0 +1,32 @@
+@import "../../styles.scss";
+
+NoclipSpeedOverlay {
+  position: absolute;
+  bottom: 4%;
+  right: 1%;
+
+  .speed-container {
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  .speed-icon {
+    font-size: 20px;
+    color: $color-accent;
+    opacity: 0.9;
+  }
+
+  .speed-label {
+    font-size: 11px;
+    color: rgba(white, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .speed-value {
+    font-size: 18px;
+    font-weight: bold;
+    font-family: monospace;
+    color: $color-accent;
+  }
+}

@@ -1,0 +1,36 @@
+@namespace Dxura.RP.Game.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@{
+	var noclip = Player.Local?.Controller?.Components.Get<MoveModeNoClip>();
+	if ( noclip == null || !noclip.IsNoclipping || noclip.TimeSinceSpeedChanged > 2f )
+		return;
+}
+
+<root>
+	<div class="speed-container flex items-center gap-3 rounded px-3 py-2">
+		<i class="material-icons speed-icon">speed</i>
+		<div class="flex flex-col">
+			<span class="speed-label">Noclip Speed</span>
+			<span class="speed-value">×@noclip.SpeedScale.ToString( "0.00" )</span>
+		</div>
+		<div class="flex flex-col gap-1">
+			<div class="flex items-center gap-1">
+				<InputHint Action="NoclipSpeedUp" Size="@InputGlyphSize.Small" Animate="@false"/>
+			</div>
+			<div class="flex items-center gap-1">
+				<InputHint Action="NoclipSpeedDown" Size="@InputGlyphSize.Small" Animate="@false"/>
+			</div>
+		</div>
+	</div>
+</root>
+
+@code
+{
+	protected override int BuildHash()
+	{
+		var noclip = Player.Local?.Controller?.Components.Get<MoveModeNoClip>();
+		return HashCode.Combine( noclip?.IsNoclipping, noclip?.SpeedScale, noclip?.TimeSinceSpeedChanged > 2f );
+	}
+}
