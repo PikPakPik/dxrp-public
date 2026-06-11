@@ -543,7 +543,7 @@
 		var angle = index / (float)Slots.Count * MathF.PI * 2f - MathF.PI / 2f;
 		var x = MathF.Cos( angle ) * WheelRadius;
 		var y = MathF.Sin( angle ) * WheelRadius;
-		return $"left: 50%; top: 50%; margin-left: {x}px; margin-top: {y}px;";
+		return $"left: 50%; top: 50%; margin-left: {x:F2}px; margin-top: {y:F2}px;";
 	}
 
 	private void LockCamera()
