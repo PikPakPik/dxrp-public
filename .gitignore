@@ -466,3 +466,9 @@ game/.vscode/
 dxrp-server-config.json
 
 dxrp-private*
+
+game/Code/rpdev.csproj
+
+game/Editor/rpdev.editor.csproj
+
+game/rpdev.slnx
