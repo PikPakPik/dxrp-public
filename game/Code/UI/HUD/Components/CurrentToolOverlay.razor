@@ -27,7 +27,7 @@
 
 @code
 {
-    bool IsToolEquipped => Player.Local.IsValid() && Player.Local.CurrentEquipment?.Identifier == "tool";
+    bool IsToolEquipped => Player.Local.IsValid() && GameModeEquipments.IsTool( Player.Local.CurrentEquipment?.Resource );
     private BaseTool? CurrentTool => BaseTool.CurrentTool;
 
     protected override int BuildHash()
