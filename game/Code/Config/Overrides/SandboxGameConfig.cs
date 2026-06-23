@@ -40,6 +40,8 @@ public class SandboxGameConfig : GameConfig
 	public override bool GovernanceLockdownEnabled { get; set; } = false;
 	public override bool GovernanceJailEnabled { get; set; } = false;
 	public override bool GovernanceMayorAnnounceEnabled { get; set; } = false;
+	public override float GovernanceMayorPoliceDamageMultiplier { get; set; } = 1f;
+	public override float GovernancePoliceDamageMultiplier { get; set; } = 1f;
 	public override float GovernanceAnnouncementDuration { get; set; } = 0f;
 
 	// Minigames

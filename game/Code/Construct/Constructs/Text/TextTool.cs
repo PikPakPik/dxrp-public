@@ -5,6 +5,13 @@ public class TextTool() : BaseConstructTool<TextData>( ConstructType.Text )
 {
 	protected override bool FlatSurface => true;
 
+	protected override TextData GetPreviewDisplayData()
+	{
+		if ( !string.IsNullOrEmpty( Data.Text ) ) return Data;
+		var key = Input.GetButtonOrigin( "BuildMenu" );
+		return Data with { Text = string.Format( Language.GetPhrase( "tool.text.preview_placeholder" ), key ) };
+	}
+
 	[Property]
 	[Title( "Text" )]
 	[Range( TextDefinition.MinTextLength, TextDefinition.MaxTextLength )]

@@ -65,7 +65,7 @@
         },
         "Scale": 1,
         "TextScope": {
-          "Text": "Hello! ❤",
+          "Text": "",
           "TextColor": "1,1,1,1",
           "FontName": "Poppins",
           "FontSize": 32,

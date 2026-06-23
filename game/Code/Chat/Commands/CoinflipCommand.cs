@@ -98,7 +98,7 @@ public class CoinflipCommand : ICommand
 			return;
 		}
 
-		if ( caller.BankBalance + caller.WalletBalance < amount )
+		if ( (ulong)caller.BankBalance + caller.WalletBalance < amount )
 		{
 			caller.SendMessage( "#notify.cash.poor" );
 			return;
@@ -140,7 +140,7 @@ public class CoinflipCommand : ICommand
 
 	private async Task JoinCoinflip( Player caller, CoinflipSession session, uint amount )
 	{
-		if ( caller.WalletBalance + caller.BankBalance < amount )
+		if ( (ulong)caller.WalletBalance + caller.BankBalance < amount )
 		{
 			caller.SendMessage( "#notify.cash.poor" );
 			return;

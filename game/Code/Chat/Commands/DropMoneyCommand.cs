@@ -30,7 +30,7 @@ public class DropMoneyCommand : ICommand
 
 		if ( Config.Current.Game.MoneyEnabled )
 		{
-			var available = useBankForExcess ? caller.WalletBalance + caller.BankBalance : caller.WalletBalance;
+			var available = useBankForExcess ? (ulong)caller.WalletBalance + caller.BankBalance : caller.WalletBalance;
 			if ( available < amount )
 			{
 				caller.Error( "#notify.cash.poor" );
@@ -68,6 +68,11 @@ public class DropMoneyCommand : ICommand
 			}
 
 			charged = await caller.ChargeHost( bankPortion, "Drop Money (bank)", true );
+
+			if ( !charged && walletPortion > 0 )
+			{
+				await caller.PayHost( walletPortion, "Drop Money (wallet refund)" );
+			}
 		}
 		else
 		{

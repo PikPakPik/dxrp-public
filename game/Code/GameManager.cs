@@ -107,9 +107,8 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 	}
 
 
-	public void OnPlayerKillHost( Player player )
+	public async void OnPlayerKillHost( Player player )
 	{
-		var moneyToDrop = player.WalletBalance;
 		var damageInfo = player.LastDamageInfo;
 		var attacker = damageInfo?.Attacker.IsValid() == true
 			? GameUtils.GetPlayerFromComponent( damageInfo.Attacker )
@@ -119,13 +118,14 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 
 		_ = ServerApiClient.Audit( "Death", description, player.SteamId );
 
-		if ( moneyToDrop == 0 || player.Restricted )
+		if ( player.WalletBalance == 0 || player.Restricted )
 		{
 			return;
 		}
 
-		player.ClearWalletHost();
-		DropMoneyHost( moneyToDrop, player.WorldPosition + Vector3.Up * 30f, $"Player killed: {player.SteamName} ({player.SteamId})" );
+		await player.ClearWalletAndDropHost(
+			player.WorldPosition + Vector3.Up * 30f,
+			$"Player killed: {player.SteamName} ({player.SteamId})" );
 	}
 
 	private static string BuildDeathAuditDescription( Player victim, Player? attacker, DamageInfo? damageInfo )

@@ -47,6 +47,14 @@ public class MoveModeNoClip : MoveMode
 
 	private Vector3.SmoothDamped _smoothedVelocity = new( 0.0f, 0.0f, 0.3f );
 
+	private float _speedScale = 1.0f;
+	private const float MinSpeedScale = 0.25f;
+	private const float MaxSpeedScale = 10.0f;
+	private const float SpeedStep = 0.25f;
+
+	public float SpeedScale => _speedScale;
+	public TimeSince TimeSinceSpeedChanged { get; private set; } = 99f;
+
 	/// <summary>
 	///     Indicates if the player is currently noclipping.
 	/// </summary>
@@ -68,6 +76,20 @@ public class MoveModeNoClip : MoveMode
 		if ( CanNoclip() && Input.Pressed( "Noclip" ) )
 		{
 			IsNoclipping = !IsNoclipping;
+		}
+
+		if ( IsNoclipping )
+		{
+			if ( Input.Pressed( "NoclipSpeedUp" ) )
+			{
+				_speedScale = Math.Clamp( _speedScale + SpeedStep, MinSpeedScale, MaxSpeedScale );
+				TimeSinceSpeedChanged = 0;
+			}
+			else if ( Input.Pressed( "NoclipSpeedDown" ) )
+			{
+				_speedScale = Math.Clamp( _speedScale - SpeedStep, MinSpeedScale, MaxSpeedScale );
+				TimeSinceSpeedChanged = 0;
+			}
 		}
 
 		return IsNoclipping ? 100 : 0;
@@ -137,13 +159,13 @@ public class MoveModeNoClip : MoveMode
 			wishVelocity += Vector3.Down * targetSpeed;
 		}
 
-		// Apply speed multiplier
-		wishVelocity *= SpeedMultiplier;
+		// Apply speed multiplier and scroll-adjusted scale
+		wishVelocity *= SpeedMultiplier * _speedScale;
 
 		// Apply speed limit
-		if ( wishVelocity.Length > MaxSpeed )
+		if ( wishVelocity.Length > MaxSpeed * _speedScale )
 		{
-			wishVelocity = wishVelocity.Normal * MaxSpeed;
+			wishVelocity = wishVelocity.Normal * MaxSpeed * _speedScale;
 		}
 
 		return wishVelocity;

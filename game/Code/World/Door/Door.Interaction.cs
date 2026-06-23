@@ -49,7 +49,7 @@ public partial class Door
 		}
 		else
 		{
-			if ( Config.Current.Game.MoneyEnabled && player.WalletBalance + player.BankBalance < Price )
+			if ( Config.Current.Game.MoneyEnabled && (ulong)player.WalletBalance + player.BankBalance < Price )
 			{
 				Notify.Error( "#notify.door.poor" );
 				return;

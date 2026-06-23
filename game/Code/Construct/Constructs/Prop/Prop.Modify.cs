@@ -159,9 +159,15 @@ public partial class Prop
 		ModelCollider.Elasticity = elasticity;
 	}
 
-	private void SetScale( Vector3 scale )
+	private void SetScale( Vector3 scale, bool change )
 	{
 		GameObject.WorldScale = scale;
+
+		if ( Networking.IsHost && change )
+		{
+			var collideGuard = GetOrAddComponent<CollideGuard>();
+			collideGuard.ResetTimer();
+		}
 	}
 
 	private void SetNoCollide( bool noCollide, bool change )

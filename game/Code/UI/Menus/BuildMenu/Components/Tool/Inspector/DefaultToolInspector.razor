@@ -184,6 +184,7 @@
 								           style="width: 100%;"
 								           MaxLength="@( range?.Max.CeilToInt() ?? Config.Current.Game.DefaultTextEntryMaxLength )"
 								           Value="@(property.GetValue<string>())"
+								           Placeholder="#tool.inspector.text_placeholder"
 								           OnTextEdited=@( ( string value ) => { property.SetValue( value ); } )
 								></TextEntry>
 							</div>

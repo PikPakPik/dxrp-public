@@ -218,7 +218,7 @@ public abstract class BaseConstructTool<TData>( ConstructType type ) : BaseTool
 			}
 		}
 
-		// Hide preview if no valid target
+		// Hide preview if no valid target or invalid data
 		if ( !hasValidTarget )
 		{
 			ClearPreview();
@@ -232,14 +232,15 @@ public abstract class BaseConstructTool<TData>( ConstructType type ) : BaseTool
 			ClearPreview();
 
 			_preview = CreatePreviewObject();
-			UpdatePreviewData( Data );
+			UpdatePreviewData( GetPreviewDisplayData() );
 		}
 
 		// Only update preview data if it has changed
-		var serializationResult = Construct.Current.Serializer.Serialize( type, Data );
+		var displayData = GetPreviewDisplayData();
+		var serializationResult = Construct.Current.Serializer.Serialize( type, displayData );
 		if ( serializationResult.IsSuccess && !serializationResult.Value.Equals( _lastPreviewDataJson ) )
 		{
-			UpdatePreviewData( Data, true );
+			UpdatePreviewData( displayData, true );
 		}
 	}
 
@@ -274,6 +275,8 @@ public abstract class BaseConstructTool<TData>( ConstructType type ) : BaseTool
 		return construct;
 	}
 
+	protected virtual TData GetPreviewDisplayData() => Data;
+
 	private void UpdatePreviewData( TData data, bool hideUi = false )
 	{
 		// If we have a preview, update its data
@@ -291,7 +294,7 @@ public abstract class BaseConstructTool<TData>( ConstructType type ) : BaseTool
 			return;
 		}
 
-		var serializationResult = Construct.Current.Serializer.Serialize( type, Data );
+		var serializationResult = Construct.Current.Serializer.Serialize( type, data );
 		if ( !serializationResult.IsSuccess )
 		{
 			return;

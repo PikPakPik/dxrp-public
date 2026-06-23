@@ -22,6 +22,7 @@ Exports/*
 *.los
 **/*launchSettings.json
 
+
 *idea
 
 ## Ignore Visual Studio temporary files, build results, and
@@ -463,3 +464,11 @@ game/.claude/
 game/.vscode/
 
 dxrp-server-config.json
+
+dxrp-private*
+
+game/Code/rpdev.csproj
+
+game/Editor/rpdev.editor.csproj
+
+game/rpdev.slnx
