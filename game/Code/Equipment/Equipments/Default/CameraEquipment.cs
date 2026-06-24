@@ -208,8 +208,6 @@ public class CameraEquipment : InputWeaponComponent, IEquipmentEvents
 
 	private async Task SharePhoto()
 	{
-		PhotoTakenSound.Broadcast( WorldPosition );
-
 		var texture = Texture.CreateRenderTarget().WithSize( 1920, 1080 ).Create();
 
 		try
@@ -232,7 +230,9 @@ public class CameraEquipment : InputWeaponComponent, IEquipmentEvents
 			Scene.Camera.RenderToTexture( texture );
 
 			player.GameObject.Tags.Remove( "invisible" );
+			
 			Notify.Info( "#equipment.camera.share.upload" );
+			PhotoTakenSound.Broadcast( WorldPosition );
 
 			await GameTask.WorkerThread();
 
