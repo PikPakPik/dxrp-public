@@ -144,7 +144,7 @@ public partial class Governance
 			return true;
 		}
 
-		if ( player.PlayTime < Config.Current.Game.TaxExemptPlayTimeThreshold )
+		if ( player.PlayTime / 60f < Config.Current.Game.TaxExemptPlayTimeThreshold )
 		{
 			return true;
 		}

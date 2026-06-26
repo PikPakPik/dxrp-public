@@ -263,7 +263,7 @@ public class VoteSystem : SingletonComponent<VoteSystem>, IGameEvents
 		}
 
 		// For demote votes, require minimum playtime
-		if ( type == VoteType.DemotePlayer && initiator.PlayTime < Config.Current.Game.DemoteMinPlaytime )
+		if ( type == VoteType.DemotePlayer && initiator.PlayTime / 60f < Config.Current.Game.DemoteMinPlaytime )
 		{
 			initiator.Warn( $"You need at least {Config.Current.Game.DemoteMinPlaytime} minutes of playtime to start a demote vote." );
 			return false;
