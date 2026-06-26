@@ -67,7 +67,7 @@
 
 					@if ( Package.Interaction.Used )
 					{
-						<div tooltip="#assetlist.hours_tooltip"><i>alarm</i> @FormatHoursPlayed()</div>
+						<div tooltip="#assetlist.hours_tooltip"><i>alarm</i> @TimeUtils.FormatHoursCompact( Package.Interaction.Seconds )</div>
 					}
 
 				</div>
@@ -112,21 +112,6 @@
 
 			return "";
 		}
-	}
-
-	public string FormatHoursPlayed()
-	{
-		var minutes = Package.Interaction.Seconds / 60.0;
-
-		if ( minutes < 60 )
-			return minutes.ToString( "0m" );
-
-		var hours = Package.Interaction.Seconds / 60.0 / 60.0;
-
-		if ( hours > 10 )
-			return hours.ToString( "0h" );
-
-		return hours.ToString( "0.#h" );
 	}
 
 	public string UpdatedString()

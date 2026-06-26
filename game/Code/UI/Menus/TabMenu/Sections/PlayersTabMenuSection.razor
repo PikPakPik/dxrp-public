@@ -166,7 +166,7 @@
 							}
 							else if ( player.HasStatus( Constants.AfkStatus ) )
 							{
-								<i class="material-icons text-warning text-sm" tooltip="#tabmenu.players.status.afk">schedule</i>
+								<i class="material-icons text-warning text-sm" tooltip="@string.Format( Language.GetPhrase( "tabmenu.players.status.afk_duration" ), player.GetAfkDurationText() )">schedule</i>
 							}
 							
 							@if ( IsPartyMember( player ) )

@@ -50,7 +50,7 @@
 				<span class="text-sm text-bold text-white">@( cinema.NowPlayingTitle ?? Language.GetPhrase( "cinema.ui.nothing" ) )</span>
 				@if ( cinema.NowPlayingDurationSeconds > 0 )
 				{
-					<span class="text-xs text-accent">@FormatTime( cinema.NowPlayingElapsedSeconds ) / @FormatTime( cinema.NowPlayingDurationSeconds )</span>
+					<span class="text-xs text-accent">@TimeUtils.FormatClock( cinema.NowPlayingElapsedSeconds ) / @TimeUtils.FormatClock( cinema.NowPlayingDurationSeconds )</span>
 				}
 			</div>
 
@@ -182,14 +182,6 @@
 		var cinema = Cinema.Local;
 		if ( cinema == null || !cinema.IsValid() ) return;
 		cinema.VoteSkipHost();
-	}
-
-	private static string FormatTime( float totalSeconds )
-	{
-		var ts = TimeSpan.FromSeconds( Math.Max( 0, totalSeconds ) );
-		return ts.TotalHours >= 1
-			? $"{(int)ts.TotalHours}:{ts.Minutes:D2}:{ts.Seconds:D2}"
-			: $"{ts.Minutes}:{ts.Seconds:D2}";
 	}
 
 	public override void Tick()
