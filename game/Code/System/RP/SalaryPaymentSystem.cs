@@ -72,7 +72,6 @@ public class SalaryPaymentSystem : Component, IGameEvents
 				player.Info( "#notify.salary.paid", 3f );
 			}
 
-			player.PlayTime++; // Temporary, until we can do it via server pulse
 		}
 	}
 }
