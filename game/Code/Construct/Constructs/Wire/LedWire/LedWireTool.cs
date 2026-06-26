@@ -5,7 +5,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.led.name", "#tool.wire.led.description", "#tool.group.notify", Category = ToolCategory.Wire, MinimumLevel = 1 )]
-public class LedWireTool() : BaseWireConstructTool<LedWireData>( ConstructType.LedWire )
+public class LedWireTool() : BaseConstructTool<LedWireData>( ConstructType.LedWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( -90, 0, 0 );
 

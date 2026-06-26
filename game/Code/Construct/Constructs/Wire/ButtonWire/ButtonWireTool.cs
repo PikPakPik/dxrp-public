@@ -4,7 +4,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.button.name", "#tool.wire.button.description", "#tool.group.io", Category = ToolCategory.Wire )]
-public class ButtonWireTool() : BaseWireConstructTool<ButtonWireData>( ConstructType.ButtonWire )
+public class ButtonWireTool() : BaseConstructTool<ButtonWireData>( ConstructType.ButtonWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( -90, 0, 0 );
 

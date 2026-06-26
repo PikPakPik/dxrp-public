@@ -4,7 +4,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.trigger.name", "#tool.wire.trigger.description", "#tool.group.sensor", Category = ToolCategory.Wire, MinimumLevel = 1 )]
-public class TriggerWireTool() : BaseWireConstructTool<TriggerWireData>( ConstructType.TriggerWire )
+public class TriggerWireTool() : BaseConstructTool<TriggerWireData>( ConstructType.TriggerWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( -90, 0, 0 );
 

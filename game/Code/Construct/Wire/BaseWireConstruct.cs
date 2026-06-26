@@ -1,3 +1,4 @@
+using Dxura.RP.Game.Tools;
 using Dxura.RP.Game.UI;
 namespace Dxura.RP.Game.Wire;
 
@@ -17,6 +18,8 @@ public abstract class BaseWireConstruct( ConstructType type ) : BaseConstruct( t
 	public bool LookOpacity => false;
 	public float ContextMaxDistance => 100f;
 	public string? DisplayText => WireLabelHelper.GetDisplayText( WireLabel );
+
+	public bool ShouldShow() => (WireTool.IsDeployed || WireLabelTool.IsDeployed) && DisplayText != null;
 
 	protected override void OnStart()
 	{

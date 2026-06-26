@@ -3,7 +3,7 @@ using Dxura.RP.Game.Wire;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.synthesizer.name", "#tool.wire.synthesizer.description", "#tool.group.notify", Category = ToolCategory.Wire, MinimumLevel = 2 )]
-public class SynthesizerWireTool() : BaseWireConstructTool<SynthesizerWireData>( ConstructType.SynthesizerWire )
+public class SynthesizerWireTool() : BaseConstructTool<SynthesizerWireData>( ConstructType.SynthesizerWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( 0, 180, 0 );
 

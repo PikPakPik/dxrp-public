@@ -4,7 +4,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.notifier.name", "#tool.wire.notifier.description", "#tool.group.notify", Category = ToolCategory.Wire, MinimumLevel = 1 )]
-public class NotifierWireTool() : BaseWireConstructTool<NotifierWireData>( ConstructType.NotifierWire )
+public class NotifierWireTool() : BaseConstructTool<NotifierWireData>( ConstructType.NotifierWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( -90, 0, 0 );
 

@@ -5,7 +5,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.moneypot.name", "#tool.wire.moneypot.description", "#tool.group.interaction", Category = ToolCategory.Wire, MinimumLevel = 1 )]
-public class MoneyPotWireTool() : BaseWireConstructTool<MoneyPotWireData>( ConstructType.MoneyPotWire )
+public class MoneyPotWireTool() : BaseConstructTool<MoneyPotWireData>( ConstructType.MoneyPotWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( -90, 0, 0 );
 
