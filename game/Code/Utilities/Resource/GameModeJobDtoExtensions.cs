@@ -19,17 +19,17 @@ public static class GameModeJobDtoExtensions
 
 	public static string DisplayName( this GameModeJobDto? job )
 	{
-		return job?.Name ?? string.Empty;
+		return LabelResolver.ResolveText( job?.Name ) ?? string.Empty;
 	}
 
 	public static string DisplayDescription( this GameModeJobDto? job )
 	{
-		return job?.Description ?? string.Empty;
+		return LabelResolver.ResolveText( job?.Description ) ?? string.Empty;
 	}
 
 	public static string DisplayName( this GameModeJobGroupDto? group )
 	{
-		return group?.Name ?? string.Empty;
+		return LabelResolver.ResolveText( group?.Name ) ?? string.Empty;
 	}
 
 	public static GameModeJobGroupDto? GetGroup( this GameModeJobDto? job )

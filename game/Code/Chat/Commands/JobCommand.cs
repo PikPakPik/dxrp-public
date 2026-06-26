@@ -184,9 +184,21 @@ public class JobCommand : ICommand
 		}
 
 		var normalizedInput = NormalizeJobName( input );
-		return GameModeJobs.All
+		var candidates = GameModeJobs.All
 			.Where( job => !selectableOnly || job.Selectable )
-			.FirstOrDefault( job => NormalizeJobName( job.DisplayName() ) == normalizedInput || NormalizeJobName( job.Name ) == normalizedInput );
+			.ToList();
+
+		var exact = candidates.FirstOrDefault( job =>
+			NormalizeJobName( job.DisplayName() ) == normalizedInput ||
+			NormalizeJobName( job.Name ) == normalizedInput );
+		if ( exact != null )
+		{
+			return exact;
+		}
+
+		return candidates.FirstOrDefault( job =>
+			NormalizeJobName( job.DisplayName() ).Contains( normalizedInput ) ||
+			NormalizeJobName( job.Name ).Contains( normalizedInput ) );
 	}
 
 	private static string NormalizeJobName( string value )
