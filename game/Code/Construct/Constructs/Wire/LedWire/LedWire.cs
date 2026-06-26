@@ -15,7 +15,7 @@ public class LedWire() : BaseWireConstruct( ConstructType.LedWire )
 	[Property]
 	public bool LedState { get; set; }
 
-	public override string Name => "LED";
+	public override string Name => FormatWireName( "LED" );
 
 	[Property]
 	public ModelRenderer ModelRenderer { get; set; } = null!;

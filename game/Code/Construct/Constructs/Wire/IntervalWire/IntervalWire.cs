@@ -13,7 +13,7 @@ public class IntervalWire() : BaseWireConstruct( ConstructType.IntervalWire ), I
 	[WireInput( "halt" )]
 	private bool Halt { get; set; }
 
-	public override string Name => $"Interval ({_data.Interval:0.##}s{(_data.Hold > 0 ? $", {_data.Hold:0.##}s hold" : "")})";
+	public override string Name => FormatWireName( $"Interval ({_data.Interval:0.##}s{(_data.Hold > 0 ? $", {_data.Hold:0.##}s hold" : "")})" );
 
 	private TimeUntil _nextPulse;
 

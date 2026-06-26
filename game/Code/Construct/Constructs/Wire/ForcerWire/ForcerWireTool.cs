@@ -4,7 +4,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.forcer.name", "#tool.wire.forcer.description", "#tool.group.interaction", Category = ToolCategory.Wire, MinimumLevel = 1 )]
-public class ForcerWireTool() : BaseConstructTool<ForcerWireData>( ConstructType.ForcerWire )
+public class ForcerWireTool() : BaseWireConstructTool<ForcerWireData>( ConstructType.ForcerWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( -90, 0, 0 );
 

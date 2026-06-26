@@ -39,7 +39,7 @@ public class DelayWire() : BaseWireConstruct( ConstructType.DelayWire ), IWireEv
 		get => false; // This is just a trigger, no need to store state
 	}
 
-	public override string Name => $"Delay ({_data.Delay}s)";
+	public override string Name => FormatWireName( $"Delay ({_data.Delay}s)" );
 
 	private readonly Queue<(object? value, TimeUntil outputTime)> _delayQueue = new();
 

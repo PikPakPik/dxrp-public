@@ -5,7 +5,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.speaker.name", "#tool.wire.speaker.description", "#tool.group.notify", Category = ToolCategory.Wire, MinimumLevel = 1 )]
-public class SpeakerWireTool() : BaseConstructTool<SpeakerWireData>( ConstructType.SpeakerWire )
+public class SpeakerWireTool() : BaseWireConstructTool<SpeakerWireData>( ConstructType.SpeakerWire )
 {
 	public const float MinSpeakerVolume = 0.1f;
 	public const float MaxSpeakerVolume = 1f;

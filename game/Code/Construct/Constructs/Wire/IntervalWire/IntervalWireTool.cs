@@ -5,7 +5,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.interval.name", "#tool.wire.interval.description", "#tool.group.logic", Category = ToolCategory.Wire, MinimumLevel = 1 )]
-public class IntervalWireTool() : BaseConstructTool<IntervalWireData>( ConstructType.IntervalWire )
+public class IntervalWireTool() : BaseWireConstructTool<IntervalWireData>( ConstructType.IntervalWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( -90, 0, 0 );
 

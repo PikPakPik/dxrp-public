@@ -4,7 +4,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.user.name", "#tool.wire.user.description", "#tool.group.interaction", Category = ToolCategory.Wire, MinimumLevel = 1 )]
-public class UserWireTool() : BaseConstructTool<UserWireData>( ConstructType.UserWire )
+public class UserWireTool() : BaseWireConstructTool<UserWireData>( ConstructType.UserWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( -90, 0, 0 );
 

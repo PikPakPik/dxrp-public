@@ -58,7 +58,7 @@ public class MoneyPotWire() : BaseWireConstruct( ConstructType.MoneyPotWire ), C
 	[WireOutput( "last_amount" )]
 	public float LastAmount { get; private set; }
 
-	public override string Name => $"Money Pot (${NumberUtils.FormatNumberWithSuffix( DisplayAmount )})";
+	public override string Name => FormatWireName( $"Money Pot (${NumberUtils.FormatNumberWithSuffix( DisplayAmount )})" );
 
 	public bool Press( IPressable.Event e )
 	{

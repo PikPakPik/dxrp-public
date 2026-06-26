@@ -3,7 +3,7 @@ using Dxura.RP.Game.Wire;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.keypad.name", "#tool.wire.keypad.description", "#tool.group.io", Category = ToolCategory.Wire )]
-public class KeypadWireTool() : BaseConstructTool<KeypadWireData>( ConstructType.KeypadWire )
+public class KeypadWireTool() : BaseWireConstructTool<KeypadWireData>( ConstructType.KeypadWire )
 {
 	[Property]
 	[Title( "Off Value" )]

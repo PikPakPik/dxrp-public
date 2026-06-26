@@ -4,7 +4,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.constant.name", "#tool.wire.constant.description", "#tool.group.core", Category = ToolCategory.Wire, MinimumLevel = 1 )]
-public class ConstantWireTool() : BaseConstructTool<ConstantWireData>( ConstructType.ConstantWire )
+public class ConstantWireTool() : BaseWireConstructTool<ConstantWireData>( ConstructType.ConstantWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( -90, 0, 0 );
 

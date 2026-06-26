@@ -5,7 +5,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.delay.name", "#tool.wire.delay.description", "#tool.group.logic", Category = ToolCategory.Wire, MinimumLevel = 1 )]
-public class DelayWireTool() : BaseConstructTool<DelayWireData>( ConstructType.DelayWire )
+public class DelayWireTool() : BaseWireConstructTool<DelayWireData>( ConstructType.DelayWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( -90, 0, 0 );
 

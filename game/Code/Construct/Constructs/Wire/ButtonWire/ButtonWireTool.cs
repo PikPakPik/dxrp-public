@@ -1,11 +1,10 @@
-using Dxura.RP.Game.UI;
 using Dxura.RP.Game.Wire;
 using Dxura.RP.Shared;
 
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.button.name", "#tool.wire.button.description", "#tool.group.io", Category = ToolCategory.Wire )]
-public class ButtonWireTool() : BaseConstructTool<ButtonWireData>( ConstructType.ButtonWire )
+public class ButtonWireTool() : BaseWireConstructTool<ButtonWireData>( ConstructType.ButtonWire )
 {
 	protected override Rotation FlatSurfaceRotationOffset => Rotation.From( -90, 0, 0 );
 
@@ -44,19 +43,6 @@ public class ButtonWireTool() : BaseConstructTool<ButtonWireData>( ConstructType
 		set => Data = Data with
 		{
 			OnValue = value
-		};
-	}
-
-	[Property]
-	[Title( "Label" )]
-	[Description( "Describe this button (optional)" )]
-	[Range( TextDefinition.MinTextLength, TextDefinition.MaxTextLength )]
-	public string Label
-	{
-		get => Data.Label;
-		set => Data = Data with
-		{
-			Label = value
 		};
 	}
 }
