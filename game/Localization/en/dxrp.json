@@ -639,7 +639,7 @@
   "gatetype.vector2": "Vector2 ( (A, B) → Out )",
   "gatetype.vector3": "Vector3 ( (A, B, C) → Out )",
   "gatetype.vectorget": "VectorGet ( A(x, y, z), B → Out = A[B] )",
-  "gatetype.srlatch": "SRLatch (A↑ ? !Output : Output → Out)",
+  "gatetype.latch": "SR Latch (A=Set, B=Reset → Out holds until reset)",
   "tool.precision.name": "Precision",
   "tool.precision.description": "Precisely position and rotate constructs",
   "tool.precision.too_far": "Too far away",
