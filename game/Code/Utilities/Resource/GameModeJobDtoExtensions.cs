@@ -161,7 +161,7 @@ public static class GameModeJobDtoExtensions
 		}
 
 		var ignoreJobRequirements = GameManager.Instance.IsValid() && GameManager.Instance.IgnoreJobRequirements;
-		if ( !ignoreJobRequirements && job.PlayTime.HasValue && player.PlayTime < job.PlayTime.Value )
+		if ( !ignoreJobRequirements && job.PlayTime.HasValue && player.PlayTime / 60f < job.PlayTime.Value )
 		{
 			player.Error( "#notify.job.playtime" );
 			return false;

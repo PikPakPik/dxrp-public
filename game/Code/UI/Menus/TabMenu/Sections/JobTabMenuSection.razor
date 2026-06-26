@@ -47,7 +47,7 @@
 						var currentPlayers = GameUtils.GetPlayersByJob( job ).Count();
 						var isFull = job.MaxCount > 0 && currentPlayers >= job.MaxCount;
 						var requiredPlayTime = job.PlayTime ?? 0;
-						var currentPlayTime = Player.Local.PlayTime;
+						var currentPlayTime = (int)(Player.Local.PlayTime / 60f);
 						var needsMorePlayTime = requiredPlayTime > currentPlayTime && !IgnoreJobRequirements;
 						var remainingPlayTime = requiredPlayTime - currentPlayTime;
 
@@ -103,7 +103,7 @@
 
 	protected override int BuildHash()
 	{
-		return HashCode.Combine( GameModeJobs.All, Player.Local.PlayTime, Player.Local.Job, IgnoreJobRequirements );
+		return HashCode.Combine( GameModeJobs.All, (int)(Player.Local.PlayTime / 60f), Player.Local.Job, IgnoreJobRequirements );
 	}
 
 	private void SelectJob( GameModeJobDto job )

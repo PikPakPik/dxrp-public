@@ -65,11 +65,8 @@ public partial class Player : IDescription
 		}
 	}
 
-	/// <summary>
-	///     The player's playtime (in seconds)
-	/// </summary>
 	[Sync( SyncFlags.FromHost )]
-	public int PlayTime { get; set; } = 1000;
+	public TimeSince PlayTime { get; set; }
 
 	/// <summary>
 	///     The connection of this player
