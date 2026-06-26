@@ -5,8 +5,6 @@ namespace Dxura.RP.Game;
 
 public static class GameModeJobDtoExtensions
 {
-	private static readonly Dictionary<string, Model> ModelCache = new( StringComparer.OrdinalIgnoreCase );
-
 	public static Color ColorValue( this GameModeJobDto? job )
 	{
 		return (job?.Color ?? 0).ToColor();
@@ -45,28 +43,42 @@ public static class GameModeJobDtoExtensions
 
 	public static Model GetPrimaryModel( this GameModeJobDto? job )
 	{
+		var modelPath = ResolveModelPath( job );
+
+		if ( IsCloudIdent( modelPath ) )
+		{
+			return Model.Load( "models/citizen/citizen.vmdl" );
+		}
+
+		return Model.Load( modelPath );
+	}
+
+	public static async Task<Model> GetPrimaryModelAsync( this GameModeJobDto? job )
+	{
+		var modelPath = ResolveModelPath( job );
+
+		if ( IsCloudIdent( modelPath ) )
+		{
+			return await Cloud.Load<Model>( modelPath ) ?? Model.Load( "models/citizen/citizen.vmdl" );
+		}
+
+		return Model.Load( modelPath );
+	}
+
+	private static string ResolveModelPath( GameModeJobDto? job )
+	{
 		var modelPath = job?.Model;
 		if ( string.IsNullOrWhiteSpace( modelPath ) )
 		{
 			modelPath = GameModeJobs.Default.Model;
 		}
 
-		if ( string.IsNullOrWhiteSpace( modelPath ) )
-		{
-			modelPath = "models/citizen/citizen.vmdl";
-		}
+		return string.IsNullOrWhiteSpace( modelPath ) ? "models/citizen/citizen.vmdl" : modelPath;
+	}
 
-		if ( ModelCache.TryGetValue( modelPath, out var cached ) )
-		{
-			return cached;
-		}
-
-		// Try loading (might be cloud)
-		Cloud.Load(  modelPath );
-		
-		cached = Model.Load( modelPath );
-		ModelCache[modelPath] = cached;
-		return cached;
+	private static bool IsCloudIdent( string path )
+	{
+		return !path.Contains( '/' ) && path.Contains( '.' );
 	}
 
 	public static bool HasTag( this GameModeJobDto? job, JobTag tag )
