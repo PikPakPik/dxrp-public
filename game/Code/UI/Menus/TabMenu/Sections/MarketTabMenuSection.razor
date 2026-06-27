@@ -31,8 +31,8 @@
 						var adminModeActive = _adminMode && CanUseAdminMode;
 						var normallyPermitted = GameModeMarketItems.CanPurchase( Player.Local, item );
 						var isPermitted = normallyPermitted || ( adminModeActive && GameModeMarketItems.CanAdminSpawn( Player.Local, item ) );
-						var isAdminSpawn = adminModeActive && isPermitted;
-						return (Item: item, Permitted: isPermitted, AdminSpawn: isAdminSpawn);
+						var isStaffPurchase = adminModeActive && isPermitted;
+						return (Item: item, Permitted: isPermitted, StaffPurchase: isStaffPurchase);
 					} )
 					.Where( x => _showLocked || x.Permitted )
 					.GroupBy( x => { var g = GameModeMarketItems.Grouping( x.Item ); return string.IsNullOrEmpty( g ) ? "other" : g; } )
@@ -53,13 +53,16 @@
 					@if ( !isCollapsed )
 					{
 						<div class="card-rail">
-							@foreach ( var (item, isPermitted, isAdminSpawn) in group )
+							@foreach ( var (item, isPermitted, isStaffPurchase) in group )
 							{
-								<div class="entity-card @GetCardClass( isPermitted, isAdminSpawn )"
-								     @onclick=@( () => HandleClick( item, isPermitted, isAdminSpawn ) )
+								<div class="entity-card @( !isPermitted ? "is-locked" : "" )"
+								     @onclick=@( () => HandleClick( item, isPermitted, isStaffPurchase ) )
 								     tooltip="@( !string.IsNullOrEmpty( GameModeMarketItems.DisplayDescription( item ) ) ? GameModeMarketItems.DisplayDescription( item ) : null )">
 									@{ var chipColor = GetItemColor( item ); }
 									@if ( chipColor != Color.White )
+									{
+										<div class="card-chip" style="background-color: @chipColor.Hex"></div>
+									}
 									{
 										<div class="card-chip" style="background-color: @chipColor.Hex"></div>
 									}
@@ -80,22 +83,21 @@
 											<span class="card-limit">@GetLimitText( item )</span>
 										</div>
 									}
-									else if ( isAdminSpawn )
-									{
-										<div class="card-lock admin-lock">
-											<i class="material-icons">admin_panel_settings</i>
-										</div>
-									}
 									<div class="card-top">
 										<span class="card-name">@GameModeMarketItems.DisplayName( item )</span>
-										<span class="card-limit">@GetLimitText( item, isAdminSpawn )</span>
+										<span class="card-limit">@GetLimitText( item, isStaffPurchase )</span>
 									</div>
 									<div class="card-bottom">
-										<span class="card-price">@GetPriceText( item, isAdminSpawn )</span>
+										<span class="card-price">@GetPriceText( item, isStaffPurchase )</span>
 									</div>
 								</div>
-							}
-						</div>
+								@if ( isStaffPurchase )
+								{
+									<div class="card-staff-border"></div>
+								}
+							</div>
+						}
+					</div>
 					}
 				</div>
 			}
@@ -167,24 +169,9 @@
 		return Language.GetPhrase( $"entity.category.{category.ToLowerInvariant()}" );
 	}
 
-	private static string GetCardClass( bool isPermitted, bool isAdminSpawn )
+	private string GetLimitText( GameModeMarketItemDto item, bool isStaffPurchase )
 	{
-		if ( isAdminSpawn )
-		{
-			return "is-admin-spawn";
-		}
-
-		if ( !isPermitted )
-		{
-			return "is-locked";
-		}
-
-		return string.Empty;
-	}
-
-	private string GetLimitText( GameModeMarketItemDto item, bool isAdminSpawn )
-	{
-		if ( isAdminSpawn )
+		if ( isStaffPurchase )
 		{
 			return Language.GetPhrase( "tabmenu.market.admin_mode.unlimited" );
 		}
@@ -204,9 +191,9 @@
 		return $"{owned}/{limit}";
 	}
 
-	private string GetPriceText( GameModeMarketItemDto item, bool isAdminSpawn )
+	private string GetPriceText( GameModeMarketItemDto item, bool isStaffPurchase )
 	{
-		if ( isAdminSpawn )
+		if ( isStaffPurchase )
 		{
 			return Language.GetPhrase( "tabmenu.market.admin_mode.free" );
 		}
@@ -220,7 +207,7 @@
 		return item.Color.ToColor();
 	}
 
-	private void HandleClick( GameModeMarketItemDto item, bool isPermitted, bool isAdminSpawn )
+	private void HandleClick( GameModeMarketItemDto item, bool isPermitted, bool isStaffPurchase )
 	{
 		if ( !isPermitted )
 		{
@@ -229,7 +216,7 @@
 			return;
 		}
 
-		if ( !isAdminSpawn )
+		if ( !isStaffPurchase )
 		{
 			switch ( GameModeMarketItems.Grouping( item ) )
 			{
@@ -254,7 +241,15 @@
 			}
 		}
 
-		GameManager.Instance.PurchaseMarketItemHost( item.Id, isAdminSpawn );
+		if ( isStaffPurchase )
+		{
+			GameManager.Instance.SpawnMarketItemHost( item.Id );
+		}
+		else
+		{
+			GameManager.Instance.PurchaseMarketItemHost( item.Id );
+		}
+
 		TabMenu.RequestCloseMenu();
 	}
 }

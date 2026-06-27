@@ -1,3 +1,4 @@
+using Dxura.RP.Game.Commands;
 using Dxura.RP.Game.Entities;
 using Dxura.RP.Game.System.Events;
 using Dxura.RP.Game.UI;
@@ -332,9 +333,14 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 	}
 
 	[Rpc.Host]
-	public async void PurchaseMarketItemHost( Guid marketItemId, bool staffSpawn = false )
+	public async void PurchaseMarketItemHost( Guid marketItemId )
 	{
 		var callerId = Rpc.CallerId;
+		if ( Cooldown.Current.CheckAndStartCooldown( $"{callerId}:entity", Config.Current.Game.EntityCooldown ) )
+		{
+			return;
+		}
+
 		var player = GameUtils.GetPlayerByConnectionId( callerId );
 		var marketItem = GameModeMarketItems.FindById( marketItemId );
 
@@ -343,20 +349,10 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 			return;
 		}
 
-		var isStaffSpawn = staffSpawn && GameModeMarketItems.CanAdminSpawn( player, marketItem );
-
-		if ( !isStaffSpawn )
+		if ( !GameModeMarketItems.CanPurchase( player, marketItem ) )
 		{
-			if ( Cooldown.Current.CheckAndStartCooldown( $"{callerId}:entity", Config.Current.Game.EntityCooldown ) )
-			{
-				return;
-			}
-
-			if ( !GameModeMarketItems.CanPurchase( player, marketItem ) )
-			{
-				player.Error( "#generic.forbidden" );
-				return;
-			}
+			player.Error( "#generic.forbidden" );
+			return;
 		}
 
 		var displayName = GameModeMarketItems.DisplayName( marketItem );
@@ -365,21 +361,13 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 			return;
 		}
 
-		if ( isStaffSpawn )
+		var price = (uint)Math.Max( 0, (int)MathF.Ceiling( marketItem.Cost * EntityPriceMultiplier ) );
+		if ( price > 0 && !await player.ChargeHost( price, $"Purchased {displayName}", true ) )
 		{
-			Log.Info( $"Staff {player.SteamId} spawned market item '{displayName}' [{marketItem.Id}]" );
-			_ = ServerApiClient.Audit( "StaffSpawnMarket", $"{player.SteamName} ({player.SteamId}) spawned {displayName} ({marketItem.Id})", player.SteamId );
+			return;
 		}
-		else
-		{
-			var price = (uint)Math.Max( 0, (int)MathF.Ceiling( marketItem.Cost * EntityPriceMultiplier ) );
-			if ( price > 0 && !await player.ChargeHost( price, $"Purchased {displayName}", true ) )
-			{
-				return;
-			}
 
-			Log.Info( $"Player {player.SteamId} purchased market item '{displayName}' [{marketItem.Id}] for ${price}" );
-		}
+		Log.Info( $"Player {player.SteamId} purchased market item '{displayName}' [{marketItem.Id}] for ${price}" );
 
 		switch ( marketItem.Type )
 		{
@@ -416,15 +404,7 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 					baseEntityComponent.ConfigureGameModeEntityHost( entity );
 				}
 
-				if ( isStaffSpawn )
-				{
-					GameUtils.ClearSpawnedOwnership( entityToSpawn );
-					entityToSpawn.NetworkSpawn();
-				}
-				else
-				{
-					entityToSpawn.NetworkSpawn( player.Connection );
-				}
+				entityToSpawn.NetworkSpawn( player.Connection );
 				PurchaseSound?.Broadcast( entityToSpawn.WorldPosition, entityToSpawn );
 				return;
 
@@ -454,20 +434,12 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 						return;
 					}
 
+					shipmentBaseEntity.Owner = player.SteamId;
 					shipmentBaseEntity.Identifier = equipment.Identifier();
 					shipmentEntity.MarketItemId = marketItem.Id;
 					shipmentEntity.ConfigureHost( equipment, marketItem.Quantity );
 
-					if ( isStaffSpawn )
-					{
-						GameUtils.ClearSpawnedOwnership( shipmentObject );
-						shipmentObject.NetworkSpawn();
-					}
-					else
-					{
-						shipmentBaseEntity.Owner = player.SteamId;
-						shipmentObject.NetworkSpawn( player.Connection );
-					}
+					shipmentObject.NetworkSpawn( player.Connection );
 					PurchaseSound?.Broadcast( shipmentObject.WorldPosition, shipmentObject );
 					return;
 				}
@@ -482,120 +454,21 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 		}
 	}
 
-	public bool StaffSpawnEntity( Player player, GameModeEntityDto entity, int quantity = 1 )
+	[Rpc.Host]
+	public void SpawnMarketItemHost( Guid marketItemId )
 	{
-		if ( !player.IsValid() || entity == null || !RankSystem.HasPermission( player.SteamId, Permission.CommandSpawnEntity ) )
+		var player = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
+		var marketItem = GameModeMarketItems.FindById( marketItemId );
+
+		if ( !player.IsValid() || marketItem == null )
 		{
-			return false;
+			return;
 		}
 
-		var entityPrefabPath = entity.PrefabPath();
-		if ( string.IsNullOrWhiteSpace( entityPrefabPath ) )
+		if ( !SpawnEntityCommand.TrySpawnMarketItem( player, marketItem ) )
 		{
-			return false;
+			player.Error( "#generic.forbidden" );
 		}
-
-		var entityPrefab = GameObject.GetPrefab( entityPrefabPath );
-		if ( !entityPrefab.IsValid() )
-		{
-			return false;
-		}
-
-		quantity = Math.Clamp( quantity, 1, 100 );
-		var spawnPosition = GameUtils.GetSpawnPosition( player.AimRay );
-		var horizontalForward = new Vector3( player.AimRay.Forward.x, player.AimRay.Forward.y, 0 );
-		if ( horizontalForward.Length > 0.01f )
-		{
-			horizontalForward = horizontalForward.Normal;
-		}
-		else
-		{
-			horizontalForward = Vector3.Forward;
-		}
-
-		var horizontalRight = Vector3.Cross( Vector3.Up, horizontalForward ).Normal;
-
-		for ( var i = 0; i < quantity; i++ )
-		{
-			var entityToSpawn = entityPrefab.Clone();
-			entityToSpawn.WorldPosition = spawnPosition
-				+ horizontalRight * ( ( i % 5 ) - 2 ) * 20f
-				+ horizontalForward * ( i / 5 ) * 20f;
-
-			var baseEntityComponent = entityToSpawn.GetComponent<BaseEntity>();
-			if ( baseEntityComponent != null )
-			{
-				baseEntityComponent.Identifier = entity.Identifier();
-				baseEntityComponent.ConfigureGameModeEntityHost( entity );
-			}
-
-			GameUtils.ClearSpawnedOwnership( entityToSpawn );
-			entityToSpawn.NetworkSpawn();
-			PurchaseSound?.Broadcast( entityToSpawn.WorldPosition, entityToSpawn );
-		}
-
-		Log.Info( $"Staff {player.SteamId} spawned entity '{entity.DisplayName()}' x{quantity}" );
-		_ = ServerApiClient.Audit( "StaffSpawnEntity", $"{player.SteamName} ({player.SteamId}) spawned {entity.DisplayName()} x{quantity}", player.SteamId );
-		return true;
-	}
-
-	public bool StaffSpawnEquipment( Player player, GameModeEquipmentDto equipment, int quantity = 1 )
-	{
-		if ( !player.IsValid() || equipment == null || !RankSystem.HasPermission( player.SteamId, Permission.CommandSpawnEntity ) )
-		{
-			return false;
-		}
-
-		if ( string.IsNullOrWhiteSpace( equipment.PrefabPath() ) )
-		{
-			return false;
-		}
-
-		quantity = Math.Clamp( quantity, 1, 100 );
-		var marketItemId = GameModeMarketItems.All
-			.FirstOrDefault( x => x.Type == GameModeMarketItemType.Equipment && x.ReferenceId == equipment.Id )?.Id ?? Guid.Empty;
-		var spawnPosition = GameUtils.GetSpawnPosition( player.AimRay );
-
-		if ( quantity > 1 )
-		{
-			var shipmentPrefab = GameObject.GetPrefab( GameModeMarketItems.ShipmentPrefabPath );
-			if ( !shipmentPrefab.IsValid() )
-			{
-				return false;
-			}
-
-			var shipmentObject = shipmentPrefab.Clone();
-			shipmentObject.WorldPosition = spawnPosition;
-
-			var shipmentEntity = shipmentObject.GetComponent<ShipmentEntity>();
-			var shipmentBaseEntity = shipmentObject.GetComponent<BaseEntity>();
-			if ( !shipmentEntity.IsValid() || !shipmentBaseEntity.IsValid() )
-			{
-				shipmentObject.Destroy();
-				return false;
-			}
-
-			shipmentBaseEntity.Identifier = equipment.Identifier();
-			shipmentEntity.MarketItemId = marketItemId;
-			shipmentEntity.ConfigureHost( equipment, quantity );
-
-			GameUtils.ClearSpawnedOwnership( shipmentObject );
-			shipmentObject.NetworkSpawn();
-			PurchaseSound?.Broadcast( shipmentObject.WorldPosition, shipmentObject );
-		}
-		else
-		{
-			var droppedEquipment = DroppedEquipment.CreateHost(
-				equipment,
-				spawnPosition,
-				rotation: Rotation.FromYaw( player.Controller.EyeAngles.yaw + 90 ),
-				marketItemId: marketItemId );
-			PurchaseSound?.Broadcast( droppedEquipment.WorldPosition, droppedEquipment.GameObject );
-		}
-
-		Log.Info( $"Staff {player.SteamId} spawned equipment '{equipment.DisplayName()}' x{quantity}" );
-		_ = ServerApiClient.Audit( "StaffSpawnEntity", $"{player.SteamName} ({player.SteamId}) spawned {equipment.DisplayName()} x{quantity}", player.SteamId );
-		return true;
 	}
 
 	[Rpc.Host]
