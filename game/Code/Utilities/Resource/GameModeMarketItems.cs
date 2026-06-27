@@ -114,6 +114,22 @@ public static class GameModeMarketItems
 			                 entity.EntityId == entityId.Value );
 	}
 
+	public static IEnumerable<(GameModeMarketItemDto MarketItem, GameModeEquipmentDto Equipment)> UniqueSpawnableEquipment()
+	{
+		var seenEquipment = new HashSet<Guid>();
+
+		foreach ( var marketItem in All
+			         .Where( item => item.Type == GameModeMarketItemType.Equipment && IsSpawnable( item ) )
+			         .OrderBy( DisplayName ) )
+		{
+			var equipment = ResolveEquipment( marketItem );
+			if ( equipment != null && seenEquipment.Add( equipment.Id ) )
+			{
+				yield return (marketItem, equipment);
+			}
+		}
+	}
+
 	public static bool CanAdminSpawn( Player player, GameModeMarketItemDto? item )
 	{
 		if ( !player.IsValid() || item == null || !RankSystem.HasPermission( player.SteamId, Permission.CommandSpawnEntity ) )

@@ -90,8 +90,7 @@ public class SpawnEntityCommand : ICommand
 			return false;
 		}
 
-		Log.Info( $"Staff {player.SteamId} spawned market item '{displayName}' [{marketItem.Id}]" );
-		_ = ServerApiClient.Audit( "StaffSpawnMarket", $"{player.SteamName} ({player.SteamId}) spawned {displayName} ({marketItem.Id})", player.SteamId );
+		LogStaffSpawn( player, displayName, marketItem.Quantity, marketItem.Id );
 		return true;
 	}
 
@@ -116,17 +115,7 @@ public class SpawnEntityCommand : ICommand
 
 		quantity = Math.Clamp( quantity, 1, MaxQuantity );
 		var spawnPosition = GameUtils.GetSpawnPosition( player.AimRay );
-		var horizontalForward = new Vector3( player.AimRay.Forward.x, player.AimRay.Forward.y, 0 );
-		if ( horizontalForward.Length > 0.01f )
-		{
-			horizontalForward = horizontalForward.Normal;
-		}
-		else
-		{
-			horizontalForward = Vector3.Forward;
-		}
-
-		var horizontalRight = Vector3.Cross( Vector3.Up, horizontalForward ).Normal;
+		var (horizontalForward, horizontalRight) = GetHorizontalAimAxes( player );
 
 		for ( var i = 0; i < quantity; i++ )
 		{
@@ -199,14 +188,37 @@ public class SpawnEntityCommand : ICommand
 				spawnPosition,
 				rotation: Rotation.FromYaw( player.Controller.EyeAngles.yaw + 90 ),
 				marketItemId: marketItemId );
+			GameUtils.ClearSpawnedOwnership( droppedEquipment.GameObject );
 			GameManager.Instance.PurchaseSound?.Broadcast( droppedEquipment.WorldPosition, droppedEquipment.GameObject );
 		}
 
 		return true;
 	}
 
-	private static void LogStaffSpawn( Player player, string displayName, int quantity )
+	private static (Vector3 Forward, Vector3 Right) GetHorizontalAimAxes( Player player )
 	{
+		var horizontalForward = new Vector3( player.AimRay.Forward.x, player.AimRay.Forward.y, 0 );
+		if ( horizontalForward.Length > 0.01f )
+		{
+			horizontalForward = horizontalForward.Normal;
+		}
+		else
+		{
+			horizontalForward = Vector3.Forward;
+		}
+
+		return (horizontalForward, Vector3.Cross( Vector3.Up, horizontalForward ).Normal);
+	}
+
+	private static void LogStaffSpawn( Player player, string displayName, int quantity, Guid marketItemId = default )
+	{
+		if ( marketItemId != Guid.Empty )
+		{
+			Log.Info( $"Staff {player.SteamId} spawned market item '{displayName}' [{marketItemId}]" );
+			_ = ServerApiClient.Audit( "StaffSpawnMarket", $"{player.SteamName} ({player.SteamId}) spawned {displayName} ({marketItemId})", player.SteamId );
+			return;
+		}
+
 		Log.Info( $"Staff {player.SteamId} spawned '{displayName}' x{quantity}" );
 		_ = ServerApiClient.Audit( "StaffSpawnEntity", $"{player.SteamName} ({player.SteamId}) spawned {displayName} x{quantity}", player.SteamId );
 	}
@@ -214,26 +226,10 @@ public class SpawnEntityCommand : ICommand
 	private static void SendSpawnList( Player caller, string? filter )
 	{
 		var normalizedFilter = string.IsNullOrWhiteSpace( filter ) ? null : NormalizeName( filter );
-		var listedEquipment = new HashSet<Guid>();
-		var equipments = new List<string>();
-
-		foreach ( var marketItem in GameModeMarketItems.All
-			         .Where( item => item.Type == GameModeMarketItemType.Equipment && GameModeMarketItems.IsSpawnable( item ) )
-			         .OrderBy( GameModeMarketItems.DisplayName ) )
-		{
-			var equipment = GameModeMarketItems.ResolveEquipment( marketItem );
-			if ( equipment == null || !listedEquipment.Add( equipment.Id ) )
-			{
-				continue;
-			}
-
-			if ( !MatchesListFilter( equipment.Identifier(), equipment.DisplayName(), equipment.Name(), normalizedFilter ) )
-			{
-				continue;
-			}
-
-			equipments.Add( FormatListEntry( equipment.Identifier(), equipment.DisplayName() ) );
-		}
+		var equipments = GameModeMarketItems.UniqueSpawnableEquipment()
+			.Where( entry => MatchesName( entry.Equipment.Identifier(), entry.Equipment.DisplayName(), entry.Equipment.Name(), normalizedFilter ) )
+			.Select( entry => FormatListEntry( entry.Equipment.Identifier(), entry.Equipment.DisplayName() ) )
+			.ToList();
 
 		if ( equipments.Count == 0 )
 		{
@@ -251,26 +247,28 @@ public class SpawnEntityCommand : ICommand
 		equipment = null;
 		marketItemId = Guid.Empty;
 
-		var marketItem = GameModeMarketItems.All
-			.Where( item => item.Type == GameModeMarketItemType.Equipment && GameModeMarketItems.IsSpawnable( item ) )
-			.FirstOrDefault( item =>
-			{
-				var candidate = GameModeMarketItems.ResolveEquipment( item );
-				return candidate != null && MatchesName( candidate.Identifier(), candidate.DisplayName(), candidate.Name(), input );
-			} );
-
-		if ( marketItem == null )
+		foreach ( var (marketItem, candidate) in GameModeMarketItems.UniqueSpawnableEquipment() )
 		{
-			return false;
+			if ( !MatchesName( candidate.Identifier(), candidate.DisplayName(), candidate.Name(), input ) )
+			{
+				continue;
+			}
+
+			equipment = candidate;
+			marketItemId = marketItem.Id;
+			return true;
 		}
 
-		equipment = GameModeMarketItems.ResolveEquipment( marketItem );
-		marketItemId = marketItem.Id;
-		return equipment != null;
+		return false;
 	}
 
-	private static bool MatchesName( string identifier, string displayName, string name, string input )
+	private static bool MatchesName( string identifier, string displayName, string name, string? input )
 	{
+		if ( input == null )
+		{
+			return true;
+		}
+
 		var normalizedInput = NormalizeName( input );
 		return NormalizeName( identifier ) == normalizedInput
 		       || NormalizeName( displayName ) == normalizedInput
@@ -278,18 +276,6 @@ public class SpawnEntityCommand : ICommand
 		       || NormalizeName( identifier ).Contains( normalizedInput )
 		       || NormalizeName( displayName ).Contains( normalizedInput )
 		       || NormalizeName( name ).Contains( normalizedInput );
-	}
-
-	private static bool MatchesListFilter( string identifier, string displayName, string name, string? normalizedFilter )
-	{
-		if ( normalizedFilter == null )
-		{
-			return true;
-		}
-
-		return NormalizeName( identifier ).Contains( normalizedFilter )
-		       || NormalizeName( displayName ).Contains( normalizedFilter )
-		       || NormalizeName( name ).Contains( normalizedFilter );
 	}
 
 	private static string FormatListEntry( string identifier, string displayName )
@@ -325,12 +311,9 @@ public class SpawnEntityCommand : ICommand
 	private static void SuggestMatches( Player caller, string input )
 	{
 		var normalizedInput = NormalizeName( input );
-		var suggestions = GameModeMarketItems.All
-			.Where( item => item.Type == GameModeMarketItemType.Equipment && GameModeMarketItems.IsSpawnable( item ) )
-			.Select( item => GameModeMarketItems.ResolveEquipment( item )?.Identifier() )
-			.Where( name => !string.IsNullOrWhiteSpace( name ) )
-			.Distinct( StringComparer.OrdinalIgnoreCase )
-			.Where( name => NormalizeName( name! ).Contains( normalizedInput ) )
+		var suggestions = GameModeMarketItems.UniqueSpawnableEquipment()
+			.Select( entry => entry.Equipment.Identifier() )
+			.Where( identifier => NormalizeName( identifier ).Contains( normalizedInput ) )
 			.Take( 5 )
 			.ToArray();
 

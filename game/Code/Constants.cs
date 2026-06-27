@@ -58,7 +58,6 @@ public static class Constants
 	public const string ConstructTag = "construct";
 
 	public const string EntityTag = "entity";
-	public const string StaffSpawnTag = "staff_spawn";
 	public const string RestrictedEntity = "restricted_entity"; // Modifier tag for entities which allow permitted (and can be destroyed)
 
 	public const string HandsInteractTag = "hands_interact";

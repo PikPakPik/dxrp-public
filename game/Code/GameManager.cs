@@ -397,13 +397,10 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 				if ( baseEntityComponent != null )
 				{
 					baseEntityComponent.Identifier = entity.Identifier();
-					if ( !isStaffSpawn )
-					{
-						baseEntityComponent.Owner = player.SteamId;
-					}
 					baseEntityComponent.ConfigureGameModeEntityHost( entity );
 				}
 
+				GameUtils.AssignSpawnedOwnership( entityToSpawn, player );
 				entityToSpawn.NetworkSpawn( player.Connection );
 				PurchaseSound?.Broadcast( entityToSpawn.WorldPosition, entityToSpawn );
 				return;
@@ -434,11 +431,11 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 						return;
 					}
 
-					shipmentBaseEntity.Owner = player.SteamId;
 					shipmentBaseEntity.Identifier = equipment.Identifier();
 					shipmentEntity.MarketItemId = marketItem.Id;
 					shipmentEntity.ConfigureHost( equipment, marketItem.Quantity );
 
+					GameUtils.AssignSpawnedOwnership( shipmentObject, player );
 					shipmentObject.NetworkSpawn( player.Connection );
 					PurchaseSound?.Broadcast( shipmentObject.WorldPosition, shipmentObject );
 					return;

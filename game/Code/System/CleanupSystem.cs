@@ -1,4 +1,3 @@
-using Dxura.RP.Game.Entities;
 using Dxura.RP.Shared;
 using Sandbox.Diagnostics;
 namespace Dxura.RP.Game;
@@ -137,40 +136,6 @@ public class CleanupSystem( Scene scene ) : GameObjectSystem<CleanupSystem>( sce
 
 			entity.GameObject.Root.Destroy();
 		}
-
-		CleanupStaffSpawns();
-	}
-
-	public int CleanupStaffSpawns()
-	{
-		var destroyed = new HashSet<GameObject>();
-		var count = 0;
-
-		foreach ( var entity in Scene.GetAll<BaseEntity>().ToList() )
-		{
-			var root = entity.GameObject.Root;
-			if ( !root.Tags.Has( Constants.StaffSpawnTag ) || !destroyed.Add( root ) )
-			{
-				continue;
-			}
-
-			root.Destroy();
-			count++;
-		}
-
-		foreach ( var dropped in Scene.GetAllComponents<DroppedEquipment>().ToList() )
-		{
-			var root = dropped.GameObject.Root;
-			if ( !root.Tags.Has( Constants.StaffSpawnTag ) || !destroyed.Add( root ) )
-			{
-				continue;
-			}
-
-			root.Destroy();
-			count++;
-		}
-
-		return count;
 	}
 
 	public void CleanupJobEntities( long steamId, GameModeJobDto newJob )
