@@ -8,7 +8,7 @@ public class SpawnEntityCommand : ICommand
 	public const int MaxQuantity = 100;
 
 	public string Command => "spawnentity";
-	public string Help => "/spawnentity list  |  /spawnentity <quantity> <name>  (equipment spawns as shipment when quantity > 1)";
+	public string Help => "/spawnentity list  |  /spawnentity <quantity> <equipment>  (shipments when quantity > 1; use market for entities)";
 	public bool IsUsableWhileDead => false;
 	public Permission[] RequiredPermissions => [Permission.CommandSpawnEntity];
 
@@ -44,37 +44,21 @@ public class SpawnEntityCommand : ICommand
 			return true;
 		}
 
-		var entity = ResolveEntity( name );
-		if ( entity != null )
+		if ( TryResolveSpawnableEquipment( name, out var equipment, out var marketItemId ) )
 		{
-			if ( TrySpawnEntity( caller, entity, quantity ) )
+			if ( TrySpawnEquipment( caller, equipment!, quantity, marketItemId ) )
 			{
-				LogStaffSpawn( caller, entity.DisplayName(), quantity );
+				LogStaffSpawn( caller, equipment!.DisplayName(), quantity );
 			}
 			else
 			{
-				caller.Error( $"Failed to spawn entity '{entity.DisplayName()}'." );
+				caller.Error( $"Failed to spawn equipment '{equipment!.DisplayName()}'." );
 			}
 
 			return true;
 		}
 
-		var equipment = ResolveEquipment( name );
-		if ( equipment != null )
-		{
-			if ( TrySpawnEquipment( caller, equipment, quantity ) )
-			{
-				LogStaffSpawn( caller, equipment.DisplayName(), quantity );
-			}
-			else
-			{
-				caller.Error( $"Failed to spawn equipment '{equipment.DisplayName()}'." );
-			}
-
-			return true;
-		}
-
-		caller.Error( $"Unknown entity or equipment '{name}'." );
+		caller.Error( $"Unknown spawnable equipment '{name}'. Use the market for entities like printers." );
 		SuggestMatches( caller, name );
 		return true;
 	}
@@ -230,49 +214,70 @@ public class SpawnEntityCommand : ICommand
 	private static void SendSpawnList( Player caller, string? filter )
 	{
 		var normalizedFilter = string.IsNullOrWhiteSpace( filter ) ? null : NormalizeName( filter );
+		var listedEquipment = new HashSet<Guid>();
+		var equipments = new List<string>();
 
-		var entities = GameModeEntities.All
-			.Where( entity => IsListableEntity( entity ) )
-			.Where( entity => MatchesListFilter( entity.Identifier(), entity.DisplayName(), entity.Name(), normalizedFilter ) )
-			.OrderBy( entity => entity.Identifier() )
-			.Select( entity => FormatListEntry( entity.Identifier(), entity.DisplayName() ) )
-			.ToList();
+		foreach ( var marketItem in GameModeMarketItems.All
+			         .Where( item => item.Type == GameModeMarketItemType.Equipment && GameModeMarketItems.IsSpawnable( item ) )
+			         .OrderBy( GameModeMarketItems.DisplayName ) )
+		{
+			var equipment = GameModeMarketItems.ResolveEquipment( marketItem );
+			if ( equipment == null || !listedEquipment.Add( equipment.Id ) )
+			{
+				continue;
+			}
 
-		var equipments = GameModeEquipments.All
-			.Where( equipment => IsListableEquipment( equipment ) )
-			.Where( equipment => MatchesListFilter( equipment.Identifier(), equipment.DisplayName(), equipment.Name(), normalizedFilter ) )
-			.OrderBy( equipment => equipment.Identifier() )
-			.Select( equipment => FormatListEntry( equipment.Identifier(), equipment.DisplayName() ) )
-			.ToList();
+			if ( !MatchesListFilter( equipment.Identifier(), equipment.DisplayName(), equipment.Name(), normalizedFilter ) )
+			{
+				continue;
+			}
 
-		if ( entities.Count == 0 && equipments.Count == 0 )
+			equipments.Add( FormatListEntry( equipment.Identifier(), equipment.DisplayName() ) );
+		}
+
+		if ( equipments.Count == 0 )
 		{
 			caller.SendMessage( string.IsNullOrWhiteSpace( filter )
-				? "No spawnable entities or equipment."
-				: $"No spawnable entities or equipment matching '{filter}'." );
+				? "No spawnable equipment. Use the market for entities like printers."
+				: $"No spawnable equipment matching '{filter}'." );
 			return;
 		}
 
-		if ( entities.Count > 0 )
-		{
-			caller.SendMessage( $"Entities ({entities.Count}): {string.Join( ", ", entities )}" );
-		}
-
-		if ( equipments.Count > 0 )
-		{
-			caller.SendMessage( $"Equipment ({equipments.Count}): {string.Join( ", ", equipments )}" );
-		}
+		caller.SendMessage( $"Equipment ({equipments.Count}): {string.Join( ", ", equipments )}" );
 	}
 
-	private static bool IsListableEntity( GameModeEntityDto entity )
+	private static bool TryResolveSpawnableEquipment( string input, out GameModeEquipmentDto? equipment, out Guid marketItemId )
 	{
-		var prefabPath = entity.PrefabPath();
-		return !string.IsNullOrWhiteSpace( prefabPath ) && GameObject.GetPrefab( prefabPath ).IsValid();
+		equipment = null;
+		marketItemId = Guid.Empty;
+
+		var marketItem = GameModeMarketItems.All
+			.Where( item => item.Type == GameModeMarketItemType.Equipment && GameModeMarketItems.IsSpawnable( item ) )
+			.FirstOrDefault( item =>
+			{
+				var candidate = GameModeMarketItems.ResolveEquipment( item );
+				return candidate != null && MatchesName( candidate.Identifier(), candidate.DisplayName(), candidate.Name(), input );
+			} );
+
+		if ( marketItem == null )
+		{
+			return false;
+		}
+
+		equipment = GameModeMarketItems.ResolveEquipment( marketItem );
+		marketItemId = marketItem.Id;
+		return equipment != null;
 	}
 
-	private static bool IsListableEquipment( GameModeEquipmentDto equipment )
+	private static bool MatchesName( string identifier, string displayName, string name, string input )
 	{
-		return !string.IsNullOrWhiteSpace( equipment.PrefabPath() );
+		var normalizedInput = NormalizeName( input );
+		return NormalizeName( identifier ) == normalizedInput
+		       || NormalizeName( displayName ) == normalizedInput
+		       || NormalizeName( name ) == normalizedInput
+		       || NormalizeName( identifier ).Contains( normalizedInput )
+		       || NormalizeName( displayName ).Contains( normalizedInput )
+		       || NormalizeName( name ).Contains( normalizedInput );
 	}
 
 	private static bool MatchesListFilter( string identifier, string displayName, string name, string? normalizedFilter )
@@ -317,74 +322,15 @@ public class SpawnEntityCommand : ICommand
 		return !string.IsNullOrWhiteSpace( name );
 	}
 
-	private static GameModeEntityDto? ResolveEntity( string input )
-	{
-		var byIdentifier = GameModeEntities.FindByIdentifier( input );
-		if ( byIdentifier != null )
-		{
-			return byIdentifier;
-		}
-
-		return ResolveByName(
-			GameModeEntities.All,
-			input,
-			entity => entity.Identifier(),
-			entity => entity.DisplayName(),
-			entity => entity.Name() );
-	}
-
-	private static GameModeEquipmentDto? ResolveEquipment( string input )
-	{
-		var byIdentifier = GameModeEquipments.FindByIdentifier( input );
-		if ( byIdentifier != null )
-		{
-			return byIdentifier;
-		}
-
-		return ResolveByName(
-			GameModeEquipments.All,
-			input,
-			equipment => equipment.Identifier(),
-			equipment => equipment.DisplayName(),
-			equipment => equipment.Name() );
-	}
-
-	private static T? ResolveByName<T>(
-		IEnumerable<T> items,
-		string input,
-		Func<T, string> getIdentifier,
-		Func<T, string> getDisplayName,
-		Func<T, string> getName )
-	{
-		var normalizedInput = NormalizeName( input );
-		var candidates = items.ToList();
-
-		var exact = candidates.FirstOrDefault( item =>
-			NormalizeName( getIdentifier( item ) ) == normalizedInput ||
-			NormalizeName( getDisplayName( item ) ) == normalizedInput ||
-			NormalizeName( getName( item ) ) == normalizedInput );
-		if ( exact != null )
-		{
-			return exact;
-		}
-
-		return candidates.FirstOrDefault( item =>
-			NormalizeName( getIdentifier( item ) ).Contains( normalizedInput ) ||
-			NormalizeName( getDisplayName( item ) ).Contains( normalizedInput ) ||
-			NormalizeName( getName( item ) ).Contains( normalizedInput ) );
-	}
-
 	private static void SuggestMatches( Player caller, string input )
 	{
 		var normalizedInput = NormalizeName( input );
-		var suggestions = GameModeEntities.All
-			.Select( entity => entity.Identifier() )
-			.Concat( GameModeEntities.All.Select( entity => entity.DisplayName() ) )
-			.Concat( GameModeEquipments.All.Select( equipment => equipment.Identifier() ) )
-			.Concat( GameModeEquipments.All.Select( equipment => equipment.DisplayName() ) )
+		var suggestions = GameModeMarketItems.All
+			.Where( item => item.Type == GameModeMarketItemType.Equipment && GameModeMarketItems.IsSpawnable( item ) )
+			.Select( item => GameModeMarketItems.ResolveEquipment( item )?.Identifier() )
 			.Where( name => !string.IsNullOrWhiteSpace( name ) )
 			.Distinct( StringComparer.OrdinalIgnoreCase )
-			.Where( name => NormalizeName( name ).Contains( normalizedInput ) )
+			.Where( name => NormalizeName( name! ).Contains( normalizedInput ) )
 			.Take( 5 )
 			.ToArray();
 

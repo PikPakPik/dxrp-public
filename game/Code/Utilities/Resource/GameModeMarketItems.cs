@@ -184,8 +184,13 @@ public static class GameModeMarketItems
 		return item.Type != GameModeMarketItemType.Equipment || equipmentLimit <= 0 || GetOwnedCount( player, item ) < equipmentLimit;
 	}
 
-	private static bool IsSpawnable( GameModeMarketItemDto item )
+	public static bool IsSpawnable( GameModeMarketItemDto? item )
 	{
+		if ( item == null )
+		{
+			return false;
+		}
+
 		switch ( item.Type )
 		{
 			case GameModeMarketItemType.Entity:
