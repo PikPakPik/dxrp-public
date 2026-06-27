@@ -461,6 +461,8 @@
   "tool.wire.notifier.chime.description": "Optional sound to play on the owner's client when triggered",
   "tool.wire.trigger.name": "Trigger",
   "tool.wire.trigger.description": "Detects when a laser line is broken and outputs trigger signals",
+  "tool.wire.pressureplate.name": "Pressure Plate",
+  "tool.wire.pressureplate.description": "Detects objects on a customizable zone and outputs trigger signals including mass",
   "tool.wire.delay.name": "Delay",
   "tool.wire.delay.description": "Delays input signals by a specified amount of time",
   "tool.wire.memory.name": "Memory",

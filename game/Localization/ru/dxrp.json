@@ -461,6 +461,8 @@
   "tool.wire.notifier.chime.description": "Необязательный звук, воспроизводимый у владельца при срабатывании",
   "tool.wire.trigger.name": "Триггер (Датчик)",
   "tool.wire.trigger.description": "Обнаруживает пересечение лазера и выдает сигнал",
+  "tool.wire.pressureplate.name": "Нажимная Плита",
+  "tool.wire.pressureplate.description": "Обнаруживает объекты в настраиваемой зоне и выдает сигналы, включая массу",
   "tool.wire.delay.name": "Задержка (Delay)",
   "tool.wire.delay.description": "Задерживает входной сигнал на время",
   "tool.wire.memory.name": "Память",

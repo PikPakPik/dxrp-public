@@ -461,6 +461,8 @@
   "tool.wire.notifier.chime.description": "Son optionnel joué sur le client du propriétaire lors du déclenchement",
   "tool.wire.trigger.name": "Déclencheur",
   "tool.wire.trigger.description": "Détecte quand un faisceau laser est coupé",
+  "tool.wire.pressureplate.name": "Plaque de Pression",
+  "tool.wire.pressureplate.description": "Détecte les objets dans une zone personnalisable et émet des signaux incluant la masse",
   "tool.wire.delay.name": "Délai",
   "tool.wire.delay.description": "Retarde les signaux d'entrée",
   "tool.wire.memory.name": "Mémoire",

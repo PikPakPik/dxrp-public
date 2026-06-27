@@ -106,6 +106,7 @@ public class SandboxGameConfig : GameConfig
 	public override uint TriggerWireLimit { get; set; } = 15;
 	public override uint UserWireLimit { get; set; } = 15;
 	public override uint SynthesizerWireLimit { get; set; } = 15;
+	public override uint PressurePlateWireLimit { get; set; } = 15;
 
 	//
 	// Cooldowns
