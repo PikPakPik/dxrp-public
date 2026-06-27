@@ -46,8 +46,8 @@ public class NotifierWireTool() : BaseConstructTool<NotifierWireData>( Construct
 	}
 
 	[Property]
-	[Title( "Chime" )]
-	[Description( "Optional sound to play on the owner's client when triggered" )]
+	[Title( "#tool.wire.notifier.chime" )]
+	[Description( "#tool.wire.notifier.chime.description" )]
 	public NotifierWireChime Chime
 	{
 		get => Data.Chime;
