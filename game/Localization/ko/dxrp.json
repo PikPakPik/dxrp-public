@@ -639,7 +639,7 @@
   "gatetype.vector2": "벡터2 (A, B → 출력)",
   "gatetype.vector3": "벡터3 (A, B, C → 출력)",
   "gatetype.vectorget": "벡터 추출 (A[x,y,z], B → 출력 = A[B])",
-  "gatetype.srlatch": "SR 래치 (A↑ ? !출력 : 출력 → 출력)",
+  "gatetype.latch": "SR 래치 (A=Set, B=Reset → 리셋 전까지 출력 유지)",
   "tool.precision.name": "정밀배치",
   "tool.precision.description": "구조물을 정밀하게 이동 및 회전시킵니다",
   "tool.precision.too_far": "너무 멀리 있습니다.",

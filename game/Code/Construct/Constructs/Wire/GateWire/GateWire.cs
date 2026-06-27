@@ -181,7 +181,7 @@ public class GateWire() : BaseWireConstruct( ConstructType.GateWire ), IWireEven
 			GateType.Select => numA > GateWireDefinition.GateBooleanThreshold ? InputB : InputC,
 			GateType.Threshold => numA > numB ? GateWireDefinition.GateLogicHigh : GateWireDefinition.GateLogicLow,
 			GateType.Invert => -numA,
-			GateType.Latch => UpdateSrLatch( boolInputA ),
+			GateType.Latch => UpdateSrLatch( boolInputA, boolInputB ),
 
 			// String operations
 			GateType.Concat => strA + strB + strC + strD + strE,
@@ -272,13 +272,18 @@ public class GateWire() : BaseWireConstruct( ConstructType.GateWire ), IWireEven
 		return input.Substring( start, len );
 	}
 
-	private bool UpdateSrLatch( bool inputA )
+	private float UpdateSrLatch( bool set, bool reset )
 	{
-		if ( inputA )
+		if ( _inputBLinked && reset )
 		{
-			_srLatchOutput = !_srLatchOutput;
+			_srLatchOutput = false;
 		}
-		return _srLatchOutput;
+		else if ( _inputALinked && set )
+		{
+			_srLatchOutput = true;
+		}
+
+		return _srLatchOutput ? GateWireDefinition.GateLogicHigh : GateWireDefinition.GateLogicLow;
 	}
 
 	/// <summary>

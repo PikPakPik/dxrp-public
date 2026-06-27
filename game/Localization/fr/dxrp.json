@@ -639,7 +639,7 @@
   "gatetype.vector2": "Vecteur2 ( (A, B) → Out )",
   "gatetype.vector3": "Vecteur3 ( (A, B, C) → Out )",
   "gatetype.vectorget": "VectorGet ( A[B] → Out )",
-  "gatetype.srlatch": "Bascule SR (SRLatch)",
+  "gatetype.latch": "Bascule SR (A=Set, B=Reset → sortie maintenue jusqu'au reset)",
   "tool.precision.name": "Précision",
   "tool.precision.description": "Positionner et faire pivoter précisément des constructions",
   "tool.precision.too_far": "Trop loin",
