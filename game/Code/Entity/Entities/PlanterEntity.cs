@@ -205,45 +205,29 @@ public sealed class PlanterEntity : BaseEntity, Component.ITriggerListener, ICon
 			return;
 		}
 
-		var resource = container.ContainedResource;
 		switch ( container.ContainerType )
 		{
+			case ContainerType.Bag:
+				if ( container.ResourceId != "dirt" || Soiled )
+					return;
 
-			case ContainerType.Solid:
-				// Dirt
-				if ( resource.Identifier == "dirt" )
-				{
-					if ( Soiled ) // Can only be soiled once
-					{
-						return;
-					}
-
-					container.Quantity--;
-					Soiled = true;
-				}
+				container.Quantity--;
+				Soiled = true;
 				break;
-			case ContainerType.Liquid:
-				// Water
-				if ( resource.Identifier == "water" )
-				{
-					if ( Watered || !Soiled ) // Can only be watered once (and only if soiled)
-					{
-						return;
-					}
 
-					container.Quantity--;
-					Watered = true;
-				}
+			case ContainerType.Jug:
+				if ( container.ResourceId != "water" || Watered || !Soiled )
+					return;
+
+				container.Quantity--;
+				Watered = true;
 				break;
-			case ContainerType.Seed:
 
-				// Plant
-				var plant = PlantResource.All.FirstOrDefault( x => x.Resource == resource );
+			case ContainerType.Packet:
+				var plant = PlantResource.All.FirstOrDefault( x => x.ResourceId == container.ResourceId );
 
 				if ( plant == null || !Soiled || Plant != null )
-				{
 					return;
-				}
 
 				container.Quantity--;
 				Plant = plant;

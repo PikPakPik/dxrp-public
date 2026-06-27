@@ -4,7 +4,10 @@ public class PlantResource : GameResource
 	public static HashSet<PlantResource> All { get; set; } = new();
 
 	[Property]
-	public required Resource Resource { get; set; } = null!;
+	public string ResourceId { get; set; } = string.Empty;
+
+	[Property]
+	public Texture? Icon { get; set; }
 
 	[Property]
 	public List<int> Stages { get; set; } = new();

@@ -1,36 +1,43 @@
 {
   "RootObject": {
     "__guid": "1d238c76-04ec-4a1d-9583-c46f0647c27f",
-    "__version": 1,
+    "__version": 2,
     "Flags": 0,
-    "Name": "bag",
+    "Name": "container",
     "Position": "0,0,0",
     "Rotation": "0,0,0,1",
     "Scale": "1,1,1",
     "Tags": "entity,occludable,pocket_item,hands_interact",
     "Enabled": true,
     "NetworkMode": 1,
-    "NetworkInterpolation": true,
+    "NetworkFlags": 0,
     "NetworkOrphaned": 3,
+    "NetworkTransmit": true,
     "OwnerTransfer": 1,
     "Components": [
       {
         "__type": "Dxura.RP.Game.Entities.ContainerEntity",
         "__guid": "2991993e-1f12-4562-9dee-baf5b932f09e",
         "__enabled": true,
-        "ContainerDefinition": null,
+        "Flags": 0,
+        "ContainedResource": null,
+        "ContainerType": "Solid",
         "Decal": {
           "_type": "component",
           "component_id": "cc79b255-c065-46cb-b40c-440c54e44abc",
           "go": "d8ad0918-3af6-467f-b3a4-2a07de7e7d95",
           "component_type": "Decal"
         },
+        "DefaultQuantity": 0,
+        "DestroyOnEmpty": true,
+        "GameModeEntityId": "00000000-0000-0000-0000-000000000000",
         "HealthComponent": {
           "_type": "component",
           "component_id": "7570b657-4025-42ae-9f71-e8a2241aa8ae",
           "go": "1d238c76-04ec-4a1d-9583-c46f0647c27f",
           "component_type": "HealthComponent"
         },
+        "Identifier": "",
         "ModelRenderer": {
           "_type": "component",
           "component_id": "f98bc092-8788-4954-9d09-2648285ad48d",
@@ -43,7 +50,20 @@
         "OnComponentFixedUpdate": null,
         "OnComponentStart": null,
         "OnComponentUpdate": null,
+        "Owner": 0,
         "Quantity": 0,
+        "Resource": {
+          "Id": "0fa150c9-bcfe-4966-a35c-5bbd18eacf4e",
+          "GameModeAddonContentId": "e6dd6c11-18fe-46a9-b7bd-b972b405cef4",
+          "NameOverride": null,
+          "DescriptionOverride": null,
+          "Limit": 0,
+          "HealthEnabled": false,
+          "HealthAmount": 0,
+          "DestroyOnDisconnect": false,
+          "DestroyOnJobChange": false,
+          "AllowOwnershipTransfer": false
+        },
         "Rigidbody": {
           "_type": "component",
           "component_id": "e16ecaeb-8b4e-43c3-a470-21743bb194c1",
@@ -51,19 +71,22 @@
           "component_type": "Rigidbody"
         },
         "TextRenderer": null,
+        "Tint": null,
+        "Unit": "units",
         "UseSound": "sounds/interaction/bag_open.sound"
       },
       {
         "__type": "Sandbox.ModelRenderer",
         "__guid": "f98bc092-8788-4954-9d09-2648285ad48d",
         "__enabled": true,
+        "Flags": 0,
         "BodyGroups": 18446744073709551615,
         "CreateAttachments": false,
         "LodOverride": null,
         "MaterialGroup": null,
         "MaterialOverride": null,
         "Materials": null,
-        "Model": "gameplay/entities/containers/bag/model/bag.vmdl",
+        "Model": "gameplay/entities/container/models/jug/jug.vmdl",
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
@@ -77,13 +100,15 @@
           "AfterUILayer": false
         },
         "RenderType": "On",
-        "Tint": "0.07442,0.03721,0,1"
+        "Tint": "1,1,1,1"
       },
       {
         "__type": "Sandbox.BoxCollider",
         "__guid": "8a0a3b15-da28-4b21-90ee-4cbaae20cc40",
         "__enabled": true,
-        "Center": "-0.1561475,0.1101665,1.945288",
+        "Flags": 0,
+        "Center": "-0.156147495,0.110166498,1.94528794",
+        "ColliderFlags": 0,
         "Elasticity": null,
         "Friction": null,
         "IsTrigger": false,
@@ -98,7 +123,7 @@
         "OnTriggerEnter": null,
         "OnTriggerExit": null,
         "RollingResistance": null,
-        "Scale": "5.265001,13.06642,19.72328",
+        "Scale": "5.26500082,13.0664196,19.72328",
         "Static": false,
         "Surface": null,
         "SurfaceVelocity": "0,0,0"
@@ -107,8 +132,13 @@
         "__type": "Sandbox.Rigidbody",
         "__guid": "e16ecaeb-8b4e-43c3-a470-21743bb194c1",
         "__enabled": true,
+        "Flags": 0,
         "AngularDamping": 0,
+        "EnableImpactDamage": true,
+        "EnhancedCcd": false,
         "Gravity": true,
+        "GravityScale": 1,
+        "ImpactDamage": 0,
         "LinearDamping": 0,
         "Locking": {
           "X": false,
@@ -120,6 +150,7 @@
         },
         "MassCenterOverride": "0,0,0",
         "MassOverride": 0,
+        "MinImpactDamageSpeed": 500,
         "MotionEnabled": true,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
@@ -129,12 +160,14 @@
         "OnComponentUpdate": null,
         "OverrideMassCenter": false,
         "RigidbodyFlags": 0,
+        "SleepThreshold": 2,
         "StartAsleep": false
       },
       {
         "__type": "Dxura.RP.Game.HealthComponent",
         "__guid": "7570b657-4025-42ae-9f71-e8a2241aa8ae",
         "__enabled": true,
+        "Flags": 0,
         "Health": 100,
         "IsGodMode": false,
         "MaxHealth": 75,
@@ -149,52 +182,29 @@
     "Children": [
       {
         "__guid": "d8ad0918-3af6-467f-b3a4-2a07de7e7d95",
-        "__version": 1,
+        "__version": 2,
         "Flags": 0,
         "Name": "decal",
-        "Position": "-2.973713,0,-2.348596",
+        "Position": "-2.97371292,0,-2.3485961",
         "Rotation": "0,0,0,1",
         "Scale": "1,1,1",
         "Tags": "",
         "Enabled": true,
         "NetworkMode": 2,
-        "NetworkInterpolation": true,
+        "NetworkFlags": 0,
         "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
         "OwnerTransfer": 1,
         "Components": [
           {
             "__type": "Sandbox.Decal",
             "__guid": "cc79b255-c065-46cb-b40c-440c54e44abc",
             "__enabled": true,
+            "Flags": 0,
             "__version": 3,
             "AttenuationAngle": 1,
             "ColorMix": 1,
-            "ColorTint": {
-              "Type": "Constant",
-              "Evaluation": "Life",
-              "GradientA": {
-                "blend": "Linear",
-                "color": [
-                  {
-                    "t": 0.5,
-                    "c": "1,1,1,1"
-                  }
-                ],
-                "alpha": []
-              },
-              "GradientB": {
-                "blend": "Linear",
-                "color": [
-                  {
-                    "t": 0.5,
-                    "c": "1,1,1,1"
-                  }
-                ],
-                "alpha": []
-              },
-              "ConstantA": "1,1,1,1",
-              "ConstantB": "1,1,1,1"
-            },
+            "ColorTint": "1,1,1,1",
             "Decals": [
               null
             ],
@@ -212,7 +222,7 @@
             "Scale": 1,
             "SequenceId": 0,
             "SheetSequence": false,
-            "Size": "0.4,0.4",
+            "Size": "0.400000006,0.400000006",
             "SortLayer": 0,
             "Transient": false
           }
@@ -229,13 +239,15 @@
         "Enabled": false,
         "IncludeStaticBodies": true,
         "IncludeKeyframedBodies": true,
-        "EditorAutoUpdate": true,
+        "EditorAutoUpdate": false,
         "AgentHeight": 64,
         "AgentRadius": 16,
         "AgentStepSize": 18,
         "AgentMaxSlope": 40,
         "ExcludedBodies": "",
-        "IncludedBodies": ""
+        "IncludedBodies": "",
+        "DeferGeneration": false,
+        "CustomBounds": false
       }
     },
     "__variables": [

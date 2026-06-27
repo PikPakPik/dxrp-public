@@ -157,6 +157,13 @@ public partial class Player
 			return;
 		}
 
+		// Resolve cloud model (may need to download/mount the package)
+		var model = await Job.GetPrimaryModelAsync();
+		if ( Renderer.IsValid() )
+		{
+			Renderer.Model = model;
+		}
+
 		await Dresser.Apply();
 
 		if ( !GameObject.IsValid() || !ModelHitboxes.IsValid() )

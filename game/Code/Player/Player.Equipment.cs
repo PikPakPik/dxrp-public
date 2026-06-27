@@ -588,14 +588,14 @@ public partial class Player
 		var prefabPath = resource.PrefabPath();
 		if ( string.IsNullOrWhiteSpace( prefabPath ) )
 		{
-			Log.Error( $"equipment doesn't have a prefab path? {resource.Identifier()}" );
+			Log.Warning( $"Equipment doesn't have a prefab path? {resource.Identifier()}" );
 			return null;
 		}
 
 		var prefab = GameObject.GetPrefab( prefabPath );
 		if ( !prefab.IsValid() )
 		{
-			Log.Error( $"equipment prefab could not be loaded: {prefabPath}" );
+			Log.Warning( $"Equipment prefab could not be loaded: {prefabPath}" );
 			return null;
 		}
 

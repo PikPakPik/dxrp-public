@@ -71,7 +71,7 @@
 								{
 									@if ( remaining > 0 )
 									{
-										<span class="text-xs" style="color: #44ff44;">@(TimeSpan.FromSeconds( remaining ).ToString( @"mm\:ss" ))</span>
+										<span class="text-xs" style="color: #44ff44;">@TimeUtils.FormatCountdown( remaining )</span>
 									}
 									else
 									{
@@ -186,7 +186,7 @@
 												var timeLeft = warrantPlayer.GetStatusExpiry(Constants.WarrantStatus);
 												if (timeLeft.HasValue)
 												{
-													<span>@Language.GetPhrase( "governance.warrants.time_left" ) @(TimeSpan.FromSeconds(timeLeft.Value.Relative).ToString(@"mm\:ss"))</span>
+													<span>@Language.GetPhrase( "governance.warrants.time_left" ) @TimeUtils.FormatCountdown( timeLeft.Value.Relative )</span>
 												}
 											}
 										</span>

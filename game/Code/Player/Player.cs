@@ -59,9 +59,7 @@ public sealed partial class Player : Component, IEquipmentEvents, IDamageEvents,
 	public void OnSecondlyUpdate()
 	{
 		if ( !IsLocalPlayer )
-		{
 			return;
-		}
 
 		OnSecondlyUpdateApi();
 	}
@@ -193,7 +191,7 @@ public sealed partial class Player : Component, IEquipmentEvents, IDamageEvents,
 		Assert.True( Networking.IsHost );
 
 		BankBalance = bankBalance;
-		PlayTime = playtime;
+		PlayTime = playtime * 60f;
 		Level = level;
 		RpName = rpName;
 	}

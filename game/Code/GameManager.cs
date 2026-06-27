@@ -666,6 +666,11 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 		}
 
 		Log.Info( $"Player {caller.SteamId} set {count} objects as permanent (center={center}, radius={radius})" );
+
+		if ( count > 0 )
+		{
+			SnapshotSystem.Current?.SaveSnapshot();
+		}
 	}
 
 	[Rpc.Host]
@@ -714,6 +719,11 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 		}
 
 		Log.Info( $"Player {caller.SteamId} cleared {count} permanent objects (center={center}, radius={radius})" );
+
+		if ( count > 0 )
+		{
+			SnapshotSystem.Current?.SaveSnapshot();
+		}
 	}
 
 	[Rpc.Host]

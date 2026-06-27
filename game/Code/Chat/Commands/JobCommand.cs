@@ -69,41 +69,43 @@ public class JobCommand : ICommand
 			return;
 		}
 
-		var ignoreJobRequirements = GameManager.Instance.IsValid() && GameManager.Instance.IgnoreJobRequirements;
-		if ( job.VoteRequired && !ignoreJobRequirements )
+		if ( job.VoteRequired )
 		{
-			var jobCooldownId = $"{caller.SteamId}:job:vote:{job.Id}";
-			if ( Cooldown.Current.IsOnCooldown( jobCooldownId ) )
+			if ( TryWarnJobCooldown( caller, job, $"{caller.SteamId}:job:{job.Id}" ) )
 			{
-				var remainingTime = Cooldown.Current.GetRemainingTime( jobCooldownId );
-				caller.Warn( string.Format(
-					Language.GetPhrase( "notify.vote.cooldown" ),
-					job.DisplayName(),
-					remainingTime ) );
 				return;
 			}
 
-			var voteCooldownId = $"{caller.SteamId}:vote";
-			if ( Cooldown.Current.IsOnCooldown( voteCooldownId ) )
+			var ignoreJobRequirements = GameManager.Instance.IsValid() && GameManager.Instance.IgnoreJobRequirements;
+			if ( !ignoreJobRequirements )
 			{
-				caller.Cooldown( voteCooldownId );
+				if ( TryWarnJobCooldown( caller, job, $"{caller.SteamId}:job:vote:{job.Id}" ) )
+				{
+					return;
+				}
+
+				var voteCooldownId = $"{caller.SteamId}:vote";
+				if ( Cooldown.Current.IsOnCooldown( voteCooldownId ) )
+				{
+					caller.Cooldown( voteCooldownId );
+					return;
+				}
+
+				if ( !VoteSystem.Instance.IsValid() )
+				{
+					caller.Error( "#generic.error" );
+					return;
+				}
+
+				if ( VoteSystem.Instance.StartVoteForPlayerHost( caller, caller.SteamId, VoteType.Job, customData: job.Id.ToString() ) )
+				{
+					caller.Success( string.Format(
+						Language.GetPhrase( "command.job.vote_started" ),
+						job.DisplayName() ) );
+				}
+
 				return;
 			}
-
-			if ( !VoteSystem.Instance.IsValid() )
-			{
-				caller.Error( "#generic.error" );
-				return;
-			}
-
-			if ( VoteSystem.Instance.StartVoteForPlayerHost( caller, caller.SteamId, VoteType.Job, customData: job.Id.ToString() ) )
-			{
-				caller.Success( string.Format(
-					Language.GetPhrase( "command.job.vote_started" ),
-					job.DisplayName() ) );
-			}
-
-			return;
 		}
 
 		var cooldownId = $"{caller.SteamId}:job:change";
@@ -184,9 +186,35 @@ public class JobCommand : ICommand
 		}
 
 		var normalizedInput = NormalizeJobName( input );
-		return GameModeJobs.All
+		var candidates = GameModeJobs.All
 			.Where( job => !selectableOnly || job.Selectable )
-			.FirstOrDefault( job => NormalizeJobName( job.DisplayName() ) == normalizedInput || NormalizeJobName( job.Name ) == normalizedInput );
+			.ToList();
+
+		var exact = candidates.FirstOrDefault( job =>
+			NormalizeJobName( job.DisplayName() ) == normalizedInput ||
+			NormalizeJobName( job.Name ) == normalizedInput );
+		if ( exact != null )
+		{
+			return exact;
+		}
+
+		return candidates.FirstOrDefault( job =>
+			NormalizeJobName( job.DisplayName() ).Contains( normalizedInput ) ||
+			NormalizeJobName( job.Name ).Contains( normalizedInput ) );
+	}
+
+	private static bool TryWarnJobCooldown( Player caller, GameModeJobDto job, string cooldownId )
+	{
+		if ( !Cooldown.Current.IsOnCooldown( cooldownId ) )
+		{
+			return false;
+		}
+
+		caller.Warn( string.Format(
+			Language.GetPhrase( "notify.vote.cooldown" ),
+			job.DisplayName(),
+			Cooldown.Current.GetRemainingTime( cooldownId ) ) );
+		return true;
 	}
 
 	private static string NormalizeJobName( string value )

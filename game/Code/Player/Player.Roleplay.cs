@@ -277,7 +277,7 @@ public partial class Player
 			}
 
 			Level = initResponse.Level;
-			PlayTime = initResponse.Playtime;
+			PlayTime = initResponse.Playtime * 60f;
 		} );
 	}
 

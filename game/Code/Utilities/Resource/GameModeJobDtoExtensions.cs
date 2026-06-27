@@ -1,12 +1,11 @@
 using Dxura.RP.Game.System.Events;
 using Dxura.RP.Shared;
+using System.Threading.Tasks;
 
 namespace Dxura.RP.Game;
 
 public static class GameModeJobDtoExtensions
 {
-	private static readonly Dictionary<string, Model> ModelCache = new( StringComparer.OrdinalIgnoreCase );
-
 	public static Color ColorValue( this GameModeJobDto? job )
 	{
 		return (job?.Color ?? 0).ToColor();
@@ -19,17 +18,17 @@ public static class GameModeJobDtoExtensions
 
 	public static string DisplayName( this GameModeJobDto? job )
 	{
-		return job?.Name ?? string.Empty;
+		return LabelResolver.ResolveText( job?.Name ) ?? string.Empty;
 	}
 
 	public static string DisplayDescription( this GameModeJobDto? job )
 	{
-		return job?.Description ?? string.Empty;
+		return LabelResolver.ResolveText( job?.Description ) ?? string.Empty;
 	}
 
 	public static string DisplayName( this GameModeJobGroupDto? group )
 	{
-		return group?.Name ?? string.Empty;
+		return LabelResolver.ResolveText( group?.Name ) ?? string.Empty;
 	}
 
 	public static GameModeJobGroupDto? GetGroup( this GameModeJobDto? job )
@@ -45,28 +44,42 @@ public static class GameModeJobDtoExtensions
 
 	public static Model GetPrimaryModel( this GameModeJobDto? job )
 	{
+		var modelPath = ResolveModelPath( job );
+
+		if ( IsCloudIdent( modelPath ) )
+		{
+			return Model.Load( "models/citizen/citizen.vmdl" );
+		}
+
+		return Model.Load( modelPath );
+	}
+
+	public static async Task<Model> GetPrimaryModelAsync( this GameModeJobDto? job )
+	{
+		var modelPath = ResolveModelPath( job );
+
+		if ( IsCloudIdent( modelPath ) )
+		{
+			return await Cloud.Load<Model>( modelPath ) ?? Model.Load( "models/citizen/citizen.vmdl" );
+		}
+
+		return Model.Load( modelPath );
+	}
+
+	private static string ResolveModelPath( GameModeJobDto? job )
+	{
 		var modelPath = job?.Model;
 		if ( string.IsNullOrWhiteSpace( modelPath ) )
 		{
 			modelPath = GameModeJobs.Default.Model;
 		}
 
-		if ( string.IsNullOrWhiteSpace( modelPath ) )
-		{
-			modelPath = "models/citizen/citizen.vmdl";
-		}
+		return string.IsNullOrWhiteSpace( modelPath ) ? "models/citizen/citizen.vmdl" : modelPath;
+	}
 
-		if ( ModelCache.TryGetValue( modelPath, out var cached ) )
-		{
-			return cached;
-		}
-
-		// Try loading (might be cloud)
-		Cloud.Load(  modelPath );
-		
-		cached = Model.Load( modelPath );
-		ModelCache[modelPath] = cached;
-		return cached;
+	private static bool IsCloudIdent( string path )
+	{
+		return !path.Contains( '/' ) && path.Contains( '.' );
 	}
 
 	public static bool HasTag( this GameModeJobDto? job, JobTag tag )
@@ -149,7 +162,7 @@ public static class GameModeJobDtoExtensions
 		}
 
 		var ignoreJobRequirements = GameManager.Instance.IsValid() && GameManager.Instance.IgnoreJobRequirements;
-		if ( !ignoreJobRequirements && job.PlayTime.HasValue && player.PlayTime < job.PlayTime.Value )
+		if ( !ignoreJobRequirements && job.PlayTime.HasValue && player.PlayTime / 60f < job.PlayTime.Value )
 		{
 			player.Error( "#notify.job.playtime" );
 			return false;

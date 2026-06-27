@@ -13,7 +13,7 @@ public class ConstructAction( IConstruct construct ) : IUndoable
 	/// </summary>
 	public void Undo()
 	{
-		if ( !construct.IsValid() )
+		if ( !construct.IsValid() || construct.Owner == 0 )
 		{
 			return;
 		}

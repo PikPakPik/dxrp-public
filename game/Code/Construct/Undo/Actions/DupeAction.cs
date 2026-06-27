@@ -15,8 +15,7 @@ public class DupeAction( List<IConstruct> constructs ) : IUndoable
 	{
 		foreach ( var construct in constructs )
 		{
-
-			if ( !construct.IsValid() )
+			if ( !construct.IsValid() || construct.Owner == 0 )
 			{
 				continue;
 			}

@@ -37,11 +37,10 @@
 		@if (Planter.Plant != null)
 		{
 			<div class="flex items-center gap-2 mb-2">
-				@if (Planter.Plant.Resource.Icon != null)
+				@if (Planter.Plant.Icon != null)
 				{
-					<Icon File="@Planter.Plant.Resource.Icon.ResourcePath" size="40"/>
+					<Icon File="@Planter.Plant.Icon.ResourcePath" size="40"/>
 				}
-
 			</div>
 			
 			@if (!Planter.IsMature)

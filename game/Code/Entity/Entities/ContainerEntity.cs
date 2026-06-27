@@ -11,10 +11,7 @@ public sealed class ContainerEntity : BaseEntity, IDescription
 	public int Quantity { get; set; }
 
 	[Property]
-	public required Resource ContainedResource { get; set; }
-
-	[Property]
-	public ContainerType ContainerType { get; set; } = ContainerType.Solid;
+	public ContainerType ContainerType { get; set; } = ContainerType.Bag;
 
 	[Property]
 	public int DefaultQuantity { get; set; }
@@ -39,18 +36,20 @@ public sealed class ContainerEntity : BaseEntity, IDescription
 	private SoundEvent? UseSound { get; set; }
 
 	[Property]
+	[Group( "Effects" )]
 	private Decal? Decal { get; set; }
 
-	public override string? DisplayName => string.Format( Language.GetPhrase( "entity.container.quantity" ),
-		GetText( ContainedResource?.Name ),
-		Quantity,
-		GetText( Unit ) );
+	private ContainerEntityConfig _config = new();
+
+	public string ResourceId => _config.ResourceId;
 
 	public bool IsEmpty => Quantity <= 0;
 
 	protected override void OnStart()
 	{
 		base.OnStart();
+
+		_config = GetConfig( new ContainerEntityConfig() );
 
 		UpdateState();
 	}
@@ -83,19 +82,13 @@ public sealed class ContainerEntity : BaseEntity, IDescription
 			Quantity = DefaultQuantity;
 		}
 
-		if ( !ContainedResource.IsValid() )
+		if ( Decal.IsValid() && !string.IsNullOrWhiteSpace( _config.IconPath ) )
 		{
-			return;
-		}
-
-		if ( Decal.IsValid() && ContainedResource.Icon != null )
-		{
-			var definition = new DecalDefinition
+			var icon = Texture.Load( FileSystem.Mounted, _config.IconPath );
+			if ( icon != null )
 			{
-				ColorTexture = ContainedResource.Icon
-			};
-
-			Decal.Decals = [definition];
+				Decal.Decals = [new DecalDefinition { ColorTexture = icon }];
+			}
 		}
 
 		if ( ModelRenderer.IsValid() && Tint.HasValue )
@@ -110,13 +103,8 @@ public sealed class ContainerEntity : BaseEntity, IDescription
 	{
 		if ( TextRenderer.IsValid() )
 		{
-			TextRenderer.Text = $"{ContainedResource?.Identifier ?? "Unknown"} \n {Quantity} {Unit}";
+			TextRenderer.Text = $"{_config.ResourceId} \n {Quantity} {Unit}";
 		}
 	}
 
-	private static string GetText( string? text )
-	{
-		if ( string.IsNullOrWhiteSpace( text ) ) return string.Empty;
-		return text.StartsWith( '#' ) ? Language.GetPhrase( text[1..] ) : text;
-	}
 }

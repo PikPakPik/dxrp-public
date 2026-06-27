@@ -35,7 +35,7 @@
 					<i class="material-icons">schedule</i>
 				</div>
 				<div class="stat-text">
-					<span class="stat-value">@( FormatUptime( Time.Now ) )</span>
+					<span class="stat-value">@( TimeUtils.FormatUptime( Time.Now ) )</span>
 					<span class="stat-label">#tabmenu.dashboard.uptime</span>
 				</div>
 			</div>
@@ -47,7 +47,7 @@
 					<i class="material-icons">hourglass_bottom</i>
 				</div>
 				<div class="stat-text">
-					<span class="stat-value">@( Player.Local.PlayTime / 60 )h</span>
+					<span class="stat-value">@( (int)(Player.Local.PlayTime / 3600) )h</span>
 					<span class="stat-label">#tabmenu.dashboard.playtime</span>
 				</div>
 			</div>
@@ -59,7 +59,7 @@
 					<i class="material-icons">timer</i>
 				</div>
 				<div class="stat-text">
-					<span class="stat-value">@( FormatUptime( GameManager.Instance.SessionTime ) )</span>
+					<span class="stat-value">@( TimeUtils.FormatUptime( GameManager.Instance.SessionTime ) )</span>
 					<span class="stat-label">#tabmenu.dashboard.session</span>
 				</div>
 			</div>
@@ -272,13 +272,5 @@
 	protected override int BuildHash()
 	{
 		return HashCode.Combine( IsPlayerDead(), Governance.Current.GetAllLaws().Count(), Governance.Current.GovernmentBalance, Governance.Current.TaxRate, ((float)GameManager.Instance.SessionTime).FloorToInt() );
-	}
-	
-	private static string FormatUptime(float seconds)
-	{
-		var ts = TimeSpan.FromSeconds(seconds);
-		return ts.TotalHours >= 24 
-			? $"{(int)ts.TotalDays}d {ts.Hours}h {ts.Minutes}m"
-			: $"{(int)ts.TotalHours}h {ts.Minutes}m";
 	}
 }

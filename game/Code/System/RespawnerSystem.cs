@@ -166,7 +166,13 @@ public class RespawnerSystem : SingletonComponent<RespawnerSystem>, IGameEvents
 
 		Log.Info( $"Demoting player {player.DisplayName} due to death" );
 
+		var demotedFromJob = player.Job.Id;
+
 		// Demote to citizen
 		player.Job = GameModeJobs.GetByTagOrFallback( JobTag.Citizen, "Citizen" );
+
+		Cooldown.Current.StartCooldown(
+			$"{player.SteamId}:job:{demotedFromJob}",
+			Config.Current.Game.DemoteJobReapplyCooldown );
 	}
 }

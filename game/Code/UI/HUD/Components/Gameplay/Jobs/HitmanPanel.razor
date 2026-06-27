@@ -22,7 +22,7 @@
 						<div class="active-hit-info flex flex-col items-center gap-1">
 							<span class="text-lg text-white">@target.DisplayName</span>
 							<span class="text-base text-good">$@HitSystem.ActiveHit.Value.Price.ToString("N0")</span>
-							<span class="text-sm text-tertiary">@string.Format( Language.GetPhrase( "hit.panel.time" ), FormatTimeRemaining(HitSystem.ActiveHit.Value.TimeSinceRequested) )</span>
+							<span class="text-sm text-tertiary">@string.Format( Language.GetPhrase( "hit.panel.time" ), GetHitTimeRemaining() )</span>
 						</div>
 					}
 					else
@@ -136,16 +136,17 @@
 		return HashCode.Combine( Player.Job, _isHidden, Price, CurrentTargetName, HitSystem.PendingHitRequests.Count, HasHit, Time.Now );
 	}
 
-	private string FormatTimeRemaining( TimeSince timeSince )
+	private string GetHitTimeRemaining()
 	{
+		var timeSince = HitSystem.ActiveHit!.Value.TimeSinceRequested;
 		var totalSeconds = Config.Current.Game.HitmanActiveHitDuration - timeSince;
+
 		if ( totalSeconds <= 0 )
+		{
 			return Language.GetPhrase( "hit.panel.expired" );
+		}
 
-		var minutes = (int)(totalSeconds / 60);
-		var seconds = (int)(totalSeconds % 60);
-
-		return $"{minutes}:{seconds:D2}";
+		return TimeUtils.FormatCountdown( totalSeconds, padMinutes: false );
 	}
 
 	private void ToggleHide()
