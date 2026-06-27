@@ -33,6 +33,8 @@ public sealed class ContainerEntity : BaseEntity
 	private Decal? Decal { get; set; }
 
 	private ContainerEntityConfig _config = new();
+	
+	public ContainerType ContainerType => _config.ContainerType;
 
 	public string ResourceId => _config.ResourceId;
 
