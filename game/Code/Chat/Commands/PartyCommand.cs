@@ -1,3 +1,4 @@
+using System.Globalization;
 using Dxura.RP.Shared;
 
 namespace Dxura.RP.Game.Commands;
@@ -64,6 +65,22 @@ public class PartyCommand : ICommand
 				system.HostInfo( caller );
 				return true;
 
+			case "color":
+				if ( args.Length < 2 )
+				{
+					caller.SendMessage( Language.GetPhrase( "party.color_usage" ) );
+					return true;
+				}
+
+				if ( !TryParseHexColor( args[1], out var color ) )
+				{
+					caller.Error( Language.GetPhrase( "party.color_invalid" ) );
+					return true;
+				}
+
+				system.HostSetColor( caller, color );
+				return true;
+
 			default:
 				caller.SendMessage( Language.GetPhrase( "party.command_usage" ) );
 				return true;
@@ -82,5 +99,26 @@ public class PartyCommand : ICommand
 
 		target = CommandHelper.ResolvePlayer( caller, args[1] );
 		return target.IsValid();
+	}
+
+	/// <summary>
+	/// Parses a 6-digit hex color (with or without a leading '#') into a packed 0xRRGGBB value.
+	/// </summary>
+	private static bool TryParseHexColor( string input, out uint packed )
+	{
+		packed = 0;
+
+		if ( string.IsNullOrWhiteSpace( input ) )
+		{
+			return false;
+		}
+
+		var hex = input.Trim().TrimStart( '#' );
+		if ( hex.Length != 6 )
+		{
+			return false;
+		}
+
+		return uint.TryParse( hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out packed );
 	}
 }

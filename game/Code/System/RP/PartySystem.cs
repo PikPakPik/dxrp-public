@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Dxura.RP.Shared;
 
 namespace Dxura.RP.Game;
@@ -11,8 +12,35 @@ public class PartySystemConfig
 	/// <summary>Maximum members allowed in a single party, leader included.</summary>
 	public int MaxPartySize { get; init; } = 4;
 
-	/// <summary>When true, party members cannot damage each other (used in a later step).</summary>
-	public bool PreventPartyDamage { get; init; } = false;
+	/// <summary>When true, party members cannot damage each other (friendly fire bypass).</summary>
+	public bool PreventPartyDamage { get; init; } = true;
+
+	/// <summary>Seconds a pending /party invite stays valid before it auto-expires. Mirrors CoinFlipDuration (30s).</summary>
+	public int InviteExpireSeconds { get; init; } = 30;
+}
+
+/// <summary>
+/// All replicated state for a single party, keyed by its party id. Holding everything in one type
+/// lets the whole system replicate through a single <see cref="SyncFlags.FromHost"/> dictionary
+/// (<see cref="PartySystem.Parties"/>) instead of several parallel maps.
+///
+/// This is a reference type (class) rather than a struct on purpose: its nested <see cref="Members"/> /
+/// <see cref="Invites"/> lists only round-trip to clients when the dictionary value is a class —
+/// the same shape DXRP's <c>RankSystem</c> uses (<c>NetDictionary&lt;Guid, RankDto&gt;</c>).
+/// </summary>
+public class PartyData
+{
+	/// <summary>Steam id of the current party leader.</summary>
+	public long Leader { get; set; }
+
+	/// <summary>Member steam ids in join order. Index 0 is the oldest member (used for leader transfer).</summary>
+	public List<long> Members { get; set; } = new();
+
+	/// <summary>Steam ids with a pending invite to this party.</summary>
+	public List<long> Invites { get; set; } = new();
+
+	/// <summary>Packed 0xRRGGBB highlight color (leader-customizable; drives nameplate + future party HUD).</summary>
+	public uint Color { get; set; }
 }
 
 /// <summary>
@@ -20,8 +48,10 @@ public class PartySystemConfig
 /// and are intentionally separate from the persistent <see cref="FactionSystem"/>: nothing here
 /// reads, writes, or depends on factions.
 ///
-/// State is stored as flat normalized maps (rather than nested lists) so it replicates cleanly
-/// over <see cref="SyncFlags.FromHost"/>. Clients read this synced state; only the host mutates it.
+/// All party state lives in a single <see cref="SyncFlags.FromHost"/> map of partyId → <see cref="PartyData"/>.
+/// Clients read this synced state; only the host mutates it. Every host mutation reads the entry, mutates
+/// it, and writes it back into <see cref="Parties"/> so the dictionary marks the key dirty and replicates
+/// (mirrors how <c>RankSystem</c> reassigns <c>Ranks[id] = def</c>).
 /// </summary>
 public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INetworkListener
 {
@@ -31,32 +61,47 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 	/// </summary>
 	public PartySystemConfig Settings { get; private set; } = new();
 
-	// ── Synced authoritative state (host → clients) ───────────────────────────────────────────
-	// steamId → partyId
-	[Sync( SyncFlags.FromHost )] public NetDictionary<long, Guid> MemberParty { get; set; } = new();
-	// partyId → leader steamId
-	[Sync( SyncFlags.FromHost )] public NetDictionary<Guid, long> PartyLeader { get; set; } = new();
-	// steamId → join sequence (lower = older; used for deterministic leader transfer)
-	[Sync( SyncFlags.FromHost )] public NetDictionary<long, int> MemberOrder { get; set; } = new();
-	// invited target steamId → partyId they were invited to (one pending invite per player)
-	[Sync( SyncFlags.FromHost )] public NetDictionary<long, Guid> PendingInvites { get; set; } = new();
+	/// <summary>
+	/// Default party highlight color (packed 0xRRGGBB) until the leader customizes it. Green mirrors
+	/// the reference "party halo" color and reads clearly as a friendly/ally marker.
+	/// </summary>
+	public const uint DefaultPartyColor = 0x2ECC40;
 
-	// Host-only monotonic counter for member join order.
-	private int _nextOrder = 1;
+	// ── Synced authoritative state (host → clients) ───────────────────────────────────────────
+	// partyId → all data for that party (members, leader, invites, color)
+	[Sync( SyncFlags.FromHost )] public NetDictionary<Guid, PartyData> Parties { get; set; } = new();
+
+	// Host-only: targetSteamId → token of their current pending invite. A delayed expiry timer carries the
+	// token it was scheduled with and only fires if it still matches, so a re-invite (or accept/clear)
+	// supersedes the old timer. Purely host-side scheduling state — never synced.
+	private readonly Dictionary<long, Guid> _inviteTokens = new();
 
 	// ── Read helpers (synced data; safe on host and client) ───────────────────────────────────
-	public bool IsInParty( long steamId ) => MemberParty.ContainsKey( steamId );
+	public bool IsInParty( long steamId ) => GetPartyId( steamId ).HasValue;
 
-	public Guid? GetPartyId( long steamId ) =>
-		MemberParty.TryGetValue( steamId, out var id ) ? id : null;
+	public Guid? GetPartyId( long steamId )
+	{
+		foreach ( var kv in Parties )
+		{
+			if ( kv.Value.Members is { } members && members.Contains( steamId ) )
+			{
+				return kv.Key;
+			}
+		}
+
+		return null;
+	}
 
 	public IEnumerable<long> GetMembers( Guid partyId ) =>
-		MemberParty.Where( kv => kv.Value == partyId ).Select( kv => kv.Key );
+		Parties.TryGetValue( partyId, out var data ) && data.Members is { } members
+			? members
+			: Enumerable.Empty<long>();
 
-	public int GetPartySize( Guid partyId ) => MemberParty.Count( kv => kv.Value == partyId );
+	public int GetPartySize( Guid partyId ) =>
+		Parties.TryGetValue( partyId, out var data ) && data.Members is { } members ? members.Count : 0;
 
 	public long GetLeader( Guid partyId ) =>
-		PartyLeader.TryGetValue( partyId, out var leader ) ? leader : 0;
+		Parties.TryGetValue( partyId, out var data ) ? data.Leader : 0;
 
 	public bool IsLeader( long steamId )
 	{
@@ -71,7 +116,16 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		return pa.HasValue && pb.HasValue && pa.Value == pb.Value;
 	}
 
-	private int OrderOf( long steamId ) => MemberOrder.TryGetValue( steamId, out var o ) ? o : int.MaxValue;
+	/// <summary>Highlight color (packed 0xRRGGBB) for a party, falling back to <see cref="DefaultPartyColor"/>.</summary>
+	public uint GetPartyColor( Guid partyId ) =>
+		Parties.TryGetValue( partyId, out var data ) ? data.Color : DefaultPartyColor;
+
+	/// <summary>Highlight color for the party a player belongs to (default color if they are partyless).</summary>
+	public uint GetPartyColorForMember( long steamId )
+	{
+		var partyId = GetPartyId( steamId );
+		return partyId.HasValue ? GetPartyColor( partyId.Value ) : DefaultPartyColor;
+	}
 
 	/// <summary>
 	/// Builds a client-readable view of a party for UI/HUD. This is display state only —
@@ -79,22 +133,21 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 	/// </summary>
 	public PartyRoom? GetRoomView( Guid partyId )
 	{
-		if ( !PartyLeader.TryGetValue( partyId, out var leader ) )
+		if ( !Parties.TryGetValue( partyId, out var data ) || data.Members is null )
 		{
 			return null;
 		}
 
-		var members = GetMembers( partyId )
-			.OrderBy( OrderOf )
+		var members = data.Members
 			.Select( id =>
 			{
 				var player = GameUtils.GetPlayerById( id );
 				var name = player.IsValid() ? player.DisplayName : id.ToString();
-				return new PartyMember( id, name, id == leader );
+				return new PartyMember( id, name, id == data.Leader );
 			} )
 			.ToList();
 
-		return new PartyRoom { Id = partyId, LeaderSteamId = leader, Members = members };
+		return new PartyRoom { Id = partyId, LeaderSteamId = data.Leader, Members = members };
 	}
 
 	// ── Host mutations (invoked from PartyCommand.ExecuteHost, which already runs on the host) ──
@@ -136,10 +189,19 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 			return;
 		}
 
-		PendingInvites[target.SteamId] = partyId.Value;
+		// One pending invite per player: clear any prior invite before recording this one.
+		ClearInvite( target.SteamId );
 
-		caller.Success( string.Format( Language.GetPhrase( "party.invite_sent" ), target.DisplayName ) );
-		target.Info( string.Format( Language.GetPhrase( "party.invite_received" ), caller.DisplayName ) );
+		var data = Clone( Parties[partyId.Value] );
+		data.Invites.Add( target.SteamId );
+		Parties[partyId.Value] = data;
+
+		// Invites are delivered as private, client-side party-chat lines (only the two players see them),
+		// never a public chat broadcast — and auto-expire after Settings.InviteExpireSeconds.
+		SendPartyChat( caller, string.Format( Language.GetPhrase( "party.invite_sent" ), target.DisplayName ) );
+		SendPartyChat( target, string.Format( Language.GetPhrase( "party.invite_received" ), caller.DisplayName ) );
+
+		ScheduleInviteExpiry( partyId.Value, target.SteamId );
 	}
 
 	/// <summary>Accept the single pending invite for the caller.</summary>
@@ -156,31 +218,27 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 			return;
 		}
 
-		if ( !PendingInvites.TryGetValue( caller.SteamId, out var partyId ) )
+		var partyId = FindInviteParty( caller.SteamId );
+		if ( !partyId.HasValue )
 		{
 			caller.Error( Language.GetPhrase( "party.invite_none" ) );
 			return;
 		}
 
-		// The party may have disbanded between invite and accept.
-		if ( !PartyLeader.ContainsKey( partyId ) )
-		{
-			PendingInvites.Remove( caller.SteamId );
-			caller.Error( Language.GetPhrase( "party.invite_expired" ) );
-			return;
-		}
-
-		if ( GetPartySize( partyId ) >= Settings.MaxPartySize )
+		if ( GetPartySize( partyId.Value ) >= Settings.MaxPartySize )
 		{
 			caller.Error( Language.GetPhrase( "party.party_full" ) );
 			return;
 		}
 
-		PendingInvites.Remove( caller.SteamId );
-		MemberParty[caller.SteamId] = partyId;
-		MemberOrder[caller.SteamId] = _nextOrder++;
+		_inviteTokens.Remove( caller.SteamId );
 
-		NotifyParty( partyId, string.Format( Language.GetPhrase( "party.joined" ), caller.DisplayName ) );
+		var data = Clone( Parties[partyId.Value] );
+		data.Invites.Remove( caller.SteamId );
+		data.Members.Add( caller.SteamId );
+		Parties[partyId.Value] = data;
+
+		NotifyParty( partyId.Value, string.Format( Language.GetPhrase( "party.joined" ), caller.DisplayName ) );
 	}
 
 	/// <summary>Leader kicks <paramref name="target"/> from the party.</summary>
@@ -240,7 +298,7 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		caller.Info( Language.GetPhrase( "party.left" ) );
 
 		// Notify whoever remains (no-op if the party disbanded).
-		if ( PartyLeader.ContainsKey( partyId.Value ) )
+		if ( Parties.ContainsKey( partyId.Value ) )
 		{
 			NotifyParty( partyId.Value, string.Format( Language.GetPhrase( "party.member_left" ), caller.DisplayName ) );
 		}
@@ -292,15 +350,170 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		caller.SendMessage( string.Format( Language.GetPhrase( "party.info" ), room.Members.Count, Settings.MaxPartySize, names ) );
 	}
 
+	/// <summary>
+	/// Leader sets the party's highlight color (packed 0xRRGGBB). This is the command-driven equivalent
+	/// of the future party Settings color picker; both paths funnel through this single host mutation.
+	/// </summary>
+	public void HostSetColor( Player caller, uint color )
+	{
+		if ( !Networking.IsHost || caller is null )
+		{
+			return;
+		}
+
+		var partyId = GetPartyId( caller.SteamId );
+		if ( !partyId.HasValue )
+		{
+			caller.Error( Language.GetPhrase( "party.no_party" ) );
+			return;
+		}
+
+		if ( !IsLeader( caller.SteamId ) )
+		{
+			caller.Error( Language.GetPhrase( "party.not_leader" ) );
+			return;
+		}
+
+		var data = Clone( Parties[partyId.Value] );
+		data.Color = color;
+		Parties[partyId.Value] = data;
+
+		NotifyParty( partyId.Value, Language.GetPhrase( "party.color_changed" ) );
+	}
+
 	// ── Internal helpers (host-side) ────────────────────────────────────────────────────────
+
+	/// <summary>
+	/// Returns a deep copy of <paramref name="src"/> with fresh member/invite lists. Every host mutation
+	/// works on a clone and assigns it back into <see cref="Parties"/> so the <see cref="NetDictionary{TKey,TValue}"/>
+	/// sees a new value and replicates to clients. Mutating the stored instance in place and re-assigning the
+	/// same reference would not mark the key dirty, so the change would never reach clients — this mirrors how
+	/// <c>RankSystem</c> always assigns fresh <c>RankDto</c> objects.
+	/// </summary>
+	private static PartyData Clone( PartyData src ) => new()
+	{
+		Leader = src.Leader,
+		Members = new List<long>( src.Members ),
+		Invites = new List<long>( src.Invites ),
+		Color = src.Color
+	};
+
 	private Guid CreatePartyForLeader( Player leader )
 	{
 		var partyId = Guid.NewGuid();
-		PartyLeader[partyId] = leader.SteamId;
-		MemberParty[leader.SteamId] = partyId;
-		MemberOrder[leader.SteamId] = _nextOrder++;
-		leader.Info( Language.GetPhrase( "party.created" ) );
+		Parties[partyId] = new PartyData
+		{
+			Leader = leader.SteamId,
+			Members = new List<long> { leader.SteamId },
+			Invites = new List<long>(),
+			Color = DefaultPartyColor
+		};
+		SendPartyChat( leader, Language.GetPhrase( "party.created" ) );
 		return partyId;
+	}
+
+	/// <summary>Returns the party that has a pending invite out to <paramref name="steamId"/>, if any.</summary>
+	private Guid? FindInviteParty( long steamId )
+	{
+		foreach ( var kv in Parties )
+		{
+			if ( kv.Value.Invites is { } invites && invites.Contains( steamId ) )
+			{
+				return kv.Key;
+			}
+		}
+
+		return null;
+	}
+
+	/// <summary>Clears any pending invite out to <paramref name="steamId"/> across all parties.</summary>
+	private void ClearInvite( long steamId )
+	{
+		_inviteTokens.Remove( steamId );
+
+		foreach ( var partyId in Parties.Keys.ToList() )
+		{
+			var existing = Parties[partyId];
+			if ( existing.Invites is { } invites && invites.Contains( steamId ) )
+			{
+				var data = Clone( existing );
+				data.Invites.Remove( steamId );
+				Parties[partyId] = data;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Records a fresh expiry token for <paramref name="targetSteamId"/> and schedules the invite to
+	/// auto-expire after <see cref="PartySystemConfig.InviteExpireSeconds"/>. Mirrors the /coinflip
+	/// auto-cancel pattern (delay + token guard so a re-invite/accept supersedes an in-flight timer).
+	/// </summary>
+	private void ScheduleInviteExpiry( Guid partyId, long targetSteamId )
+	{
+		var token = Guid.NewGuid();
+		_inviteTokens[targetSteamId] = token;
+		_ = ExpireInviteAfter( partyId, targetSteamId, token, Settings.InviteExpireSeconds );
+	}
+
+	private async Task ExpireInviteAfter( Guid partyId, long targetSteamId, Guid token, int seconds )
+	{
+		await GameTask.DelayRealtimeSeconds( seconds );
+		await GameTask.MainThread();
+
+		// Bail if play stopped or we are no longer the host.
+		if ( !this.IsValid() || !Networking.IsHost )
+		{
+			return;
+		}
+
+		// Superseded by a re-invite, accept, or clear — this timer is stale, do nothing.
+		if ( !_inviteTokens.TryGetValue( targetSteamId, out var current ) || current != token )
+		{
+			return;
+		}
+
+		_inviteTokens.Remove( targetSteamId );
+
+		// Only act if the invite is still pending in that party.
+		if ( !Parties.TryGetValue( partyId, out var existing ) || existing.Invites is not { } invites || !invites.Contains( targetSteamId ) )
+		{
+			return;
+		}
+
+		var data = Clone( existing );
+		data.Invites.Remove( targetSteamId );
+		Parties[partyId] = data;
+
+		var target = GameUtils.GetPlayerById( targetSteamId );
+		if ( target.IsValid() )
+		{
+			SendPartyChat( target, Language.GetPhrase( "party.invite_expired" ) );
+		}
+
+		var leader = GameUtils.GetPlayerById( GetLeader( partyId ) );
+		if ( leader.IsValid() )
+		{
+			var name = target.IsValid() ? target.DisplayName : targetSteamId.ToString();
+			SendPartyChat( leader, string.Format( Language.GetPhrase( "party.invite_expired_leader" ), name ) );
+		}
+	}
+
+	/// <summary>
+	/// Sends one private, client-side party-chat line to a single player — only they see it, never public.
+	/// Mirrors <c>MsgCommand</c>'s <c>Rpc.FilterInclude</c> delivery and is the foundation for the future
+	/// /party chat channel (same <see cref="MessageType.PartyChat"/> styling).
+	/// </summary>
+	private static void SendPartyChat( Player recipient, string message )
+	{
+		if ( !recipient.IsValid() || Chat.Current is null )
+		{
+			return;
+		}
+
+		using ( Rpc.FilterInclude( c => c.Id == recipient.ConnectionId ) )
+		{
+			Chat.Current.BroadcastChat( message, MessageType.PartyChat );
+		}
 	}
 
 	/// <summary>
@@ -309,42 +522,49 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 	/// </summary>
 	private void RemovePlayerInternal( long steamId )
 	{
-		if ( !MemberParty.TryGetValue( steamId, out var partyId ) )
+		var partyId = GetPartyId( steamId );
+		if ( !partyId.HasValue )
 		{
 			return;
 		}
 
-		MemberParty.Remove( steamId );
-		MemberOrder.Remove( steamId );
-		PendingInvites.Remove( steamId );
+		var data = Clone( Parties[partyId.Value] );
+		data.Members.Remove( steamId );
+		data.Invites.Remove( steamId );
 
-		var remaining = GetMembers( partyId ).ToList();
-		if ( remaining.Count == 0 )
+		if ( data.Members.Count == 0 )
 		{
-			DisbandParty( partyId );
+			Parties.Remove( partyId.Value );
 			return;
 		}
 
-		if ( PartyLeader.TryGetValue( partyId, out var leader ) && leader == steamId )
+		// Leader left: promote the oldest remaining member (Members is kept in join order).
+		if ( data.Leader == steamId )
 		{
-			var newLeader = remaining.OrderBy( OrderOf ).First();
-			PartyLeader[partyId] = newLeader;
+			data.Leader = data.Members[0];
+			Parties[partyId.Value] = data;
 
-			var promoted = GameUtils.GetPlayerById( newLeader );
+			var promoted = GameUtils.GetPlayerById( data.Leader );
 			if ( promoted.IsValid() )
 			{
 				promoted.Info( Language.GetPhrase( "party.leader_changed" ) );
 			}
 		}
+		else
+		{
+			Parties[partyId.Value] = data;
+		}
 	}
 
 	private void DisbandParty( Guid partyId )
 	{
-		foreach ( var id in GetMembers( partyId ).ToList() )
+		if ( !Parties.TryGetValue( partyId, out var data ) || data.Members is null )
 		{
-			MemberParty.Remove( id );
-			MemberOrder.Remove( id );
+			return;
+		}
 
+		foreach ( var id in data.Members.ToList() )
+		{
 			var player = GameUtils.GetPlayerById( id );
 			if ( player.IsValid() )
 			{
@@ -352,22 +572,17 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 			}
 		}
 
-		PartyLeader.Remove( partyId );
-
-		foreach ( var invite in PendingInvites.Where( kv => kv.Value == partyId ).ToList() )
-		{
-			PendingInvites.Remove( invite.Key );
-		}
+		Parties.Remove( partyId );
 	}
 
 	private void NotifyParty( Guid partyId, string message )
 	{
-		foreach ( var id in GetMembers( partyId ) )
+		foreach ( var id in GetMembers( partyId ).ToList() )
 		{
 			var player = GameUtils.GetPlayerById( id );
 			if ( player.IsValid() )
 			{
-				player.Info( message );
+				SendPartyChat( player, message );
 			}
 		}
 	}
@@ -381,6 +596,6 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		}
 
 		RemovePlayerInternal( channel.SteamId );
-		PendingInvites.Remove( channel.SteamId );
+		ClearInvite( channel.SteamId );
 	}
 }

@@ -8,6 +8,14 @@
 }
 
 <root>
+	@if ( IsPartyMember )
+	{
+		<div class="party-tag">
+			<i class="material-icons text-accent">group</i>
+			<span style="color: @PartyColorHex">#party.nameplate_tag</span>
+		</div>
+	}
+
 	@foreach(var statusId in Player.Statuses.Keys.Where( x => Status.Current.GetCachedInstance(x)?.ShowOnNameplate ?? false) )
 	{
 		var status = Status.Current.GetCachedInstance( statusId );
@@ -74,6 +82,30 @@
 	                                 Player.Local.Job.IsMedicRole() && 
 	                                 Player != Player.Local &&
 	                                 HasMedkitEquipped();
+
+	// Marks teammates in the local player's party. Reads the host-synced PartySystem state, so it is
+	// safe on the client. Never marks the local player or players outside the local player's party.
+	private bool IsPartyMember
+	{
+		get
+		{
+			var party = PartySystem.Instance;
+			if ( party is null || !Player.IsValid() || !Player.Local.IsValid() || Player == Player.Local )
+			{
+				return false;
+			}
+
+			return party.AreInSameParty( Player.Local.SteamId, Player.SteamId );
+		}
+	}
+
+	// The party's customizable highlight color (same packed value the future party HUD will use),
+	// rendered as a hex string for inline styling — mirrors how rank/status colors are applied.
+	private uint PartyColorValue => PartySystem.Instance is { } party && Player.IsValid()
+		? party.GetPartyColorForMember( Player.SteamId )
+		: PartySystem.DefaultPartyColor;
+
+	private string PartyColorHex => PartyColorValue.Hex();
 	
 	private bool HasCameraEquipped()
 	{
@@ -146,6 +178,8 @@
 		hash.Add(health.CeilToInt());
 		hash.Add( DxNameplates );
 		hash.Add( RankSystem.Instance.GetPlayerRank( Player.SteamId )?.Name );
+		hash.Add( IsPartyMember );
+		hash.Add( IsPartyMember ? PartyColorValue : 0u );
 		return hash.ToHashCode();
 	}
 }
