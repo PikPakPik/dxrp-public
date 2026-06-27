@@ -8,7 +8,7 @@ public class SpawnEntityCommand : ICommand
 	public const int MaxQuantity = 100;
 
 	public string Command => "spawnentity";
-	public string Help => "/spawnentity <quantity> <name>  (equipment spawns as shipment when quantity > 1)";
+	public string Help => "/spawnentity list  |  /spawnentity <quantity> <name>  (equipment spawns as shipment when quantity > 1)";
 	public bool IsUsableWhileDead => false;
 	public Permission[] RequiredPermissions => [Permission.CommandSpawnEntity];
 
@@ -22,6 +22,13 @@ public class SpawnEntityCommand : ICommand
 		if ( args.Length < 1 )
 		{
 			caller.SendMessage( Help );
+			return true;
+		}
+
+		if ( args[0].Equals( "list", StringComparison.OrdinalIgnoreCase ) )
+		{
+			var filter = args.Length > 1 ? string.Join( ' ', args[1..] ) : null;
+			SendSpawnList( caller, filter );
 			return true;
 		}
 
@@ -218,6 +225,73 @@ public class SpawnEntityCommand : ICommand
 	{
 		Log.Info( $"Staff {player.SteamId} spawned '{displayName}' x{quantity}" );
 		_ = ServerApiClient.Audit( "StaffSpawnEntity", $"{player.SteamName} ({player.SteamId}) spawned {displayName} x{quantity}", player.SteamId );
+	}
+
+	private static void SendSpawnList( Player caller, string? filter )
+	{
+		var normalizedFilter = string.IsNullOrWhiteSpace( filter ) ? null : NormalizeName( filter );
+
+		var entities = GameModeEntities.All
+			.Where( entity => IsListableEntity( entity ) )
+			.Where( entity => MatchesListFilter( entity.Identifier(), entity.DisplayName(), entity.Name(), normalizedFilter ) )
+			.OrderBy( entity => entity.Identifier() )
+			.Select( entity => FormatListEntry( entity.Identifier(), entity.DisplayName() ) )
+			.ToList();
+
+		var equipments = GameModeEquipments.All
+			.Where( equipment => IsListableEquipment( equipment ) )
+			.Where( equipment => MatchesListFilter( equipment.Identifier(), equipment.DisplayName(), equipment.Name(), normalizedFilter ) )
+			.OrderBy( equipment => equipment.Identifier() )
+			.Select( equipment => FormatListEntry( equipment.Identifier(), equipment.DisplayName() ) )
+			.ToList();
+
+		if ( entities.Count == 0 && equipments.Count == 0 )
+		{
+			caller.SendMessage( string.IsNullOrWhiteSpace( filter )
+				? "No spawnable entities or equipment."
+				: $"No spawnable entities or equipment matching '{filter}'." );
+			return;
+		}
+
+		if ( entities.Count > 0 )
+		{
+			caller.SendMessage( $"Entities ({entities.Count}): {string.Join( ", ", entities )}" );
+		}
+
+		if ( equipments.Count > 0 )
+		{
+			caller.SendMessage( $"Equipment ({equipments.Count}): {string.Join( ", ", equipments )}" );
+		}
+	}
+
+	private static bool IsListableEntity( GameModeEntityDto entity )
+	{
+		var prefabPath = entity.PrefabPath();
+		return !string.IsNullOrWhiteSpace( prefabPath ) && GameObject.GetPrefab( prefabPath ).IsValid();
+	}
+
+	private static bool IsListableEquipment( GameModeEquipmentDto equipment )
+	{
+		return !string.IsNullOrWhiteSpace( equipment.PrefabPath() );
+	}
+
+	private static bool MatchesListFilter( string identifier, string displayName, string name, string? normalizedFilter )
+	{
+		if ( normalizedFilter == null )
+		{
+			return true;
+		}
+
+		return NormalizeName( identifier ).Contains( normalizedFilter )
+		       || NormalizeName( displayName ).Contains( normalizedFilter )
+		       || NormalizeName( name ).Contains( normalizedFilter );
+	}
+
+	private static string FormatListEntry( string identifier, string displayName )
+	{
+		return string.Equals( identifier, displayName, StringComparison.OrdinalIgnoreCase )
+			? identifier
+			: $"{identifier} ({displayName})";
 	}
 
 	private static bool TryParseArguments( string[] args, out int quantity, out string name )
