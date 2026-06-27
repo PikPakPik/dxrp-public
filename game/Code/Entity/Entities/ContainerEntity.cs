@@ -1,9 +1,21 @@
-using Sandbox.Diagnostics;
 namespace Dxura.RP.Game.Entities;
+
+public class ContainerEntityConfig
+{
+	public string ResourceId { get; init; } = string.Empty;
+	public string IconPath { get; init; } = string.Empty;
+	public string Unit { get; init; } = "units";
+	public ContainerType ContainerType { get; init; } = ContainerType.Bag;
+	public int DefaultQuantity { get; init; }
+	public bool DestroyOnEmpty { get; init; } = true;
+	public string? Tint { get; init; }
+	public string? UseSound { get; init; }
+}
+
 
 [Title( "Container" )]
 [Category( "Entities" )]
-public sealed class ContainerEntity : BaseEntity, IDescription
+public sealed class ContainerEntity : BaseEntity
 {
 	[Property]
 	[Sync( SyncFlags.FromHost )]
@@ -11,29 +23,10 @@ public sealed class ContainerEntity : BaseEntity, IDescription
 	public int Quantity { get; set; }
 
 	[Property]
-	public ContainerType ContainerType { get; set; } = ContainerType.Bag;
-
-	[Property]
-	public int DefaultQuantity { get; set; }
-
-	[Property]
-	public string Unit { get; set; } = "units";
-
-	[Property]
-	public bool DestroyOnEmpty { get; set; } = true;
-
-	[Property]
-	public Color? Tint { get; set; }
-
-	[Property]
 	private ModelRenderer ModelRenderer { get; set; } = null!;
 
 	[Property]
 	private TextRenderer? TextRenderer { get; set; }
-
-	[Property]
-	[Group( "Effects" )]
-	private SoundEvent? UseSound { get; set; }
 
 	[Property]
 	[Group( "Effects" )]
@@ -56,14 +49,14 @@ public sealed class ContainerEntity : BaseEntity, IDescription
 
 	private void OnQuantityChanged( int oldValue, int newValue )
 	{
-		if ( newValue < oldValue )
+		if ( newValue < oldValue && !string.IsNullOrEmpty( _config.UseSound ) )
 		{
-			UseSound.Play( WorldPosition );
+			Sound.Play( _config.UseSound, WorldPosition );
 		}
 
 		if ( newValue <= 0 )
 		{
-			if ( DestroyOnEmpty )
+			if ( _config.DestroyOnEmpty )
 			{
 				GameObject.Destroy();
 				return;
@@ -79,21 +72,21 @@ public sealed class ContainerEntity : BaseEntity, IDescription
 	{
 		if ( Networking.IsHost && Quantity <= 0 )
 		{
-			Quantity = DefaultQuantity;
+			Quantity = _config.DefaultQuantity;
 		}
 
 		if ( Decal.IsValid() && !string.IsNullOrWhiteSpace( _config.IconPath ) )
 		{
-			var icon = Texture.Load( FileSystem.Mounted, _config.IconPath );
+			var icon = Texture.LoadFromFileSystem( _config.IconPath, FileSystem.Mounted );
 			if ( icon != null )
 			{
 				Decal.Decals = [new DecalDefinition { ColorTexture = icon }];
 			}
 		}
 
-		if ( ModelRenderer.IsValid() && Tint.HasValue )
+		if ( ModelRenderer.IsValid() && Color.TryParse( _config.Tint, out var tint ) )
 		{
-			ModelRenderer.Tint = Tint.Value;
+			ModelRenderer.Tint = tint;
 		}
 
 		UpdateText();
@@ -103,7 +96,7 @@ public sealed class ContainerEntity : BaseEntity, IDescription
 	{
 		if ( TextRenderer.IsValid() )
 		{
-			TextRenderer.Text = $"{_config.ResourceId} \n {Quantity} {Unit}";
+			TextRenderer.Text = $"{_config.ResourceId} \n {Quantity} {_config.Unit}";
 		}
 	}
 
