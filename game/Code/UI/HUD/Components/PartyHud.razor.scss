@@ -1,0 +1,64 @@
+@import "../../styles.scss";
+
+PartyHud {
+  position: absolute;
+  // Top-left, but deliberately clear of AdminTickets (top: $space-3, staff-only, z 999000) above and
+  // Waila (top: 20%) below. Self is excluded from the roster, so at most 3 member cards ever render.
+  top: 96px;
+  left: $space-3;
+  z-index: 90;
+  flex-direction: column;
+  pointer-events: none;
+
+  .party-header {
+    min-width: 232px;
+    padding: 3px 7px;
+    margin-bottom: 3px;
+    background-color: rgba($color-primary, 0.92);
+    border-radius: $rounding;
+    pointer-events: all;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+
+    &:hover {
+      background-color: rgba(lighten($color-primary, 8%), 0.95);
+    }
+  }
+
+  // Route every click on the bar (icon, title, count, chevron) to the header's onclick — without this
+  // the child glyphs capture the hit-test and the arrow appears unclickable.
+  .header-icon,
+  .header-title,
+  .header-count,
+  .header-arrow {
+    pointer-events: none;
+  }
+
+  .header-icon {
+    font-size: 14px;
+  }
+
+  .header-arrow {
+    font-size: 15px;
+    color: $color-gray-400;
+    margin-left: 4px;
+  }
+
+  .header-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: $color-white;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .header-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: $color-gray-400;
+  }
+
+  .party-members {
+    gap: 3px;
+  }
+}

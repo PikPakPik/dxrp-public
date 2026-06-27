@@ -1,0 +1,130 @@
+@import "../../styles.scss";
+
+PartyMemberCard {
+  pointer-events: none;
+  flex-direction: column;
+  min-width: 232px;
+  background-color: rgba($color-primary, 0.92);
+  border-radius: $rounding;
+  transition: opacity 0.15s ease;
+
+  &.dead {
+    opacity: 0.5;
+  }
+
+  .top-row {
+    padding: 5px 7px;
+    gap: 7px;
+  }
+
+  .profile-picture {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+
+  .name-col {
+    gap: 0;
+  }
+
+  .leader-star {
+    font-size: 12px;
+  }
+
+  .player-name {
+    font-size: 12px;
+    color: $color-white;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+  }
+
+  .wallet-display-value {
+    font-size: 11px;
+    font-weight: 700;
+    color: $color-good;
+    height: 13px;
+    line-height: 13px;
+    overflow: hidden;
+  }
+
+  .vital-bars {
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .vital-row {
+    gap: 5px;
+  }
+
+  .vital-icon {
+    font-size: 11px;
+    width: 13px;
+  }
+
+  .armor-icon {
+    color: $counter-terror-color;
+  }
+
+  .vital-bar {
+    width: 96px;
+    background-color: rgba(black, 0.6);
+    border-radius: 1px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .health-bar {
+    height: 9px;
+  }
+
+  .armor-bar {
+    height: 6px;
+  }
+
+  .vital-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  .armor-fill {
+    background-color: $counter-terror-color;
+  }
+
+  .vital-value {
+    font-size: 11px;
+    font-weight: bold;
+    min-width: 22px;
+  }
+
+  .health-value {
+    font-size: 11px;
+  }
+
+  .armor-value {
+    color: $counter-terror-color;
+  }
+
+  .bottom-row {
+    padding: 1px 7px;
+    gap: 6px;
+    background-color: rgba(black, 0.35);
+    border-top: 0.5px solid rgba(white, 0.05);
+  }
+
+  .job-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+
+  .dead-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: $color-bad;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}

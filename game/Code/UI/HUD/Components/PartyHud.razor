@@ -1,0 +1,91 @@
+@namespace Dxura.RP.Game.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@{
+	var room = PartyRoom.Current;
+}
+
+@if ( room is null || room.Count == 0 )
+{
+	return;
+}
+
+<root>
+	<div class="party-header flex flex-row items-center gap-1" onclick="@ToggleCollapsed">
+		<i class="material-icons header-icon" style="color: @AccentHex">group</i>
+		<label class="header-title">#party.hud_title</label>
+		<div class="flex-grow"></div>
+		<label class="header-count">@room.Count/@MaxSize</label>
+		<i class="material-icons header-arrow">@(_collapsed ? "expand_more" : "expand_less")</i>
+	</div>
+
+	@if ( !_collapsed )
+	{
+		<div class="party-members flex flex-col">
+			@foreach ( var member in OrderedMembers( room ) )
+			{
+				var memberPlayer = GameUtils.GetPlayerById( member.Id );
+				<PartyMemberCard Player=@memberPlayer IsLeader=@member.IsLeader AccentColor=@AccentColor/>
+			}
+		</div>
+	}
+</root>
+
+@code
+{
+	// The local player's party highlight color (leader-customizable), shared with every card so the
+	// roster reads as one cohesive group. Falls back to the default color when partyless/unavailable.
+	private uint AccentColor => PartySystem.Instance is { } system && Player.Local.IsValid()
+		? system.GetPartyColorForMember( Player.Local.SteamId )
+		: PartySystem.DefaultPartyColor;
+
+	private string AccentHex => AccentColor.Hex();
+
+	private int MaxSize => PartySystem.Instance?.Settings.MaxPartySize ?? 4;
+
+	// Accordion state. The whole header bar toggles it; DXRP reveals the cursor while Alt is held, so a
+	// normal click on the bar collapses/expands the roster. Collapsed leaves just the header + chevron.
+	private bool _collapsed;
+
+	private void ToggleCollapsed()
+	{
+		_collapsed = !_collapsed;
+	}
+
+	// Other members only — the local player is omitted because their own vitals already live in the
+	// bottom-left PlayerInfo HUD. Leader first, then everyone else by name for a stable, readable list.
+	private static IEnumerable<PartyMember> OrderedMembers( PartyRoom room )
+	{
+		var localId = Player.Local.IsValid() ? Player.Local.SteamId : 0L;
+		return room.Members
+			.Where( m => m.Id != localId )
+			.OrderByDescending( m => m.IsLeader )
+			.ThenBy( m => m.Name );
+	}
+
+	protected override int BuildHash()
+	{
+		var room = PartyRoom.Current;
+		if ( room is null )
+		{
+			return 0;
+		}
+
+		// Only the roster shape + accent drive re-creation of the card list; each PartyMemberCard
+		// re-renders its own live vitals (health/armor/cash) via its own BuildHash.
+		var hash = new HashCode();
+		hash.Add( room.Id );
+		hash.Add( room.Count );
+		hash.Add( AccentColor );
+		hash.Add( _collapsed );
+		foreach ( var member in room.Members )
+		{
+			hash.Add( member.Id );
+			hash.Add( member.IsLeader );
+			hash.Add( member.Name );
+		}
+
+		return hash.ToHashCode();
+	}
+}

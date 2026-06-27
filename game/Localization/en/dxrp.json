@@ -363,6 +363,8 @@
   "party.chat_help": "Send a message to your party. Usage: /partychat <message>",
   "party.chat_usage": "Usage: /partychat <message>",
   "party.chat_not_in_party": "You are not in a party.",
+  "party.hud_title": "PARTY",
+  "party.hud_dead": "DEAD",
   "command.warrant.help": "Usage: /warrant <player> <reason> (Police), /warrant <approve|deny> (Mayor/Chief)",
   "command.warrant.mayor_cannot": "The Mayor cannot request warrants, only approve or deny them",
   "command.warrant.not_found": "No player found matching '{0}'",
