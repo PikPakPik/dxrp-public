@@ -35,14 +35,18 @@ public class Notify : GameObjectSystem<Notify>, IGameEvents
 	}
 
 	// Add a new notification locally
-	private void Add( string message, NotificationType type = NotificationType.Generic, float duration = 5f )
+	private void Add( string message, NotificationType type = NotificationType.Generic, float duration = 5f, string? chimeSound = null )
 	{
 		message = ResolvePhrase( message );
 		Log.Info( $"[{type}] {message}" );
 
 		var notification = new NotificationEntry( message, type, duration );
 
-		if ( type is NotificationType.Error or NotificationType.Success )
+		if ( !string.IsNullOrEmpty( chimeSound ) )
+		{
+			Sound.Play( chimeSound );
+		}
+		else if ( type is NotificationType.Error or NotificationType.Success )
 		{
 			Sound.Play( $"notify-{type.ToString().ToLower()}" );
 		}
@@ -78,9 +82,9 @@ public class Notify : GameObjectSystem<Notify>, IGameEvents
 		Current?.Add( message, NotificationType.Success, duration );
 	}
 
-	public static void Warn( string message, float duration = 5f )
+	public static void Warn( string message, float duration = 5f, string? chimeSound = null )
 	{
-		Current?.Add( message, NotificationType.Warning, duration );
+		Current?.Add( message, NotificationType.Warning, duration, chimeSound );
 	}
 
 	public static void Inventory( string message, float duration = 4f )
@@ -117,9 +121,9 @@ public class Notify : GameObjectSystem<Notify>, IGameEvents
 	}
 
 	[Rpc.Broadcast( NetFlags.HostOnly | NetFlags.Reliable )]
-	public static void BroadcastWarn( string message, float duration = 5f )
+	public static void BroadcastWarn( string message, float duration = 5f, string? chimeSound = null )
 	{
-		Warn( message, duration );
+		Warn( message, duration, chimeSound );
 	}
 
 	[Rpc.Broadcast( NetFlags.HostOnly | NetFlags.Reliable )]
@@ -174,11 +178,11 @@ public static partial class PlayerExtensions
 		}
 	}
 
-	public static void Warn( this Player player, string message, float duration = 5f )
+	public static void Warn( this Player player, string message, float duration = 5f, string? chimeSound = null )
 	{
 		using ( Rpc.FilterInclude( c => c.Id == player.ConnectionId ) )
 		{
-			Notify.BroadcastWarn( message, duration );
+			Notify.BroadcastWarn( message, duration, chimeSound );
 		}
 	}
 
