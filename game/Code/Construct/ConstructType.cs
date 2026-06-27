@@ -27,5 +27,6 @@ public enum ConstructType
 	MemoryWire = 1014,
 	CameraWire = 1015,
 	TargetWire = 1016,
-	SynthesizerWire = 1017
+	SynthesizerWire = 1017,
+	MetaWire = 1018
 }
