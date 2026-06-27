@@ -3,8 +3,21 @@ namespace Dxura.RP.Game.Wire;
 [Title( "Meta" )]
 [Category( "Wire" )]
 [Icon( "cable" )]
-public class MetaWire() : BaseWireConstruct( ConstructType.MetaWire ), IWireEvents
+public class MetaWire() : BaseWireConstruct( ConstructType.MetaWire )
 {
+	[WireInput( "refresh" )]
+	public bool Refresh
+	{
+		set
+		{
+			if ( value )
+			{
+				RefreshOutputs();
+			}
+		}
+		get => false;
+	}
+
 	[WireOutput( "tax_rate" )]
 	public float TaxRate { get; private set; }
 
@@ -34,11 +47,6 @@ public class MetaWire() : BaseWireConstruct( ConstructType.MetaWire ), IWireEven
 	protected override void OnStart()
 	{
 		base.OnStart();
-		RefreshOutputs();
-	}
-
-	public void OnWireTick()
-	{
 		RefreshOutputs();
 	}
 

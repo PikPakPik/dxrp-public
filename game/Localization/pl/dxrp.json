@@ -566,6 +566,8 @@
   "wire.output.trigger_info.description": "Informacje o tym, co wykrył wyzwalacz",
   "wire.input.reset_damage.name": "Resetuj obrażenia",
   "wire.input.reset_damage.description": "Resetuje śledzone obrażenia",
+  "wire.input.refresh.name": "Odśwież",
+  "wire.input.refresh.description": "Ponownie odczytuje aktualne dane zarządzania",
   "wire.output.total_damage.name": "Łączne obrażenia",
   "wire.output.total_damage.description": "Łączne obrażenia od ostatniego resetu",
   "wire.output.damage.name": "Obrażenia",

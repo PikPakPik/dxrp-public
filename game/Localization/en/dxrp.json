@@ -566,6 +566,8 @@
   "wire.output.trigger_info.description": "Information about what the trigger detected",
   "wire.input.reset_damage.name": "Reset Damage",
   "wire.input.reset_damage.description": "Resets the tracked damage",
+  "wire.input.refresh.name": "Refresh",
+  "wire.input.refresh.description": "Re-reads current governance data",
   "wire.output.total_damage.name": "Total Damage",
   "wire.output.total_damage.description": "The total damage done to this since last reset",
   "wire.output.damage.name": "Damage",
