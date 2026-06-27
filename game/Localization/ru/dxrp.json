@@ -52,6 +52,7 @@
   "tabmenu.players.permission.door": "Разрешить/запретить доступ к дверям",
   "tabmenu.players.status.disconnected": "Отключен",
   "tabmenu.players.status.afk": "AFK",
+  "tabmenu.players.status.afk_duration": "AFK {0}",
   "tabmenu.players.steamid": "SteamID: {0}",
   "tabmenu.players.teleport_to": "Телепорт к",
   "tabmenu.players.bring": "Телепорт к себе",

@@ -52,6 +52,7 @@
   "tabmenu.players.permission.door": "Toggle door permission for this player",
   "tabmenu.players.status.disconnected": "Disconnected",
   "tabmenu.players.status.afk": "AFK",
+  "tabmenu.players.status.afk_duration": "AFK since {0}",
   "tabmenu.players.steamid": "SteamID: {0}",
   "tabmenu.players.teleport_to": "Goto",
   "tabmenu.players.bring": "Bring",

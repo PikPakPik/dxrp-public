@@ -10,7 +10,7 @@
 			@* Show next minigame countdown when no active minigame *@
 			var nextTime = Math.Max(0, MinigameSystem.Instance?.NextAutoMinigameTime ?? 0);
 			<p class="text-2xl uppercase text-gray-400">#minigame.next</p>
-			<h2 class="text-2xl text-accent text-bold">@FormatTime(nextTime)</h2>
+			<h2 class="text-2xl text-accent text-bold">@TimeUtils.FormatDuration(nextTime)</h2>
 		}
 		else
 		{
@@ -20,7 +20,7 @@
 				case MinigameState.Seeding:
 					var seedingRemaining = Math.Max(0, 30f - _stateTimer);
 					<p class="text-2xl  text-gray-400 uppercase">#minigame.accepting</p>
-					<h2 class="text-2xl text-accent text-bold">@FormatTime(seedingRemaining)</h2>
+					<h2 class="text-2xl text-accent text-bold">@TimeUtils.FormatDuration(seedingRemaining)</h2>
 					break;
 					
 				case MinigameState.Creating:
@@ -30,13 +30,13 @@
 				case MinigameState.PreLobby:
 					var lobbyRemaining = Math.Max(0, MinigameResource.LobbyDuration - _stateTimer);
 					<p class="text-2xl  text-gray-400 uppercase">#minigame.starting_in</p>
-					<h2 class="text-2xl text-accent text-bold">@FormatTime(lobbyRemaining)</h2>
+					<h2 class="text-2xl text-accent text-bold">@TimeUtils.FormatDuration(lobbyRemaining)</h2>
 					break;
 
 				case MinigameState.Playing:
 					var playingRemaining = Math.Max(0, MinigameResource.Duration - _stateTimer);
 					<p class="text-2xl  text-gray-400 uppercase">#minigame.time_remaining</p>
-					<h2 class="text-2xl text-accent text-bold">@FormatTime(playingRemaining)</h2>
+					<h2 class="text-2xl text-accent text-bold">@TimeUtils.FormatDuration(playingRemaining)</h2>
 					break;
 
 				case MinigameState.PostLobby:
@@ -70,18 +70,6 @@
 			_stateTimer = 0f;
 			_lastState = CurrentState;
 		}
-	}
-
-	string FormatTime(float seconds)
-	{
-		var totalSeconds = (int)Math.Ceiling(seconds);
-		var minutes = totalSeconds / 60;
-		var secs = totalSeconds % 60;
-
-		if (minutes > 0)
-			return $"{minutes}m {secs}s";
-
-		return $"{secs}s";
 	}
 
 	protected override int BuildHash() => HashCode.Combine( Time.Now );

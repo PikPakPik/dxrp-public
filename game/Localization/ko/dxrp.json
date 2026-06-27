@@ -52,6 +52,7 @@
   "tabmenu.players.permission.door": "이 플레이어에게 도어 권한 허용/거부",
   "tabmenu.players.status.disconnected": "접속해제됨",
   "tabmenu.players.status.afk": "자리비움",
+  "tabmenu.players.status.afk_duration": "{0} 동안 자리비움",
   "tabmenu.players.steamid": "스팀고유번호: {0}",
   "tabmenu.players.teleport_to": "강림",
   "tabmenu.players.bring": "소환",

@@ -52,6 +52,7 @@
   "tabmenu.players.permission.door": "Przełącz uprawnienia do drzwi dla tego gracza",
   "tabmenu.players.status.disconnected": "Rozłączony",
   "tabmenu.players.status.afk": "Nieobecny",
+  "tabmenu.players.status.afk_duration": "Nieobecny od {0}",
   "tabmenu.players.steamid": "SteamID: {0}",
   "tabmenu.players.teleport_to": "Idź do",
   "tabmenu.players.bring": "Przywołaj",

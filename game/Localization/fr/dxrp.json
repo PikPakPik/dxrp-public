@@ -52,6 +52,7 @@
   "tabmenu.players.permission.door": "Basculer permission des portes",
   "tabmenu.players.status.disconnected": "Déconnecté",
   "tabmenu.players.status.afk": "AFK",
+  "tabmenu.players.status.afk_duration": "AFK depuis {0}",
   "tabmenu.players.steamid": "SteamID : {0}",
   "tabmenu.players.teleport_to": "Se téléporter à",
   "tabmenu.players.bring": "Amener",

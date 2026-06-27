@@ -70,7 +70,7 @@
 
 					<div class="vote-timer-bar">
 						<div class="vote-timer-fill" style="width: @( timeProgress * 100 )%"></div>
-						<label class="vote-timer-text">@FormatTimeRemaining( remainingTime )</label>
+						<label class="vote-timer-text">@TimeUtils.FormatCountdown( remainingTime )</label>
 					</div>
 
 					<div class="vote-actions flex">
@@ -120,14 +120,6 @@
 		}
 
 		_dismissedVotes.RemoveWhere( voteId => !VoteSystem.Instance.ActiveVotes.ContainsKey( voteId ) );
-	}
-
-	private string FormatTimeRemaining( float seconds )
-	{
-		var minutes = (int)(seconds / 60);
-		var remainingSeconds = (int)(seconds % 60);
-
-		return $"{minutes:D2}:{remainingSeconds:D2}";
 	}
 
 	protected override int BuildHash()
