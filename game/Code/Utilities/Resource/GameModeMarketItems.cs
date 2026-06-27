@@ -114,9 +114,24 @@ public static class GameModeMarketItems
 			                 entity.EntityId == entityId.Value );
 	}
 
+	public static bool CanAdminSpawn( Player player, GameModeMarketItemDto? item )
+	{
+		if ( !player.IsValid() || item == null || !RankSystem.HasPermission( player.SteamId, Permission.CommandSpawnEntity ) )
+		{
+			return false;
+		}
+
+		return IsSpawnable( item );
+	}
+
 	public static bool CanPurchase( Player player, GameModeMarketItemDto? item )
 	{
 		if ( !player.IsValid() || item == null || player.Restricted )
+		{
+			return false;
+		}
+
+		if ( !IsSpawnable( item ) )
 		{
 			return false;
 		}
@@ -125,7 +140,7 @@ public static class GameModeMarketItems
 		{
 			case GameModeMarketItemType.Entity:
 				var entity = ResolveEntity( item );
-				if ( entity == null || string.IsNullOrWhiteSpace( entity.PrefabPath() ) )
+				if ( entity!.Limit > 0 && GetOwnedEntityCount( player, entity.Id ) >= entity.Limit )
 				{
 					return false;
 				}
@@ -137,18 +152,11 @@ public static class GameModeMarketItems
 
 			case GameModeMarketItemType.Equipment:
 				var equipment = ResolveEquipment( item );
-				if ( equipment == null || item.Quantity <= 0 )
-				{
-					return false;
-				}
-				if ( item.Quantity == 1 && (player.CanTake( equipment ) == Player.PickupResult.None || string.IsNullOrWhiteSpace( equipment.PrefabPath() )) )
+				if ( item.Quantity == 1 && player.CanTake( equipment! ) == Player.PickupResult.None )
 				{
 					return false;
 				}
 				break;
-
-			default:
-				return false;
 		}
 
 		if ( item.BlacklistJobIds.Contains( player.Job.Id ) )
@@ -174,6 +182,33 @@ public static class GameModeMarketItems
 
 		var equipmentLimit = ResolveEquipment( item )?.Limit ?? 0;
 		return item.Type != GameModeMarketItemType.Equipment || equipmentLimit <= 0 || GetOwnedCount( player, item ) < equipmentLimit;
+	}
+
+	private static bool IsSpawnable( GameModeMarketItemDto item )
+	{
+		switch ( item.Type )
+		{
+			case GameModeMarketItemType.Entity:
+				var entity = ResolveEntity( item );
+				return entity != null && !string.IsNullOrWhiteSpace( entity.PrefabPath() );
+
+			case GameModeMarketItemType.Equipment:
+				var equipment = ResolveEquipment( item );
+				if ( equipment == null || item.Quantity <= 0 || string.IsNullOrWhiteSpace( equipment.PrefabPath() ) )
+				{
+					return false;
+				}
+
+				if ( item.Quantity > 1 )
+				{
+					return GameObject.GetPrefab( ShipmentPrefabPath ).IsValid();
+				}
+
+				return true;
+
+			default:
+				return false;
+		}
 	}
 
 	private static string GetEquipmentDisplayName( GameModeEquipmentDto equipment, int quantity )
