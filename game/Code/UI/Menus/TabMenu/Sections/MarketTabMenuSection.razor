@@ -184,7 +184,7 @@
 		};
 		if ( !Player.Local.IsValid() || limit <= 0 )
 		{
-			return "Unlimited";
+			return Language.GetPhrase( "tabmenu.market.admin_mode.unlimited" );
 		}
 
 		var owned = GameModeMarketItems.GetOwnedCount( Player.Local, item );

@@ -8,7 +8,7 @@ public class SpawnEntityCommand : ICommand
 	public const int MaxQuantity = 100;
 
 	public string Command => "spawnentity";
-	public string Help => "/spawnentity list  |  /spawnentity <quantity> <equipment>  (shipments when quantity > 1; use market for entities)";
+	public string Help => Language.GetPhrase( "command.spawnentity.help" );
 	public bool IsUsableWhileDead => false;
 	public Permission[] RequiredPermissions => [Permission.CommandSpawnEntity];
 
@@ -21,7 +21,7 @@ public class SpawnEntityCommand : ICommand
 
 		if ( args.Length < 1 )
 		{
-			caller.SendMessage( Help );
+			caller.SendMessage( Language.GetPhrase( "command.spawnentity.help" ) );
 			return true;
 		}
 
@@ -34,13 +34,13 @@ public class SpawnEntityCommand : ICommand
 
 		if ( !TryParseArguments( args, out var quantity, out var name ) )
 		{
-			caller.SendMessage( Help );
+			caller.SendMessage( Language.GetPhrase( "command.spawnentity.help" ) );
 			return true;
 		}
 
 		if ( quantity <= 0 || quantity > MaxQuantity )
 		{
-			caller.Error( $"Quantity must be between 1 and {MaxQuantity}." );
+			caller.Error( string.Format( Language.GetPhrase( "command.spawnentity.quantity_invalid" ), MaxQuantity ) );
 			return true;
 		}
 
@@ -52,13 +52,13 @@ public class SpawnEntityCommand : ICommand
 			}
 			else
 			{
-				caller.Error( $"Failed to spawn equipment '{equipment!.DisplayName()}'." );
+				caller.Error( string.Format( Language.GetPhrase( "command.spawnentity.spawn_failed" ), equipment!.DisplayName() ) );
 			}
 
 			return true;
 		}
 
-		caller.Error( $"Unknown spawnable equipment '{name}'. Use the market for entities like printers." );
+		caller.Error( string.Format( Language.GetPhrase( "command.spawnentity.unknown" ), name ) );
 		SuggestMatches( caller, name );
 		return true;
 	}
@@ -234,12 +234,12 @@ public class SpawnEntityCommand : ICommand
 		if ( equipments.Count == 0 )
 		{
 			caller.SendMessage( string.IsNullOrWhiteSpace( filter )
-				? "No spawnable equipment. Use the market for entities like printers."
-				: $"No spawnable equipment matching '{filter}'." );
+				? Language.GetPhrase( "command.spawnentity.list_empty" )
+				: string.Format( Language.GetPhrase( "command.spawnentity.list_empty_filter" ), filter ) );
 			return;
 		}
 
-		caller.SendMessage( $"Equipment ({equipments.Count}): {string.Join( ", ", equipments )}" );
+		caller.SendMessage( string.Format( Language.GetPhrase( "command.spawnentity.list" ), equipments.Count, string.Join( ", ", equipments ) ) );
 	}
 
 	private static bool TryResolveSpawnableEquipment( string input, out GameModeEquipmentDto? equipment, out Guid marketItemId )
@@ -322,7 +322,7 @@ public class SpawnEntityCommand : ICommand
 			return;
 		}
 
-		caller.SendMessage( $"Did you mean: {string.Join( ", ", suggestions )}" );
+		caller.SendMessage( string.Format( Language.GetPhrase( "command.spawnentity.suggest" ), string.Join( ", ", suggestions ) ) );
 	}
 
 	private static string NormalizeName( string value )
