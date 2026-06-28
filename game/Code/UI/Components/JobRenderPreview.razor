@@ -202,7 +202,7 @@
 			var renderer = _body.AddComponent<SkinnedModelRenderer>();
 			renderer.Model = GetPreviewModel( job );
 
-			ApplyClothing( renderer, job );
+			JobPreviewClothing.ApplyJob( renderer, job );
 			EnsureLight();
 			CenterPreview( renderer );
 		}
@@ -305,23 +305,6 @@
 			_camera.ZFar = 256f;
 			_camera.FieldOfView = 40f;
 		}
-	}
-
-	private static void ApplyClothing( SkinnedModelRenderer renderer, GameModeJobDto job )
-	{
-		var clothing = new ClothingContainer();
-
-		if ( Player.Local.IsValid() )
-		{
-			var avatarData = Player.Local.Network.Owner?.GetUserData( "avatar" );
-			if ( !string.IsNullOrWhiteSpace( avatarData ) )
-			{
-				clothing.Deserialize( avatarData );
-			}
-		}
-
-		clothing.AddRange( job.GetClothingEntries() );
-		clothing.Apply( renderer );
 	}
 
 	private const string DefaultPreviewModelPath = "models/citizen_human/citizen_human_male.vmdl";

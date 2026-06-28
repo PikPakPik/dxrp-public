@@ -192,7 +192,7 @@
 			var renderer = _body.AddComponent<SkinnedModelRenderer>();
 			renderer.Model = GetPreviewModel( player );
 
-			ApplyClothing( renderer, player );
+			JobPreviewClothing.ApplyPlayer( renderer, player );
 			EnsureLight();
 			CenterPreview( renderer );
 		}
@@ -280,24 +280,6 @@
 			_camera.ZFar = 256f;
 			_camera.FieldOfView = 25f;
 		}
-	}
-
-	private static void ApplyClothing( SkinnedModelRenderer renderer, Player player )
-	{
-		var clothing = new ClothingContainer();
-		var avatarData = player.Network.Owner?.GetUserData( "avatar" );
-
-		if ( !string.IsNullOrWhiteSpace( avatarData ) )
-		{
-			clothing.Deserialize( avatarData );
-		}
-
-		if ( player.Job.IsValid() )
-		{
-			clothing.AddRange( player.Job.GetClothingEntries() );
-		}
-
-		clothing.Apply( renderer );
 	}
 
 	private void ClearPreview()

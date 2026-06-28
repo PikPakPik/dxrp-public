@@ -9,6 +9,7 @@
 	@{
 		var visibleJobs = GetVisibleJobs().ToList();
 		EnsureSelectedJob( visibleJobs );
+		var playersByJobId = BuildPlayersByJobMap();
 
 		var groupedJobs = visibleJobs
 			.GroupBy( x => x.GameModeJobGroupId )
@@ -55,7 +56,7 @@
 							<div class="job-list">
 								@foreach ( var job in groupJobs )
 								{
-									var jobPlayers = GameUtils.GetPlayersByJob( job ).ToList();
+									var jobPlayers = playersByJobId.GetValueOrDefault( job.Id ) ?? EmptyJobPlayers;
 									var currentPlayers = jobPlayers.Count;
 									var isFull = job.MaxCount > 0 && currentPlayers >= job.MaxCount;
 									var isCurrentJob = Player.Local.Job == job;
@@ -113,7 +114,7 @@
 			@if ( _selectedJob != null )
 			{
 				<SelectedJobPane Job="@_selectedJob"
-				                 OnSelect="@ConfirmJobSelection"/>
+				                 OnSelect="@( job => ConfirmJobSelection( job ) )"/>
 			}
 			else
 			{
@@ -129,6 +130,7 @@
 @code
 {
 	const int MaxJobCardAvatars = 4;
+	static readonly List<Player> EmptyJobPlayers = [];
 
 	GameModeJobDto? _selectedJob;
 	HashSet<Guid> _collapsedGroupIds = TabMenuSectionPreferences.LoadCollapsedJobGroups();
@@ -143,7 +145,47 @@
 			collapsedHash = HashCode.Combine( collapsedHash, groupId );
 		}
 
-		return HashCode.Combine( GameModeJobs.All, (int)(Player.Local.PlayTime / 60f), Player.Local.Job, IgnoreJobRequirements, _selectedJob?.Id, collapsedHash, Time.Delta );
+		return HashCode.Combine( GameModeJobs.All, (int)(Player.Local.PlayTime / 60f), Player.Local.Job, IgnoreJobRequirements, _selectedJob?.Id, collapsedHash, BuildJobOccupancyHash() );
+	}
+
+	private static int BuildJobOccupancyHash()
+	{
+		var hash = 0;
+
+		foreach ( var player in GameUtils.Players )
+		{
+			if ( !player.IsValid() || !player.Job.IsValid() )
+			{
+				continue;
+			}
+
+			hash = HashCode.Combine( hash, player.SteamId, player.Job.Id );
+		}
+
+		return hash;
+	}
+
+	private static Dictionary<Guid, List<Player>> BuildPlayersByJobMap()
+	{
+		var map = new Dictionary<Guid, List<Player>>();
+
+		foreach ( var player in GameUtils.Players )
+		{
+			if ( !player.IsValid() || !player.Job.IsValid() )
+			{
+				continue;
+			}
+
+			if ( !map.TryGetValue( player.Job.Id, out var players ) )
+			{
+				players = [];
+				map[player.Job.Id] = players;
+			}
+
+			players.Add( player );
+		}
+
+		return map;
 	}
 
 	private IEnumerable<GameModeJobDto> GetVisibleJobs()

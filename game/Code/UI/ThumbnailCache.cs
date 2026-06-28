@@ -7,6 +7,7 @@ public static class ThumbnailCache
 	private static readonly Dictionary<Model, Texture> ModelCache = new();
 	private static readonly Dictionary<Material, Texture> MaterialCache = new();
 	private static readonly Dictionary<string, Texture> CharacterPortraitCache = new();
+	private static readonly LinkedList<string> CharacterPortraitOrder = new();
 
 	private static readonly Dictionary<string, Texture?> UrlCache = new();
 	private static readonly LinkedList<string> UrlOrder = new();
@@ -15,6 +16,7 @@ public static class ThumbnailCache
 	private static readonly Dictionary<string, List<Action>> UrlWaiters = new();
 
 	private const int MaxUrlCacheSize = 500;
+	private const int MaxCharacterPortraitCacheSize = 150;
 	private const int MaxUrlBytes = 1024 * 1024 * 2;
 
 	public static void Clear()
@@ -34,6 +36,7 @@ public static class ThumbnailCache
 		ModelCache.Clear();
 		MaterialCache.Clear();
 		CharacterPortraitCache.Clear();
+		CharacterPortraitOrder.Clear();
 		UrlCache.Clear();
 		UrlOrder.Clear();
 		UrlLoading.Clear();
@@ -257,7 +260,7 @@ public static class ThumbnailCache
 	{
 		if ( model is null || model.IsError )
 		{
-			CharacterPortraitCache[key] = Texture.Transparent;
+			StoreCharacterPortrait( key, Texture.Transparent );
 			return Texture.Transparent;
 		}
 
@@ -323,8 +326,31 @@ public static class ThumbnailCache
 			camera.RenderToTexture( texture );
 		}
 
-		CharacterPortraitCache[key] = texture;
+		StoreCharacterPortrait( key, texture );
 		return texture;
+	}
+
+	private static void StoreCharacterPortrait( string key, Texture texture )
+	{
+		if ( CharacterPortraitCache.ContainsKey( key ) )
+		{
+			CharacterPortraitCache[key] = texture;
+			return;
+		}
+
+		if ( CharacterPortraitCache.Count >= MaxCharacterPortraitCacheSize )
+		{
+			var oldest = CharacterPortraitOrder.First!.Value;
+			CharacterPortraitOrder.RemoveFirst();
+			if ( CharacterPortraitCache.TryGetValue( oldest, out var old ) )
+			{
+				old?.Dispose();
+				CharacterPortraitCache.Remove( oldest );
+			}
+		}
+
+		CharacterPortraitCache[key] = texture;
+		CharacterPortraitOrder.AddLast( key );
 	}
 
 	[ConCmd( "dx_clear_thumbnail_cache" )]

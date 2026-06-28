@@ -27,7 +27,6 @@ else if ( HasPreview )
 
 @code
 {
-	private static readonly Vector3 Origin = new( 0f, 0f, -9300f );
 	private const string DefaultPreviewModelPath = "models/citizen_human/citizen_human_male.vmdl";
 
 	public Player? Player { get; set; }
@@ -78,49 +77,14 @@ else if ( HasPreview )
 	{
 		if ( Player is { IsValid: true } player )
 		{
-			ApplyPlayerClothing( renderer, player );
+			JobPreviewClothing.ApplyPlayer( renderer, player );
 			return;
 		}
 
 		if ( PreviewJob is { } previewJob && previewJob.IsValid() )
 		{
-			ApplyJobClothing( renderer, previewJob );
+			JobPreviewClothing.ApplyJob( renderer, previewJob );
 		}
-	}
-
-	private static void ApplyPlayerClothing( SkinnedModelRenderer renderer, Player player )
-	{
-		var clothing = new ClothingContainer();
-		var avatarData = player.Network.Owner?.GetUserData( "avatar" );
-
-		if ( !string.IsNullOrWhiteSpace( avatarData ) )
-		{
-			clothing.Deserialize( avatarData );
-		}
-
-		if ( player.Job.IsValid() )
-		{
-			clothing.AddRange( player.Job.GetClothingEntries() );
-		}
-
-		clothing.Apply( renderer );
-	}
-
-	private static void ApplyJobClothing( SkinnedModelRenderer renderer, GameModeJobDto job )
-	{
-		var clothing = new ClothingContainer();
-
-		if ( Player.Local.IsValid() )
-		{
-			var avatarData = Player.Local.Network.Owner?.GetUserData( "avatar" );
-			if ( !string.IsNullOrWhiteSpace( avatarData ) )
-			{
-				clothing.Deserialize( avatarData );
-			}
-		}
-
-		clothing.AddRange( job.GetClothingEntries() );
-		clothing.Apply( renderer );
 	}
 
 	private Model GetPreviewModel()
