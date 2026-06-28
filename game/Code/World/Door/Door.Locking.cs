@@ -77,16 +77,14 @@ public partial class Door
 			return true;
 		}
 
-		if ( !string.IsNullOrWhiteSpace( OwnerGroupIdentifier ) &&
-		     !player.Job.IsInGroup( OwnerGroupIdentifier ) )
+		if ( !string.IsNullOrWhiteSpace( OwnerGroupIdentifier ) )
 		{
-			return true;
+			return OwnerGroup != null && player.Job.GetGroup()?.Id == OwnerGroup.Id;
 		}
 
-		if ( !string.IsNullOrWhiteSpace( OwnerJobIdentifier ) &&
-		     OwnerJob?.Id != player.Job.Id )
+		if ( !string.IsNullOrWhiteSpace( OwnerJobIdentifier ) )
 		{
-			return true;
+			return OwnerJob?.Id == player.Job.Id;
 		}
 
 		return false;

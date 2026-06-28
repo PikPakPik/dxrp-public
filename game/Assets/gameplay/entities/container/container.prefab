@@ -49,8 +49,8 @@
         "Owner": 0,
         "Quantity": 0,
         "Resource": {
-          "Id": "2f5bd2f5-fc48-4af0-b249-767a2dd97db5",
-          "GameModeAddonContentId": "19b77531-15ad-4840-a8d6-fe4273750447",
+          "Id": "de602ccd-7f8c-4c19-a85b-9bb3b8d2b475",
+          "GameModeAddonContentId": "fbd9925a-de6d-4a71-86cd-751e2b691976",
           "NameOverride": null,
           "DescriptionOverride": null,
           "Limit": 0,
@@ -66,7 +66,23 @@
           "go": "1d238c76-04ec-4a1d-9583-c46f0647c27f",
           "component_type": "Rigidbody"
         },
-        "TextRenderer": null,
+        "TypeDecals": {
+          "Jug": {
+            "LocalPosition": "-6.51437569,0,2.13103724",
+            "LocalRotation": "0,0,0,0",
+            "Size": "0.400000006,0.400000006,0.400000006"
+          },
+          "Bag": {
+            "LocalPosition": "-3.01839948,0,-2.41482544",
+            "LocalRotation": "0,0,0,0",
+            "Size": "0.400000006,0.400000006,0.400000006"
+          },
+          "Packet": {
+            "LocalPosition": "1.5,0,1.39999998",
+            "LocalRotation": "-0.707106769,-3.09086197E-08,0.707106769,-3.09086197E-08",
+            "Size": "0.400000006,0.400000006,0.400000006"
+          }
+        },
         "TypeModels": {
           "Bag": "gameplay/entities/container/models/bag/bag.vmdl",
           "Jug": "gameplay/entities/container/models/jug/jug.vmdl",
@@ -84,7 +100,7 @@
         "MaterialGroup": null,
         "MaterialOverride": null,
         "Materials": null,
-        "Model": "gameplay/entities/container/models/jug/jug.vmdl",
+        "Model": "gameplay/entities/container/models/bag/bag.vmdl",
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
@@ -183,7 +199,7 @@
         "__version": 2,
         "Flags": 0,
         "Name": "decal",
-        "Position": "-2.97371292,0,-2.3485961",
+        "Position": "-3.11338472,0,-2.85470676",
         "Rotation": "0,0,0,1",
         "Scale": "1,1,1",
         "Tags": "",
@@ -204,7 +220,63 @@
             "ColorMix": 1,
             "ColorTint": "1,1,1,1",
             "Decals": [
-              null
+              {
+                "$compiler": "embed",
+                "$source": null,
+                "data": {
+                  "ColorTexture": {
+                    "$compiler": "texture",
+                    "$source": "imagefile",
+                    "data": {
+                      "FilePath": "ui/resources/water.png",
+                      "MaxSize": 4096,
+                      "ConvertHeightToNormals": false,
+                      "NormalScale": 1,
+                      "Rotate": 0,
+                      "FlipVertical": false,
+                      "FlipHorizontal": false,
+                      "Cropping": {
+                        "Left": 0,
+                        "Top": 0,
+                        "Right": 0,
+                        "Bottom": 0
+                      },
+                      "Padding": {
+                        "Left": 0,
+                        "Top": 0,
+                        "Right": 0,
+                        "Bottom": 0
+                      },
+                      "InvertColor": false,
+                      "Tint": "1,1,1,1",
+                      "Blur": 0,
+                      "Sharpen": 0,
+                      "Brightness": 1,
+                      "Contrast": 1,
+                      "Saturation": 1,
+                      "Hue": 0,
+                      "Colorize": false,
+                      "TargetColor": "1,1,1,1",
+                      "CacheToDisk": true,
+                      "FormatOverride": "RGBA8888"
+                    },
+                    "compiled": null
+                  },
+                  "NormalTexture": null,
+                  "RoughMetalOcclusionTexture": null,
+                  "EmissiveTexture": null,
+                  "EmissionEnergy": 1,
+                  "HeightTexture": null,
+                  "ParallaxStrength": 1,
+                  "Tint": "1,1,1,1",
+                  "ColorMix": 1,
+                  "Width": 16,
+                  "Height": 16,
+                  "FilterMode": "Anisotropic",
+                  "__references": null
+                },
+                "compiled": null
+              }
             ],
             "Depth": 0.7000012,
             "LifeTime": 0,

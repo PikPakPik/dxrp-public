@@ -125,24 +125,10 @@ public partial class Player
 		// 1: Apply model
 		Renderer.Model = Job.GetPrimaryModel();
 
-		// 2: Get User Clothing (if any)
-		var userClothing = new ClothingContainer();
-		if ( Network.Owner != null )
-		{
-			userClothing.Deserialize( Network.Owner.GetUserData( "avatar" ) );
-		}
-
-		// 3: Baseline
+		// 2: Build and apply clothing
+		var includeJobClothing = DxCivilianJobClothing || !Job.IsInGroup( "0802e49f-43ba-5bf2-adb0-933b150f0156" );
 		Dresser.Clothing.Clear();
-
-		// 4: Apply user clothing
-		Dresser.Clothing.AddRange( userClothing.Clothing );
-
-		// 5: Apply job clothing (only if civilian job clothing is enabled or not a civilian job)
-		if ( DxCivilianJobClothing || !Job.IsInGroup( "civilian" ) )
-		{
-			Dresser.Clothing.AddRange( Job.GetClothingEntries() );
-		}
+		Dresser.Clothing.AddRange( Job.BuildClothing( this, includeJobClothing ).Clothing );
 
 		_ = ApplyClothingAsync();
 	}
@@ -159,12 +145,14 @@ public partial class Player
 
 		// Resolve cloud model (may need to download/mount the package)
 		var model = await Job.GetPrimaryModelAsync();
+
+		await Dresser.Apply();
+
+		// Set model after Dresser.Apply() so it isn't overwritten by the clothing container
 		if ( Renderer.IsValid() )
 		{
 			Renderer.Model = model;
 		}
-
-		await Dresser.Apply();
 
 		if ( !GameObject.IsValid() || !ModelHitboxes.IsValid() )
 		{

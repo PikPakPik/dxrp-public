@@ -7,4 +7,5 @@ public record NotifierWireData : IConstructData, IWireLabelData
 	public bool IncludeValue { get; set; } = false;
 	public bool IgnoreFalsyValue { get; set; } = true;
 	public string Label { get; set; } = string.Empty;
+	public NotifierWireChime Chime { get; set; } = NotifierWireChime.None;
 }
