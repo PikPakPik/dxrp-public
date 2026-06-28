@@ -8,6 +8,8 @@ public static class ThumbnailCache
 	private static readonly Dictionary<Material, Texture> MaterialCache = new();
 	private static readonly Dictionary<string, Texture> CharacterPortraitCache = new();
 	private static readonly LinkedList<string> CharacterPortraitOrder = new();
+	private static readonly Queue<(string Key, Model Model, Action<SkinnedModelRenderer> Setup)> PortraitQueue = new();
+	private static readonly HashSet<string> PendingPortraitKeys = new();
 
 	private static readonly Dictionary<string, Texture?> UrlCache = new();
 	private static readonly LinkedList<string> UrlOrder = new();
@@ -37,6 +39,8 @@ public static class ThumbnailCache
 		MaterialCache.Clear();
 		CharacterPortraitCache.Clear();
 		CharacterPortraitOrder.Clear();
+		PortraitQueue.Clear();
+		PendingPortraitKeys.Clear();
 		UrlCache.Clear();
 		UrlOrder.Clear();
 		UrlLoading.Clear();
@@ -60,6 +64,9 @@ public static class ThumbnailCache
 		return GenerateTexture( material );
 	}
 
+	public static bool IsPortraitCached( string key ) =>
+		!string.IsNullOrWhiteSpace( key ) && CharacterPortraitCache.ContainsKey( key );
+
 	public static Texture GetCharacterPortrait( string key, Model model, Action<SkinnedModelRenderer> setupRenderer )
 	{
 		if ( string.IsNullOrWhiteSpace( key ) )
@@ -68,7 +75,26 @@ public static class ThumbnailCache
 		if ( CharacterPortraitCache.TryGetValue( key, out var tex ) )
 			return tex;
 
-		return GenerateCharacterPortrait( key, model, setupRenderer );
+		if ( PendingPortraitKeys.Add( key ) )
+			PortraitQueue.Enqueue( (key, model, setupRenderer) );
+
+		return Texture.Transparent;
+	}
+
+	public static void ProcessPortraitQueue( int maxCount = 1 )
+	{
+		var processed = 0;
+		while ( processed < maxCount && PortraitQueue.Count > 0 )
+		{
+			var (key, model, setup) = PortraitQueue.Dequeue();
+			PendingPortraitKeys.Remove( key );
+
+			if ( CharacterPortraitCache.ContainsKey( key ) )
+				continue;
+
+			GenerateCharacterPortrait( key, model, setup );
+			processed++;
+		}
 	}
 
 	/// <summary>

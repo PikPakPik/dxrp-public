@@ -137,6 +137,12 @@
 
 	bool IgnoreJobRequirements => GameManager.Instance.IsValid() && GameManager.Instance.IgnoreJobRequirements;
 
+	public override void Tick()
+	{
+		base.Tick();
+		ThumbnailCache.ProcessPortraitQueue( 2 );
+	}
+
 	protected override int BuildHash()
 	{
 		var collapsedHash = 0;
