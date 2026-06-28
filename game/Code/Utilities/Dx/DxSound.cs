@@ -72,4 +72,28 @@ public static partial class DxSound
 
 		return Sound.Play( resource );
 	}
+
+	[Rpc.Broadcast( NetFlags.HostOnly | NetFlags.Reliable )]
+	public static void BroadcastLocalSound( string soundName )
+	{
+		if ( string.IsNullOrEmpty( soundName ) )
+		{
+			return;
+		}
+
+		Sound.Play( soundName );
+	}
+
+	public static void PlayLocalSound( this Player player, string? soundName )
+	{
+		if ( string.IsNullOrEmpty( soundName ) || !player.IsValid() )
+		{
+			return;
+		}
+
+		using ( Rpc.FilterInclude( c => c.Id == player.ConnectionId ) )
+		{
+			BroadcastLocalSound( soundName );
+		}
+	}
 }

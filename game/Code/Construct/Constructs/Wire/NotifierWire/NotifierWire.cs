@@ -31,7 +31,8 @@ public class NotifierWire() : BaseWireConstruct( ConstructType.NotifierWire )
 				message = $"{message} ({value})";
 			}
 
-			owner.Warn( message, chimeSound: _data.Chime.GetSound() );
+			owner.Warn( message );
+			owner.PlayLocalSound( _data.Chime.GetSound() );
 		}
 		get => false; // This is just a trigger, no need to store state
 	}
