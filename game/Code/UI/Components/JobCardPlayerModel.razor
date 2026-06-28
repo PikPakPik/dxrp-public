@@ -27,8 +27,6 @@ else if ( HasPreview )
 
 @code
 {
-	private const string DefaultPreviewModelPath = "models/citizen_human/citizen_human_male.vmdl";
-
 	public Player? Player { get; set; }
 	public GameModeJobDto? PreviewJob { get; set; }
 	public bool IsCurrentJob { get; set; }
@@ -67,53 +65,17 @@ else if ( HasPreview )
 	{
 		var key = BuildSignature();
 		if ( string.IsNullOrWhiteSpace( key ) )
-		{
 			return Texture.Transparent;
-		}
 
-		return ThumbnailCache.GetCharacterPortrait( key, GetPreviewModel(), ApplyPreviewClothing );
-	}
-
-	private void ApplyPreviewClothing( SkinnedModelRenderer renderer )
-	{
 		if ( Player is { IsValid: true } player )
-		{
-			JobPreviewClothing.ApplyPlayer( renderer, player );
-			return;
-		}
+			return ThumbnailCache.GetCharacterPortrait( key, player.GetPrimaryModel(),
+				r => player.Job.BuildClothing( player ).Apply( r ) );
 
 		if ( PreviewJob is { } previewJob && previewJob.IsValid() )
-		{
-			JobPreviewClothing.ApplyJob( renderer, previewJob );
-		}
-	}
+			return ThumbnailCache.GetCharacterPortrait( key, previewJob,
+				r => previewJob.BuildClothing().Apply( r ) );
 
-	private Model GetPreviewModel()
-	{
-		if ( Player is { IsValid: true } player )
-		{
-			if ( player.Renderer.IsValid() && player.Renderer.Model.IsValid() )
-			{
-				return player.Renderer.Model;
-			}
-
-			if ( player.Job.IsValid() )
-			{
-				return player.Job.GetPrimaryModel();
-			}
-		}
-
-		if ( PreviewJob is { } previewJob && previewJob.IsValid() )
-		{
-			if ( string.IsNullOrWhiteSpace( previewJob.Model ) )
-			{
-				return Model.Load( DefaultPreviewModelPath );
-			}
-
-			return previewJob.GetPrimaryModel();
-		}
-
-		return GameModeJobs.Default.GetPrimaryModel();
+		return Texture.Transparent;
 	}
 
 	private string BuildSignature()

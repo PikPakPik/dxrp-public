@@ -36,13 +36,13 @@ SelectedJobPane {
     display: flex;
     flex-direction: column;
     background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba($color-secondary, 0.15) 18%,
-      rgba($color-secondary, 0.55) 38%,
-      rgba($color-secondary, 0.88) 56%,
-      rgba($color-secondary, 0.97) 72%,
-      rgba($color-secondary, 0.97) 100%
+                    to bottom,
+                    transparent 0%,
+                    rgba($color-secondary, 0.15) 18%,
+                    rgba($color-secondary, 0.55) 38%,
+                    rgba($color-secondary, 0.88) 56%,
+                    rgba($color-secondary, 0.97) 72%,
+                    rgba($color-secondary, 0.97) 100%
     );
     padding-top: 72px;
   }

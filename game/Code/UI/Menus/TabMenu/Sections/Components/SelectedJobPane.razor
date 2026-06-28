@@ -24,106 +24,112 @@
 
 <root class="selected-job-pane">
 	<div class="job-detail-preview">
-		<JobRenderPreview Job="@Job"/>
+		<PlayerRenderPreview Job="@Job"/>
 
 		<div class="job-detail-overlay">
-		<div class="job-detail-header">
-			<div class="job-detail-chip" style="background-color: @Job.Color.Hex()"></div>
-			<div class="job-detail-title">
-				<span class="job-detail-name">@Job.DisplayName()</span>
-			</div>
-		</div>
-
-		<div class="job-detail-info">
-			<div class="job-detail-stats">
-				<div class="stat-chip salary">
-					<i class="material-icons">payments</i>
-					<span>$@(Job.Salary.ToString("N0"))/hr</span>
+			<div class="job-detail-header">
+				<div class="job-detail-chip" style="background-color: @Job.Color.Hex()"></div>
+				<div class="job-detail-title">
+					<span class="job-detail-name">@Job.DisplayName()</span>
 				</div>
-				<div class="stat-chip player-count @(isFull ? "full" : "")">
-					<i class="material-icons">group</i>
-					<span>@Job.FormatPlayerSlots( currentPlayers )</span>
-				</div>
-				@if ( Job.VoteRequired && !IgnoreJobRequirements )
-				{
-					<div class="stat-chip vote">
-						<i class="material-icons">how_to_vote</i>
-						<span>#generic.vote</span>
-					</div>
-				}
-				@if ( Job.Health > 0 && Job.Health != 100 )
-				{
-					<div class="stat-chip">
-						<i class="material-icons">favorite</i>
-						<span>@Job.Health HP</span>
-					</div>
-				}
 			</div>
 
-			@if ( needsMorePlayTime )
-			{
-				<div class="unlock-notice">
-					<span>#generic.unlocks</span> @TimeSpan.FromMinutes( remainingPlayTime ).Humanize( 1 )
-				</div>
-			}
-
-			<div class="job-detail-sections">
-				@if ( !string.IsNullOrWhiteSpace( Job.DisplayDescription() ) )
-				{
-					<div class="detail-section detail-section-description">
-						<div class="detail-section-title">#tabmenu.jobs.description</div>
-						<div class="detail-section-body">
-							@Job.DisplayDescription()
+			<div class="job-detail-info">
+				<div class="job-detail-stats">
+					<div class="stat-chip salary">
+						<i class="material-icons">payments</i>
+						<span>$@( Job.Salary.ToString( "N0" ) )/hr</span>
+					</div>
+					<div class="stat-chip player-count @( isFull ? "full" : "" )">
+						<i class="material-icons">group</i>
+						<span>@Job.FormatPlayerSlots( currentPlayers )</span>
+					</div>
+					@if ( Job.VoteRequired && !IgnoreJobRequirements )
+					{
+						<div class="stat-chip vote">
+							<i class="material-icons">how_to_vote</i>
+							<span>#generic.vote</span>
 						</div>
-					</div>
-				}
-
-				@if ( loadout.Count > 0 )
-				{
-					<div class="detail-section detail-section-loadout">
-						<div class="detail-section-title">#tabmenu.jobs.loadout</div>
-						<div class="loadout-icons">
-							@foreach ( var equipment in visibleLoadout )
-							{
-								@if ( !string.IsNullOrEmpty( equipment.DisplayIcon() ) )
-								{
-									<div class="loadout-icon" style="background-image:url(@equipment.DisplayIcon());" tooltip="@equipment.DisplayName()"></div>
-								}
-								else
-								{
-									<div class="loadout-icon loadout-icon-fallback" tooltip="@equipment.DisplayName()">
-										<i class="material-icons">inventory_2</i>
-									</div>
-								}
-							}
-							@if ( hiddenLoadoutCount > 0 )
-							{
-								<div class="loadout-more" tooltip="@string.Format( Language.GetPhrase( "tabmenu.jobs.more_equipment" ), hiddenLoadoutCount )">+@hiddenLoadoutCount</div>
-							}
+					}
+					@if ( Job.Health > 0 && Job.Health != 100 )
+					{
+						<div class="stat-chip">
+							<i class="material-icons">favorite</i>
+							<span>@Job.Health HP</span>
 						</div>
+					}
+				</div>
+
+				@if ( needsMorePlayTime )
+				{
+					<div class="unlock-notice">
+						<span>#generic.unlocks</span> @TimeSpan.FromMinutes( remainingPlayTime ).Humanize( 1 )
 					</div>
 				}
-			</div>
 
-			<div class="job-detail-actions">
-				@if ( isCurrentJob )
-				{
-					<button class="btn btn-disabled action-btn" disabled>#tabmenu.jobs.current</button>
-				}
-				else if ( canChange )
-				{
-					<button class="btn btn-primary action-btn" onclick="@( () => OnSelect?.Invoke( Job ) )">
-						@( Job.VoteRequired && !IgnoreJobRequirements ? "#generic.vote" : "#tabmenu.jobs.change" )
-					</button>
-				}
-				else if ( isFull )
-				{
-					<button class="btn btn-disabled action-btn" disabled>#tabmenu.jobs.full</button>
-				}
-				else
-				{
-					<button class="btn btn-disabled action-btn" disabled>#tabmenu.jobs.unavailable</button>
-				}
+				<div class="job-detail-sections">
+					@if ( !string.IsNullOrWhiteSpace( Job.DisplayDescription() ) )
+					{
+						<div class="detail-section detail-section-description">
+							<div class="detail-section-title">#tabmenu.jobs.description</div>
+							<div class="detail-section-body">
+								@Job.DisplayDescription()
+							</div>
+						</div>
+					}
+
+					@if ( loadout.Count > 0 )
+					{
+						<div class="detail-section detail-section-loadout">
+							<div class="detail-section-title">#tabmenu.jobs.loadout</div>
+							<div class="loadout-icons">
+								@foreach ( var equipment in visibleLoadout )
+								{
+									@if ( !string.IsNullOrEmpty( equipment.DisplayIcon() ) )
+									{
+										<div class="loadout-icon"
+										     style="background-image:url(@equipment.DisplayIcon());"
+										     tooltip="@equipment.DisplayName()"></div>
+									}
+									else
+									{
+										<div class="loadout-icon loadout-icon-fallback"
+										     tooltip="@equipment.DisplayName()">
+											<i class="material-icons">inventory_2</i>
+										</div>
+									}
+								}
+								@if ( hiddenLoadoutCount > 0 )
+								{
+									<div class="loadout-more"
+									     tooltip="@string.Format( Language.GetPhrase( "tabmenu.jobs.more_equipment" ), hiddenLoadoutCount )">
+										+@hiddenLoadoutCount</div>
+								}
+							</div>
+						</div>
+					}
+				</div>
+
+				<div class="job-detail-actions">
+					@if ( isCurrentJob )
+					{
+						<button class="btn btn-disabled action-btn" disabled>#tabmenu.jobs.current</button>
+					}
+					else if ( canChange )
+					{
+						<button class="btn btn-primary action-btn" onclick="@( () => OnSelect?.Invoke( Job ) )">
+							@( Job.VoteRequired && !IgnoreJobRequirements ? "#generic.vote" : "#tabmenu.jobs.change" )
+						</button>
+					}
+					else if ( isFull )
+					{
+						<button class="btn btn-disabled action-btn" disabled>#tabmenu.jobs.full</button>
+					}
+					else
+					{
+						<button class="btn btn-disabled action-btn" disabled>#tabmenu.jobs.unavailable</button>
+					}
+				</div>
 			</div>
 		</div>
 	</div>

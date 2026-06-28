@@ -10,6 +10,7 @@ public static class ThumbnailCache
 	private static readonly LinkedList<string> CharacterPortraitOrder = new();
 	private static readonly Queue<(string Key, Model Model, Action<SkinnedModelRenderer> Setup)> PortraitQueue = new();
 	private static readonly HashSet<string> PendingPortraitKeys = new();
+	private static readonly HashSet<string> PendingAsyncPortraitKeys = new();
 
 	private static readonly Dictionary<string, Texture?> UrlCache = new();
 	private static readonly LinkedList<string> UrlOrder = new();
@@ -41,6 +42,7 @@ public static class ThumbnailCache
 		CharacterPortraitOrder.Clear();
 		PortraitQueue.Clear();
 		PendingPortraitKeys.Clear();
+		PendingAsyncPortraitKeys.Clear();
 		UrlCache.Clear();
 		UrlOrder.Clear();
 		UrlLoading.Clear();
@@ -79,6 +81,39 @@ public static class ThumbnailCache
 			PortraitQueue.Enqueue( (key, model, setupRenderer) );
 
 		return Texture.Transparent;
+	}
+
+	public static Texture GetCharacterPortrait( string key, GameModeJobDto job, Action<SkinnedModelRenderer> setupRenderer )
+	{
+		if ( string.IsNullOrWhiteSpace( key ) )
+			return Texture.Transparent;
+
+		if ( CharacterPortraitCache.TryGetValue( key, out var tex ) )
+			return tex;
+
+		if ( !job.HasCloudModel() )
+		{
+			if ( PendingPortraitKeys.Add( key ) )
+				PortraitQueue.Enqueue( (key, job.GetPrimaryModel(), setupRenderer) );
+			return Texture.Transparent;
+		}
+
+		if ( PendingAsyncPortraitKeys.Add( key ) )
+			_ = GenerateCloudPortraitAsync( key, job, setupRenderer );
+
+		return Texture.Transparent;
+	}
+
+	private static async Task GenerateCloudPortraitAsync( string key, GameModeJobDto job,
+		Action<SkinnedModelRenderer> setupRenderer )
+	{
+		var model = await job.GetPrimaryModelAsync();
+		await GameTask.MainThread();
+
+		if ( !CharacterPortraitCache.ContainsKey( key ) )
+			GenerateCharacterPortrait( key, model, setupRenderer );
+
+		PendingAsyncPortraitKeys.Remove( key );
 	}
 
 	public static void ProcessPortraitQueue( int maxCount = 1 )
