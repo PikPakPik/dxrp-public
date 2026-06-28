@@ -126,7 +126,7 @@ public partial class Player
 		Renderer.Model = Job.GetPrimaryModel();
 
 		// 2: Build and apply clothing
-		var includeJobClothing = DxCivilianJobClothing || !Job.IsInGroup( "civilian" );
+		var includeJobClothing = DxCivilianJobClothing || !Job.IsInGroup( "0802e49f-43ba-5bf2-adb0-933b150f0156" );
 		Dresser.Clothing.Clear();
 		Dresser.Clothing.AddRange( Job.BuildClothing( this, includeJobClothing ).Clothing );
 
