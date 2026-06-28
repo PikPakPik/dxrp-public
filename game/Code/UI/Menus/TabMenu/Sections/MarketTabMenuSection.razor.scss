@@ -167,13 +167,10 @@ MarketTabMenuSection {
 
   .card-staff-border {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     border: 1px solid #e04c4c;
-    border-radius: $space-2;
     pointer-events: none;
+    z-index: 1;
   }
 
   // Entity color as a subtle tinted layer
