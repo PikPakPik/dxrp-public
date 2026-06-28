@@ -6,6 +6,7 @@ public static class ThumbnailCache
 {
 	private static readonly Dictionary<Model, Texture> ModelCache = new();
 	private static readonly Dictionary<Material, Texture> MaterialCache = new();
+	private static readonly Dictionary<string, Texture> CharacterPortraitCache = new();
 
 	private static readonly Dictionary<string, Texture?> UrlCache = new();
 	private static readonly LinkedList<string> UrlOrder = new();
@@ -24,11 +25,15 @@ public static class ThumbnailCache
 		foreach ( var texture in MaterialCache.Values )
 			texture?.Dispose();
 
+		foreach ( var texture in CharacterPortraitCache.Values )
+			texture?.Dispose();
+
 		foreach ( var texture in UrlCache.Values )
 			texture?.Dispose();
 
 		ModelCache.Clear();
 		MaterialCache.Clear();
+		CharacterPortraitCache.Clear();
 		UrlCache.Clear();
 		UrlOrder.Clear();
 		UrlLoading.Clear();
@@ -50,6 +55,17 @@ public static class ThumbnailCache
 			return tex;
 
 		return GenerateTexture( material );
+	}
+
+	public static Texture GetCharacterPortrait( string key, Model model, Action<SkinnedModelRenderer> setupRenderer )
+	{
+		if ( string.IsNullOrWhiteSpace( key ) )
+			return Texture.Transparent;
+
+		if ( CharacterPortraitCache.TryGetValue( key, out var tex ) )
+			return tex;
+
+		return GenerateCharacterPortrait( key, model, setupRenderer );
 	}
 
 	/// <summary>
@@ -234,6 +250,80 @@ public static class ThumbnailCache
 		}
 
 		MaterialCache[material] = texture;
+		return texture;
+	}
+
+	private static Texture GenerateCharacterPortrait( string key, Model? model, Action<SkinnedModelRenderer> setupRenderer )
+	{
+		if ( model is null || model.IsError )
+		{
+			CharacterPortraitCache[key] = Texture.Transparent;
+			return Texture.Transparent;
+		}
+
+		var texture = Texture.CreateRenderTarget().WithSize( 128, 128 ).Create();
+		var scene = new Scene();
+
+		using ( scene.Push() )
+		{
+			var modelGo = new GameObject();
+			var renderer = modelGo.AddComponent<SkinnedModelRenderer>();
+			renderer.Model = model;
+			setupRenderer( renderer );
+
+			var bounds = model.Bounds;
+			if ( bounds.Size.LengthSquared <= 1f )
+			{
+				bounds = renderer.Bounds;
+			}
+
+			var height = MathF.Max( bounds.Size.z, 48f );
+			var centerX = (bounds.Mins.x + bounds.Maxs.x) * 0.5f;
+			var centerY = (bounds.Mins.y + bounds.Maxs.y) * 0.5f;
+			modelGo.LocalPosition = new Vector3( -centerX, -centerY, -bounds.Mins.z );
+			modelGo.WorldRotation = Rotation.From( 0f, 15f, 0f );
+
+			var focusPoint = Vector3.Up * (height * 0.94f);
+			foreach ( var boneName in new[] { "eyes", "eye_right", "eye_left", "eye_l", "eye_r" } )
+			{
+				var bone = renderer.GetBoneObject( boneName );
+				if ( !bone.IsValid() )
+					continue;
+
+				var boneZ = bone.Transform.World.Position.z;
+				if ( boneZ > height * 0.9f )
+				{
+					focusPoint = Vector3.Up * boneZ;
+					break;
+				}
+			}
+
+			var cameraGo = new GameObject();
+			var camera = cameraGo.AddComponent<CameraComponent>();
+			camera.FieldOfView = 35f;
+			camera.BackgroundColor = Color.Transparent;
+			camera.ZNear = 0.5f;
+			camera.ZFar = 256f;
+
+			var distance = MathF.Min( 44f, MathF.Max( 34f, height * 0.48f ) );
+			cameraGo.WorldPosition = focusPoint + new Vector3( distance, -0.5f, 0f );
+			cameraGo.WorldRotation = Rotation.LookAt( focusPoint - cameraGo.WorldPosition, Vector3.Up );
+
+			var lightGo = new GameObject();
+			lightGo.WorldPosition = focusPoint + Vector3.Forward * 28f + Vector3.Left * 12f + Vector3.Up * 16f;
+			lightGo.WorldRotation = Rotation.LookAt( focusPoint - lightGo.WorldPosition, Vector3.Up );
+
+			var spotLight = lightGo.AddComponent<SpotLight>();
+			spotLight.LightColor = Color.White * 2f;
+			spotLight.Radius = 180f;
+			spotLight.Attenuation = 0.55f;
+			spotLight.ConeOuter = 70f;
+			spotLight.Shadows = false;
+
+			camera.RenderToTexture( texture );
+		}
+
+		CharacterPortraitCache[key] = texture;
 		return texture;
 	}
 

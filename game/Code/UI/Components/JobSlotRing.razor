@@ -1,0 +1,53 @@
+@namespace Dxura.RP.Game.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@{
+	var hasLimit = MaxCount > 0;
+	var fillPercent = hasLimit ? Math.Clamp( CurrentPlayers / (float)MaxCount * 100f, 0f, 100f ) : 0f;
+	var label = MaxCount > 0 ? $"{CurrentPlayers}/{MaxCount}" : CurrentPlayers.ToString();
+}
+
+<root style="@BuildRootStyle()"
+      class="job-slot-ring @( IsFull ? "full" : "" ) @( !hasLimit ? "unlimited" : "" )">
+	<div class="ring-track"></div>
+	@if ( hasLimit && fillPercent > 0f && !IsFull )
+	{
+		<div class="ring-progress" style="@BuildProgressStyle( fillPercent )"></div>
+	}
+	<div class="ring-center" style="@BuildCenterStyle()"></div>
+	<span class="ring-label">@label</span>
+</root>
+
+@code
+{
+	const string FillColor = "#199c3b";
+
+	const int RingWidth = 3;
+
+	public int CurrentPlayers { get; set; }
+	public int MaxCount { get; set; }
+	public bool IsFull { get; set; }
+	public int Size { get; set; } = 52;
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine( CurrentPlayers, MaxCount, IsFull, Size );
+	}
+
+	private string BuildRootStyle()
+	{
+		return $"width: {Size}px; height: {Size}px; min-width: {Size}px; min-height: {Size}px;";
+	}
+
+	private string BuildCenterStyle()
+	{
+		return $"top: {RingWidth}px; left: {RingWidth}px; right: {RingWidth}px; bottom: {RingWidth}px;";
+	}
+
+	private string BuildProgressStyle( float fillPercent )
+	{
+		var sweep = fillPercent.Clamp( 0, 99.9f );
+		return $"background: conic-gradient({FillColor} 0%, {FillColor} {sweep:0.#}%, transparent {sweep:0.#}%, transparent 100%);";
+	}
+}

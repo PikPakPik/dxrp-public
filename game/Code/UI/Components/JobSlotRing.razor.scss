@@ -1,0 +1,55 @@
+@import "../styles.scss";
+
+JobSlotRing {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+
+  .ring-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: rgba(white, 0.38);
+    z-index: 0;
+  }
+
+  &.full .ring-track {
+    background-color: $color-bad;
+  }
+
+  .ring-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  .ring-center {
+    position: absolute;
+    border-radius: 50%;
+    background-color: $color-primary;
+    z-index: 2;
+  }
+
+  .ring-label {
+    position: relative;
+    z-index: 3;
+    font-size: $text-sm;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    color: rgba($color-tertiary, 0.95);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+}

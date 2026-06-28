@@ -39,7 +39,7 @@ MarketTabMenuSection {
     font-size: $text-sm;
     color: $color-gray-400;
     transition: all 0.15s ease;
-    i { font-size: $text-base; }
+    i { font-size: $text-lg; }
 
     &:hover {
       color: $color-tertiary;
@@ -90,7 +90,7 @@ MarketTabMenuSection {
   }
 
   .category-toggle-icon {
-    font-size: 18px;
+    font-size: 22px;
     flex-shrink: 0;
     text-transform: none;
     color: $color-gray-400;
@@ -125,11 +125,14 @@ MarketTabMenuSection {
   // Card
   .entity-card {
     display: flex;
-    width: 150px;
-    min-width: 150px;
-    height: 90px;
+    flex-direction: row;
+    align-items: stretch;
+    width: 180px;
+    min-width: 180px;
+    min-height: 120px;
+    height: auto;
     flex-shrink: 0;
-    overflow: hidden;
+    overflow: visible;
     cursor: pointer;
     border-radius: $space-2;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -152,9 +155,9 @@ MarketTabMenuSection {
 
   // Entity color as a subtle tinted layer
   .card-chip {
-    width: 8px;
-    min-width: 8px;
-    height: 100%;
+    width: 10px;
+    min-width: 10px;
+    align-self: stretch;
     flex-shrink: 0;
   }
 
@@ -163,9 +166,11 @@ MarketTabMenuSection {
     flex-direction: column;
     justify-content: space-between;
     flex-grow: 1;
+    min-height: 120px;
     height: 100%;
     padding: $space-3;
     background-color: $color-secondary;
+    overflow: visible;
   }
 
   .card-lock {
@@ -174,7 +179,7 @@ MarketTabMenuSection {
     right: $space-2;
 
     i {
-      font-size: $text-sm;
+      font-size: $text-lg;
       color: white;
       opacity: 0.4;
     }
@@ -187,14 +192,20 @@ MarketTabMenuSection {
   }
 
   .card-name {
-    font-size: $text-sm;
+    font-size: $text-base;
     font-weight: 700;
     color: white;
+    line-height: 1.3;
+    white-space: normal;
+    overflow: visible;
   }
 
   .card-limit {
-    font-size: $text-xs;
+    font-size: $text-sm;
     color: $color-gray-400;
+    line-height: 1.3;
+    white-space: normal;
+    overflow: visible;
   }
 
   .card-bottom {
@@ -204,7 +215,7 @@ MarketTabMenuSection {
   }
 
   .card-price {
-    font-size: $text-base;
+    font-size: $text-lg;
     font-weight: 700;
     color: #54be35;
   }

@@ -163,7 +163,7 @@
 
 		_camera.WorldPosition = cameraPosition;
 		_camera.WorldRotation = Rotation.LookAt( lookTarget - cameraPosition, Vector3.Up );
-		_camera.FieldOfView = 36f;
+		_camera.FieldOfView = 40f;
 		_camera.BackgroundColor = Color.Transparent;
 		_camera.ZNear = 1f;
 		_camera.ZFar = 256f;
@@ -228,19 +228,19 @@
 		_modelSize = new Vector3( width, width, height );
 		_body!.LocalPosition = new Vector3( -localCenter.x, -localCenter.y, -localMins.z );
 		_focusPoint = Origin + Vector3.Up * Math.Clamp( height * 0.5f, 34f, 52f );
-		_fitDistance = Math.Clamp( MathF.Max( height * 1.05f, width * 2.1f ), 82f, 158f );
-		_zoomOffset = 34f;
-		_minDistance = Math.Clamp( _fitDistance * 0.85f, 58f, 110f );
-		_maxDistance = Math.Clamp( _fitDistance * 1.65f, 96f, 190f );
+		_fitDistance = Math.Clamp( MathF.Max( height * 1.18f, width * 2.35f ), 96f, 178f );
+		_zoomOffset = 52f;
+		_minDistance = Math.Clamp( _fitDistance * 0.88f, 68f, 128f );
+		_maxDistance = Math.Clamp( _fitDistance * 1.7f, 108f, 210f );
 	}
 
 	private float CalculateFitDistance( float aspectRatio )
 	{
 		aspectRatio = MathF.Max( aspectRatio, 0.75f );
 
-		const float verticalCoverage = 0.62f;
-		const float horizontalCoverage = 0.58f;
-		const float fieldOfViewDegrees = 36f;
+		const float verticalCoverage = 0.48f;
+		const float horizontalCoverage = 0.44f;
+		const float fieldOfViewDegrees = 40f;
 
 		var halfVerticalFov = MathF.Tan( fieldOfViewDegrees * 0.5f * MathF.PI / 180f );
 		var halfHorizontalFov = halfVerticalFov * aspectRatio;
@@ -251,10 +251,10 @@
 		if ( _scenePanel != null )
 		{
 			var panelHeight = _scenePanel.Box.Rect.Height;
-			if ( panelHeight > 0f && panelHeight < 320f )
+			if ( panelHeight > 0f && panelHeight < 400f )
 			{
-				var t = panelHeight / 320f;
-				distance *= 1.42f + ( 1f - 1.42f ) * t;
+				var t = panelHeight / 400f;
+				distance *= 1.58f + ( 1f - 1.58f ) * t;
 			}
 		}
 
@@ -303,7 +303,7 @@
 			_camera.BackgroundColor = Color.Transparent;
 			_camera.ZNear = 1f;
 			_camera.ZFar = 256f;
-			_camera.FieldOfView = 36f;
+			_camera.FieldOfView = 40f;
 		}
 	}
 

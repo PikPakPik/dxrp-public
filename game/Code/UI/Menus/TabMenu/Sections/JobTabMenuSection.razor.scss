@@ -35,6 +35,7 @@ JobTabMenuSection {
   .job-list-scroll {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     flex-grow: 1;
     flex-shrink: 1;
     min-height: 0;
@@ -48,6 +49,7 @@ JobTabMenuSection {
     flex-direction: column;
     width: 100%;
     flex-shrink: 0;
+    flex-grow: 0;
     margin-bottom: $space-4;
 
     &:last-child {
@@ -81,7 +83,7 @@ JobTabMenuSection {
     }
 
     .group-toggle-icon {
-      font-size: 18px;
+      font-size: 22px;
       flex-shrink: 0;
       text-transform: none;
     }
@@ -97,8 +99,9 @@ JobTabMenuSection {
       font-weight: 700;
       padding: 2px $space-2;
       border-radius: 999px;
-      background-color: rgba(black, 0.2);
-      color: rgba(white, 0.85);
+      background-color: rgba(black, 0.15);
+      color: inherit;
+      opacity: 0.85;
     }
   }
 
@@ -106,164 +109,136 @@ JobTabMenuSection {
     margin-bottom: 0;
   }
 
-  .job-list-grid {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: $space-3;
-    width: 100%;
-  }
-
-  .job-list-item {
+  .job-list {
     display: flex;
     flex-direction: column;
     gap: $space-2;
-    flex-grow: 1;
+    width: 100%;
+  }
+
+  .job-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    min-height: 64px;
     flex-shrink: 0;
-    flex-basis: 48%;
-    min-width: 0;
-    min-height: 96px;
-    padding: $space-3;
     border-radius: $space-2;
-    background-color: rgba($color-primary, 0.65);
-    border: 1px solid rgba(white, 0.04);
+    overflow: hidden;
+    background-color: rgba($color-primary, 0.9);
+    border: 1px solid rgba(white, 0.05);
     cursor: pointer;
     transition: background-color 0.15s ease, border-color 0.15s ease;
 
     &:hover {
-      background-color: rgba($color-primary, 0.85);
-      border-color: rgba(white, 0.08);
-    }
-
-    &.selected {
-      background-color: rgba($color-accent, 0.15);
+      background-color: rgba($color-primary, 1);
       border-color: rgba(white, 0.12);
     }
 
+    &.selected {
+      background-color: rgba($color-accent, 0.07);
+      border-color: rgba($color-accent, 0.28);
+    }
+
     &.current:not(.selected) {
-      background-color: rgba($color-good, 0.08);
+      border-color: rgba($color-good, 0.4);
+    }
+
+    JobSlotRing .ring-center {
+      background-color: $color-primary;
+    }
+
+    &:hover JobSlotRing .ring-center {
+      background-color: $color-primary;
+    }
+
+    &.selected JobSlotRing .ring-center {
+      background-color: mix($color-primary, $color-accent, 88%);
     }
   }
 
-  .job-list-header {
+  .job-card-chip {
+    width: 4px;
+    min-width: 4px;
+    align-self: stretch;
+    flex-shrink: 0;
+  }
+
+  .job-card-players {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: 56px;
+    padding: $space-1 0 $space-1 $space-2;
+
+    JobCardPlayerModel + JobCardPlayerModel {
+      margin-left: -13px;
+    }
+
+    JobCardPlayerModel:nth-child(1) { z-index: 1; }
+    JobCardPlayerModel:nth-child(2) { z-index: 2; }
+    JobCardPlayerModel:nth-child(3) { z-index: 3; }
+    JobCardPlayerModel:nth-child(4) { z-index: 4; }
+  }
+
+  .job-card-players-overflow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    margin-left: -6px;
+    padding: 0 $space-1;
+    border-radius: 999px;
+    background-color: rgba($color-secondary, 0.95);
+    border: 1px solid rgba(white, 0.12);
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba($color-tertiary, 0.85);
+    pointer-events: none;
+  }
+
+  .job-card-body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    width: 100%;
+    padding: $space-2 $space-3;
+  }
+
+  .job-card-info {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: $space-1;
-    width: 100%;
+    flex-grow: 1;
     min-width: 0;
   }
 
-  .job-list-name {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    min-height: 22px;
-    font-size: $text-lg;
+  .job-card-name {
+    font-size: $text-base;
     font-weight: 700;
-    line-height: 1.25;
+    line-height: 1.2;
+    color: rgba($color-tertiary, 0.95);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
   }
 
-  .current-tag {
-    align-self: flex-start;
-    flex-shrink: 0;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: $color-good;
-    padding: 2px $space-2;
-    background-color: rgba($color-good, 0.15);
-    border-radius: 2px;
-  }
-
-  .job-list-meta {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: $space-2;
-    font-size: $text-sm;
-    color: $color-gray-400;
-
-    > span {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 3px;
-    }
-
-    .material-icons {
-      font-size: 16px;
-    }
-
-    .salary {
-      color: $color-good;
-    }
-
-    .player-count.full {
-      color: $color-bad;
-    }
-
-    .vote-badge {
-      color: $color-accent;
-    }
-  }
-
-  .job-list-description {
-    font-size: $text-sm;
-    line-height: 1.45;
-    color: $color-gray-400;
-    max-height: 2.9em;
-    overflow: hidden;
-  }
-
-  .job-list-loadout {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: $space-1;
-    margin-top: auto;
-  }
-
-  .loadout-icon {
-    width: 28px;
-    height: 28px;
-    flex-shrink: 0;
-    border-radius: 2px;
-    background-color: rgba(black, 0.35);
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-
-  .loadout-icon-fallback {
+  .job-card-slots {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $color-gray-400;
-
-    .material-icons {
-      font-size: 16px;
-    }
-  }
-
-  .loadout-more {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 28px;
-    height: 28px;
-    padding: 0 5px;
-    font-size: 11px;
-    font-weight: 700;
-    color: $color-gray-400;
-    background-color: rgba(black, 0.25);
-    border-radius: 2px;
+    align-self: center;
+    flex-shrink: 0;
+    width: 52px;
+    min-width: 52px;
+    height: 52px;
   }
 
   .job-detail-panel {

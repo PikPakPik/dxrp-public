@@ -82,7 +82,7 @@
 @code
 {
 	private bool _showLocked;
-	HashSet<string> _collapsedCategories = [];
+	HashSet<string> _collapsedCategories = TabMenuSectionPreferences.LoadCollapsedMarketCategories();
 
 	protected override int BuildHash()
 	{
@@ -112,6 +112,8 @@
 		{
 			_collapsedCategories.Remove( categoryKey );
 		}
+
+		TabMenuSectionPreferences.SaveCollapsedMarketCategories( _collapsedCategories );
 	}
 
 	private static string GetCategoryText( string? category )

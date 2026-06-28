@@ -23,7 +23,8 @@
 }
 
 <root class="selected-job-pane">
-	<div class="job-detail-header" style="background-color: @Job.Color.Hex()">
+	<div class="job-detail-header">
+		<div class="job-detail-chip" style="background-color: @Job.Color.Hex()"></div>
 		<div class="job-detail-title">
 			<span class="job-detail-name">@Job.DisplayName()</span>
 		</div>
@@ -42,7 +43,7 @@
 				</div>
 				<div class="stat-chip player-count @(isFull ? "full" : "")">
 					<i class="material-icons">group</i>
-					<span>@currentPlayers/@( Job.MaxCount == 0 ? "∞" : Job.MaxCount.ToString() )</span>
+					<span>@Job.FormatPlayerSlots( currentPlayers )</span>
 				</div>
 				@if ( Job.VoteRequired && !IgnoreJobRequirements )
 				{
@@ -67,41 +68,43 @@
 				</div>
 			}
 
-			@if ( !string.IsNullOrWhiteSpace( Job.DisplayDescription() ) )
-			{
-				<div class="detail-section">
-					<div class="detail-section-title">#tabmenu.jobs.description</div>
-					<div class="detail-section-body">
-						@Job.DisplayDescription()
+			<div class="job-detail-sections">
+				@if ( !string.IsNullOrWhiteSpace( Job.DisplayDescription() ) )
+				{
+					<div class="detail-section detail-section-description">
+						<div class="detail-section-title">#tabmenu.jobs.description</div>
+						<div class="detail-section-body">
+							@Job.DisplayDescription()
+						</div>
 					</div>
-				</div>
-			}
+				}
 
-			@if ( loadout.Count > 0 )
-			{
-				<div class="detail-section">
-					<div class="detail-section-title">#tabmenu.jobs.loadout</div>
-					<div class="loadout-icons">
-						@foreach ( var equipment in visibleLoadout )
-						{
-							@if ( !string.IsNullOrEmpty( equipment.DisplayIcon() ) )
+				@if ( loadout.Count > 0 )
+				{
+					<div class="detail-section detail-section-loadout">
+						<div class="detail-section-title">#tabmenu.jobs.loadout</div>
+						<div class="loadout-icons">
+							@foreach ( var equipment in visibleLoadout )
 							{
-								<div class="loadout-icon" style="background-image:url(@equipment.DisplayIcon());" tooltip="@equipment.DisplayName()"></div>
+								@if ( !string.IsNullOrEmpty( equipment.DisplayIcon() ) )
+								{
+									<div class="loadout-icon" style="background-image:url(@equipment.DisplayIcon());" tooltip="@equipment.DisplayName()"></div>
+								}
+								else
+								{
+									<div class="loadout-icon loadout-icon-fallback" tooltip="@equipment.DisplayName()">
+										<i class="material-icons">inventory_2</i>
+									</div>
+								}
 							}
-							else
+							@if ( hiddenLoadoutCount > 0 )
 							{
-								<div class="loadout-icon loadout-icon-fallback" tooltip="@equipment.DisplayName()">
-									<i class="material-icons">inventory_2</i>
-								</div>
+								<div class="loadout-more" tooltip="@string.Format( Language.GetPhrase( "tabmenu.jobs.more_equipment" ), hiddenLoadoutCount )">+@hiddenLoadoutCount</div>
 							}
-						}
-						@if ( hiddenLoadoutCount > 0 )
-						{
-							<div class="loadout-more" tooltip="@string.Format( Language.GetPhrase( "tabmenu.jobs.more_equipment" ), hiddenLoadoutCount )">+@hiddenLoadoutCount</div>
-						}
+						</div>
 					</div>
-				</div>
-			}
+				}
+			</div>
 
 			<div class="job-detail-actions">
 				@if ( isCurrentJob )
