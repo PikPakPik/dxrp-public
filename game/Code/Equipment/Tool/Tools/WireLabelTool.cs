@@ -14,8 +14,6 @@ public class WireLabelTool : BaseTool
 	[Range( 0, WireLabelHelper.MaxWireLabelLength )]
 	public string Label { get; set; } = string.Empty;
 
-	public IWireComponent? HoveredWireComponent { get; private set; }
-
 	public override string Attack1Control => "#tool.wire.labeler.attack1";
 	public override string Attack2Control => "#tool.wire.labeler.attack2";
 	public override string ReloadControl => "#tool.wire.labeler.reload";
@@ -28,14 +26,12 @@ public class WireLabelTool : BaseTool
 		}
 
 		IsDeployed = true;
-		UpdateHoveredComponent();
 	}
 
 	public override void OnUnequip()
 	{
 		base.OnUnequip();
 		IsDeployed = false;
-		HoveredWireComponent = null;
 	}
 
 	public override void PrimaryUseStart()
@@ -101,19 +97,6 @@ public class WireLabelTool : BaseTool
 			Notify.Success( "#tool.wire.labeler.cleared" );
 			Tool.DoUseEffects( true, tr.HitPosition, tr.Normal );
 		}
-	}
-
-	private void UpdateHoveredComponent()
-	{
-		var tr = PerformEyeTrace();
-		if ( !tr.Hit || !tr.GameObject.IsValid() )
-		{
-			HoveredWireComponent = null;
-			return;
-		}
-
-		var wireComponent = tr.GameObject.Root.GetComponent<IWireComponent>();
-		HoveredWireComponent = wireComponent;
 	}
 
 	private bool TryGetWireTarget( SceneTraceResult tr, out GameObject targetGo )
