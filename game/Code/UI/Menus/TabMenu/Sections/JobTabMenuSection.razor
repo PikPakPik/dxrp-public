@@ -114,7 +114,7 @@
 			@if ( _selectedJob != null )
 			{
 				<SelectedJobPane Job="@_selectedJob"
-				                 OnSelect="@( job => ConfirmJobSelection( job ) )"/>
+				                 OnSelect="@ConfirmJobSelection"/>
 			}
 			else
 			{
