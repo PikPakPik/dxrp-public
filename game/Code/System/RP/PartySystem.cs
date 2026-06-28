@@ -150,6 +150,25 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		return new PartyRoom { Id = partyId, LeaderSteamId = data.Leader, Members = members };
 	}
 
+	/// <summary>
+	/// Client-readable list of parties that currently hold a pending invite out to <paramref name="steamId"/>.
+	/// Drives the /party menu "Join Party" tab (our invite-based equivalent of "request to join").
+	/// </summary>
+	public IEnumerable<PartyRoom> GetInvitesFor( long steamId )
+	{
+		foreach ( var kv in Parties )
+		{
+			if ( kv.Value.Invites is { } invites && invites.Contains( steamId ) )
+			{
+				var room = GetRoomView( kv.Key );
+				if ( room is not null )
+				{
+					yield return room;
+				}
+			}
+		}
+	}
+
 	// ── Host mutations (invoked from PartyCommand.ExecuteHost, which already runs on the host) ──
 
 	/// <summary>Invite <paramref name="target"/> to the caller's party, auto-creating one if needed.</summary>
@@ -379,6 +398,181 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		Parties[partyId.Value] = data;
 
 		NotifyParty( partyId.Value, Language.GetPhrase( "party.color_changed" ) );
+	}
+
+	/// <summary>
+	/// Leader hands leadership to <paramref name="target"/>, a fellow party member. This is the manual
+	/// counterpart to the automatic oldest-member transfer in <see cref="RemovePlayerInternal"/> when a
+	/// leader leaves; both just reassign <see cref="PartyData.Leader"/> and replicate.
+	/// </summary>
+	public void HostPromote( Player caller, Player target )
+	{
+		if ( !Networking.IsHost || caller is null || target is null )
+		{
+			return;
+		}
+
+		var partyId = GetPartyId( caller.SteamId );
+		if ( !partyId.HasValue )
+		{
+			caller.Error( Language.GetPhrase( "party.no_party" ) );
+			return;
+		}
+
+		if ( !IsLeader( caller.SteamId ) )
+		{
+			caller.Error( Language.GetPhrase( "party.not_leader" ) );
+			return;
+		}
+
+		if ( caller == target )
+		{
+			caller.Error( Language.GetPhrase( "party.already_leader" ) );
+			return;
+		}
+
+		if ( GetPartyId( target.SteamId ) != partyId )
+		{
+			caller.Error( string.Format( Language.GetPhrase( "party.target_not_found" ), target.DisplayName ) );
+			return;
+		}
+
+		var data = Clone( Parties[partyId.Value] );
+		data.Leader = target.SteamId;
+		Parties[partyId.Value] = data;
+
+		NotifyParty( partyId.Value, string.Format( Language.GetPhrase( "party.member_promoted" ), target.DisplayName ) );
+	}
+
+	/// <summary>
+	/// Broadcasts <paramref name="message"/> to every member of the caller's party as a
+	/// <see cref="MessageType.PartyChat"/> line. Shared by <c>/partychat</c> (<c>/pchat</c>) and the
+	/// <c>/party &lt;message&gt;</c> shorthand so both run the same cooldown-checked, moderated,
+	/// party-filtered path instead of duplicating it.
+	/// </summary>
+	public void HostSendPartyChat( Player caller, string message )
+	{
+		if ( !Networking.IsHost || !caller.IsValid() || Chat.Current is null )
+		{
+			return;
+		}
+
+		var partyId = GetPartyId( caller.SteamId );
+		if ( !partyId.HasValue )
+		{
+			caller.SendMessage( Language.GetPhrase( "party.chat_not_in_party" ) );
+			return;
+		}
+
+		if ( string.IsNullOrWhiteSpace( message ) )
+		{
+			caller.SendMessage( Language.GetPhrase( "party.chat_usage" ) );
+			return;
+		}
+
+		if ( Cooldown.Current.CheckAndStartCooldown( $"{caller.SteamId}:chat", Config.Current.Game.ChatCooldown ) )
+		{
+			caller.Error( "#generic.wait" );
+			return;
+		}
+
+		message = message.Truncate( Config.Current.Game.ChatMaxLength );
+		message = GameManager.ModerateText( caller.SteamId, $"CHAT {MessageType.PartyChat}", message, true );
+
+		var members = GetMembers( partyId.Value ).ToHashSet();
+		var partyConnections = GameUtils.Players
+			.Where( p => p.IsValid() && members.Contains( p.SteamId ) )
+			.Select( p => p.Connection )
+			.ToHashSet();
+
+		using ( Rpc.FilterInclude( c => partyConnections.Contains( c ) ) )
+		{
+			Chat.Current.BroadcastPlayerChat( Guid.NewGuid(), caller.ConnectionId, message, MessageType.PartyChat );
+		}
+	}
+
+	// ── Client → host requests (invoked from the /party menu UI on the caller's client) ──────────
+	// The menu can't run host mutations directly, so each button routes through one of these [Rpc.Host]
+	// wrappers. They resolve the caller from the RPC and delegate to the same Host* mutation the
+	// /party chat command uses — so menu and command share one authoritative, validated path.
+
+	[Rpc.Host]
+	public void RequestKick( long targetSteamId )
+	{
+		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
+		var target = GameUtils.GetPlayerById( targetSteamId );
+		if ( caller.IsValid() && target.IsValid() )
+		{
+			HostKick( caller, target );
+		}
+	}
+
+	[Rpc.Host]
+	public void RequestPromote( long targetSteamId )
+	{
+		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
+		var target = GameUtils.GetPlayerById( targetSteamId );
+		if ( caller.IsValid() && target.IsValid() )
+		{
+			HostPromote( caller, target );
+		}
+	}
+
+	[Rpc.Host]
+	public void RequestLeave()
+	{
+		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
+		if ( caller.IsValid() )
+		{
+			HostLeave( caller );
+		}
+	}
+
+	[Rpc.Host]
+	public void RequestDisband()
+	{
+		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
+		if ( caller.IsValid() )
+		{
+			HostDisband( caller );
+		}
+	}
+
+	[Rpc.Host]
+	public void RequestAccept()
+	{
+		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
+		if ( caller.IsValid() )
+		{
+			HostAccept( caller );
+		}
+	}
+
+	[Rpc.Host]
+	public void RequestInvite( string name )
+	{
+		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
+		if ( !caller.IsValid() || string.IsNullOrWhiteSpace( name ) )
+		{
+			return;
+		}
+
+		// ResolvePlayer already messages the caller on a miss/ambiguous name.
+		var target = CommandHelper.ResolvePlayer( caller, name );
+		if ( target.IsValid() )
+		{
+			HostInvite( caller, target! );
+		}
+	}
+
+	[Rpc.Host]
+	public void RequestSetColor( uint color )
+	{
+		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
+		if ( caller.IsValid() )
+		{
+			HostSetColor( caller, color );
+		}
 	}
 
 	// ── Internal helpers (host-side) ────────────────────────────────────────────────────────

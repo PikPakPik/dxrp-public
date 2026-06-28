@@ -1,35 +1,56 @@
 @namespace Dxura.RP.Game.UI
 @inherits Panel
 @attribute [StyleSheet]
+@* Always-on party roster HUD — draggable window (DraggablePanel), collapsible via the header chevron. *@
 
 @{
 	var room = PartyRoom.Current;
 }
 
-@if ( room is null || room.Count == 0 )
+@* Stay visible while the /party menu is open ON PURPOSE: the menu registers a cursor-unlock request
+   (HUD.SetCursorUnlockRequest), so with the menu open the cursor is FREE without holding the Alt/Caps
+   "Mouse" key. That free cursor is what lets the player drag this bar and click the collapse chevron
+   with NO key held — open /p, arrange the HUD, close it, and the position/collapsed state persist.
+   Only a hard player minimize (Hidden, the eye toggle in the menu) actually removes it. *@
+@if ( room is null || room.Count == 0 || Hidden )
 {
 	return;
 }
 
 <root>
-	<div class="party-header flex flex-row items-center gap-1" onclick="@ToggleCollapsed">
-		<i class="material-icons header-icon" style="color: @AccentHex">group</i>
-		<label class="header-title">#party.hud_title</label>
-		<div class="flex-grow"></div>
-		<label class="header-count">@room.Count/@MaxSize</label>
-		<i class="material-icons header-arrow">@(_collapsed ? "expand_more" : "expand_less")</i>
-	</div>
+	@* Draggable like the admin-ticket windows (Dimmer's request): the header bar is the drag handle —
+	   grab it anywhere to reposition. The dropped position persists via StorageKey. WidthPixels is left
+	   at 0 so the panel auto-sizes to the widest member card (full names always show). *@
+	<DraggablePanel StorageKey="party-hud"
+	                HandleClass="party-header flex flex-row items-center gap-1">
+		<HandleContent>
+			<i class="material-icons header-icon" style="color: @AccentHex">group</i>
+			<label class="header-title">#party.hud_title</label>
+			<div class="flex-grow"></div>
+			<label class="header-count">@room.Count/@MaxSize</label>
+			@* Dedicated collapse toggle. @onmousedown swallows the event so grabbing the chevron toggles the
+			   roster instead of starting a drag — the exact pattern AdminTickets' close (X) button uses. *@
+			<button class="header-arrow-btn"
+			        tooltip="@Language.GetPhrase( _collapsed ? "party.hud_expand" : "party.hud_collapse" )"
+			        @onmousedown="@StopMouseEvent"
+			        @onclick="@ToggleCollapsed">
+				<i class="material-icons header-arrow">@(_collapsed ? "expand_more" : "expand_less")</i>
+			</button>
+		</HandleContent>
 
-	@if ( !_collapsed )
-	{
-		<div class="party-members flex flex-col">
-			@foreach ( var member in OrderedMembers( room ) )
+		<ChildContent>
+			@if ( !_collapsed )
 			{
-				var memberPlayer = GameUtils.GetPlayerById( member.Id );
-				<PartyMemberCard Player=@memberPlayer IsLeader=@member.IsLeader AccentColor=@AccentColor/>
+				<div class="party-members flex flex-col">
+					@foreach ( var member in OrderedMembers( room ) )
+					{
+						var memberPlayer = GameUtils.GetPlayerById( member.Id );
+						<PartyMemberCard Player=@memberPlayer IsLeader=@member.IsLeader AccentColor=@AccentColor/>
+					}
+				</div>
 			}
-		</div>
-	}
+		</ChildContent>
+	</DraggablePanel>
 </root>
 
 @code
@@ -44,13 +65,26 @@
 
 	private int MaxSize => PartySystem.Instance?.Settings.MaxPartySize ?? 4;
 
-	// Accordion state. The whole header bar toggles it; DXRP reveals the cursor while Alt is held, so a
-	// normal click on the bar collapses/expands the roster. Collapsed leaves just the header + chevron.
-	private bool _collapsed;
+	/// <summary>Client-side toggle to minimize the always-on roster. Restored from the /party menu.</summary>
+	public static bool Hidden { get; set; }
+
+	// Accordion state. The whole header bar toggles it; DXRP reveals the cursor while the unlock input
+	// (typically Alt / "Mouse") is held, so a click on the bar collapses/expands the roster. Collapsed
+	// leaves just the header + chevron. Made static so the user's collapsed preference survives any
+	// re-mount of the panel during HUD rebuilds.
+	private static bool _collapsed;
 
 	private void ToggleCollapsed()
 	{
 		_collapsed = !_collapsed;
+		Sound.Play( "pop" );
+	}
+
+	// Swallow the chevron's mousedown so it never reaches the DraggablePanel handle behind it: clicking
+	// the chevron collapses/expands the roster instead of starting a drag. Mirrors AdminTickets exactly.
+	private static void StopMouseEvent( PanelEvent e )
+	{
+		e.StopPropagation();
 	}
 
 	// Other members only — the local player is omitted because their own vitals already live in the
@@ -79,6 +113,8 @@
 		hash.Add( room.Count );
 		hash.Add( AccentColor );
 		hash.Add( _collapsed );
+		hash.Add( PartyMenu.IsOpen );
+		hash.Add( Hidden );
 		foreach ( var member in room.Members )
 		{
 			hash.Add( member.Id );

@@ -2,46 +2,45 @@
 
 PartyHud {
   position: absolute;
-  // Top-left, but deliberately clear of AdminTickets (top: $space-3, staff-only, z 999000) above and
-  // Waila (top: 20%) below. Self is excluded from the roster, so at most 3 member cards ever render.
-  top: 96px;
-  left: $space-3;
-  z-index: 90;
+  // Dimmer's marked spot: under the Frame tool panel and to the RIGHT of the printer Waila panel. This
+  // is the STARTING position only — the panel is draggable, so the player can move it anywhere from here
+  // and the offset persists (DraggablePanel StorageKey="party-hud").
+  top: 15%;
+  left: 10%;
+  // Above the display-only panels (Waila / CurrentToolOverlay are z:auto) so the header reliably
+  // hit-tests to us (for dragging + the collapse chevron) instead of an overlapping panel.
+  z-index: 500;
+  display: flex;
   flex-direction: column;
-  pointer-events: none;
+  align-items: flex-start;
+  // NOTE: do NOT set `pointer-events: none` on this root. The shared HUD root (HUD.razor) already gates
+  // the whole HUD — `none` until the cursor is unlocked (alt held / a cursor request), then `all`. A
+  // `pointer-events: none` ANCESTOR disables its entire subtree, which would kill both dragging and the
+  // chevron. AdminTickets (a clickable, draggable always-on HUD) sets none here either — we follow it.
 
+  // The header bar is the DraggablePanel drag handle (it carries the .draggable-handle class too, which
+  // adds cursor:move). The handle + member list stack vertically and stretch to the widest card.
   .party-header {
-    min-width: 232px;
-    padding: 3px 7px;
+    min-width: 232px; // floor; stretches to match the widest member card so names show in full
+    padding: 2px 8px 2px 7px; // slim vertical height for the drag/dropdown bar
     margin-bottom: 3px;
     background-color: rgba($color-primary, 0.92);
     border-radius: $rounding;
-    pointer-events: all;
-    cursor: pointer;
+    pointer-events: all; // grab anywhere on the bar to drag
+    cursor: move; // 4-way drag affordance — matches the admin-ticket header. The DraggablePanel handle
+                  // also sets this, but declaring it here guarantees it across the component boundary.
     transition: background-color 0.1s ease;
 
     &:hover {
-      background-color: rgba(lighten($color-primary, 8%), 0.95);
+      background-color: rgba($color-primary, 0.98);
     }
   }
 
-  // Route every click on the bar (icon, title, count, chevron) to the header's onclick — without this
-  // the child glyphs capture the hit-test and the arrow appears unclickable.
-  .header-icon,
-  .header-title,
-  .header-count,
-  .header-arrow {
-    pointer-events: none;
-  }
-
+  // The header text/icon are left at default pointer-events (NOT none) so they inherit the bar's
+  // `cursor: move` and a mousedown on them still bubbles to the drag handle — exactly how the admin
+  // ticket header behaves. (Setting them to none broke the move-cursor hit-test on the bar.)
   .header-icon {
     font-size: 14px;
-  }
-
-  .header-arrow {
-    font-size: 15px;
-    color: $color-gray-400;
-    margin-left: 4px;
   }
 
   .header-title {
@@ -56,6 +55,33 @@ PartyHud {
     font-size: 11px;
     font-weight: 700;
     color: $color-gray-400;
+  }
+
+  // Dedicated collapse toggle (stops its own mousedown so it doesn't drag — see PartyHud.razor).
+  .header-arrow-btn {
+    pointer-events: all;
+    border: 0;
+    background-color: transparent;
+    padding: 1px 4px;
+    margin-left: 6px;
+    border-radius: $rounding;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+
+    &:hover {
+      background-color: rgba($color-white, 0.12);
+
+      .header-arrow {
+        color: $color-white;
+      }
+    }
+  }
+
+  .header-arrow {
+    font-size: 15px;
+    color: $color-gray-400;
+    pointer-events: none;
+    transition: color 0.1s ease;
   }
 
   .party-members {
