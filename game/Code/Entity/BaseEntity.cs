@@ -19,7 +19,6 @@ public class BaseEntity : Component, IDamageEvents, IDescription, IOwned, IGameO
 	public string Identifier { get; set; } = "";
 
 	[Property]
-	[Sync( SyncFlags.FromHost )]
 	public GameModeEntityDto? Resource => GameModeEntities.GetByIdentifierOrFallback( Identifier );
 
 	[Property]
