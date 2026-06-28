@@ -1,0 +1,138 @@
+@namespace Dxura.RP.Game.UI
+@using Dxura.RP.Shared
+@using Sandbox
+@using Sandbox.UI
+@inherits Panel
+
+@attribute [StyleSheet]
+
+@if ( IsCurrentJob )
+{
+	<root style="@BuildRootStyle()" class="current-job-badge">
+		<div class="current-badge-ring" style="@BuildRingStyle()">
+			<div class="current-badge-fill" style="@BuildFillStyle()">
+				<i class="material-icons">check</i>
+			</div>
+		</div>
+	</root>
+}
+else if ( HasPreview )
+{
+	<root style="@BuildRootStyle()">
+		<div class="model-shell" style="@BuildShellStyle()">
+			<Image Texture="@GetPortraitTexture()" class="model-image"/>
+		</div>
+	</root>
+}
+
+@code
+{
+	private const string DefaultPreviewModelPath = "models/citizen_human/citizen_human_male.vmdl";
+
+	public Player? Player { get; set; }
+	public GameModeJobDto? PreviewJob { get; set; }
+	public bool IsCurrentJob { get; set; }
+	public int Size { get; set; } = 44;
+	public Color BorderColor { get; set; } = Color.White;
+
+	private bool HasPreview => Player is { IsValid: true } || PreviewJob.IsValid();
+
+	protected override int BuildHash()
+	{
+		return HashCode.Combine( Player, PreviewJob, IsCurrentJob, Size, BorderColor );
+	}
+
+	private string BuildRootStyle()
+	{
+		return $"width: {Size}px; height: {Size}px; min-width: {Size}px; min-height: {Size}px;";
+	}
+
+	private string BuildShellStyle()
+	{
+		return $"border: 2px solid {BorderColor.Hex};";
+	}
+
+	private string BuildRingStyle()
+	{
+		return $"border-color: {BorderColor.Hex};";
+	}
+
+	private string BuildFillStyle()
+	{
+		return $"background-color: {BorderColor.Hex};";
+	}
+
+	private Texture GetPortraitTexture()
+	{
+		var key = BuildSignature();
+		if ( string.IsNullOrWhiteSpace( key ) )
+		{
+			return Texture.Transparent;
+		}
+
+		return ThumbnailCache.GetCharacterPortrait( key, GetPreviewModel(), ApplyPreviewClothing );
+	}
+
+	private void ApplyPreviewClothing( SkinnedModelRenderer renderer )
+	{
+		if ( Player is { IsValid: true } player )
+		{
+			JobPreviewClothing.ApplyPlayer( renderer, player );
+			return;
+		}
+
+		if ( PreviewJob is { } previewJob && previewJob.IsValid() )
+		{
+			JobPreviewClothing.ApplyJob( renderer, previewJob );
+		}
+	}
+
+	private Model GetPreviewModel()
+	{
+		if ( Player is { IsValid: true } player )
+		{
+			if ( player.Renderer.IsValid() && player.Renderer.Model.IsValid() )
+			{
+				return player.Renderer.Model;
+			}
+
+			if ( player.Job.IsValid() )
+			{
+				return player.Job.GetPrimaryModel();
+			}
+		}
+
+		if ( PreviewJob is { } previewJob && previewJob.IsValid() )
+		{
+			if ( string.IsNullOrWhiteSpace( previewJob.Model ) )
+			{
+				return Model.Load( DefaultPreviewModelPath );
+			}
+
+			return previewJob.GetPrimaryModel();
+		}
+
+		return GameModeJobs.Default.GetPrimaryModel();
+	}
+
+	private string BuildSignature()
+	{
+		if ( Player is { IsValid: true } player )
+		{
+			var avatarData = player.Network.Owner?.GetUserData( "avatar" ) ?? string.Empty;
+			var modelHash = player.Renderer.IsValid() && player.Renderer.Model.IsValid() ? player.Renderer.Model.GetHashCode() : 0;
+			return $"portrait:player:{player.SteamId}:{player.Job.Id}:{modelHash}:{avatarData}";
+		}
+
+		if ( PreviewJob is { } previewJob && previewJob.IsValid() )
+		{
+			var avatarData = Player.Local.IsValid()
+				? Player.Local.Network.Owner?.GetUserData( "avatar" ) ?? string.Empty
+				: string.Empty;
+
+			return $"portrait:job:{previewJob.Id}:{previewJob.Model}:{string.Join( ',', previewJob.Clothes )}:{avatarData}";
+		}
+
+		return string.Empty;
+	}
+}

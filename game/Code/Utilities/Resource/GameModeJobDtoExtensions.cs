@@ -82,6 +82,21 @@ public static class GameModeJobDtoExtensions
 		return !path.Contains( '/' ) && path.Contains( '.' );
 	}
 
+	public static string FormatPlayerSlots( this GameModeJobDto? job, int currentPlayers )
+	{
+		if ( job == null )
+		{
+			return "0";
+		}
+
+		if ( job.MaxCount <= 0 )
+		{
+			return currentPlayers.ToString();
+		}
+
+		return $"{currentPlayers}/{job.MaxCount}";
+	}
+
 	public static bool HasTag( this GameModeJobDto? job, JobTag tag )
 	{
 		return JobTags.Has( job, tag );

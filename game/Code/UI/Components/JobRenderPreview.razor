@@ -1,16 +1,17 @@
 @namespace Dxura.RP.Game.UI
+@using Dxura.RP.Shared
 @using Sandbox
 @using Sandbox.UI
 @inherits Panel
 
 @attribute [StyleSheet]
 
-@if ( Player == null || !Player.IsValid() )
+@if ( Job == null || !Job.IsValid() )
 {
 	return;
 }
 
-<root class="player-render-preview @(_isDragging ? "dragging" : string.Empty)">
+<root class="job-render-preview @(_isDragging ? "dragging" : string.Empty)">
 	<div class="preview-shell">
 		<ScenePanel @ref="_scenePanel" class="preview-scene"/>
 	</div>
@@ -18,9 +19,9 @@
 
 @code
 {
-	private static readonly Vector3 Origin = new( 0f, 0f, -9000f );
+	private static readonly Vector3 Origin = new( 0f, 0f, -9100f );
 
-	public Player? Player { get; set; }
+	public GameModeJobDto? Job { get; set; }
 
 	private ScenePanel? _scenePanel;
 	private Scene? _scene;
@@ -38,6 +39,8 @@
 	private float _maxDistance = 128f;
 	private float _yaw = -10f;
 	private float _yawVelocity;
+	private float _cameraPitchDegrees = 12f;
+	private float _lookTargetRaise = 8f;
 	private bool _isDragging;
 	private Vector2 _lastMousePosition;
 
@@ -45,7 +48,7 @@
 	{
 		base.Tick();
 
-		if ( Player == null || !Player.IsValid() )
+		if ( Job == null || !Job.IsValid() )
 		{
 			ClearPreview();
 			return;
@@ -58,10 +61,10 @@
 
 		EnsureScene();
 
-		var signature = BuildSignature( Player );
+		var signature = BuildSignature( Job );
 		if ( signature != _signature )
 		{
-			RebuildPreview( Player );
+			RebuildPreview( Job );
 			_signature = signature;
 		}
 
@@ -149,11 +152,18 @@
 			? _scenePanel.Box.Rect.Width / _scenePanel.Box.Rect.Height
 			: 1f;
 		var distance = Math.Clamp( CalculateFitDistance( aspectRatio ) + _zoomOffset, _minDistance, _maxDistance );
-		var cameraPosition = _focusPoint + new Vector3( distance, -2f, 0f );
+		var pitch = _cameraPitchDegrees * MathF.PI / 180f;
+		var cameraOffset = new Vector3(
+			distance * MathF.Cos( pitch ),
+			-2f,
+			distance * MathF.Sin( pitch )
+		);
+		var cameraPosition = _focusPoint + cameraOffset;
+		var lookTarget = _focusPoint + Vector3.Up * _lookTargetRaise;
 
 		_camera.WorldPosition = cameraPosition;
-		_camera.WorldRotation = Rotation.LookAt( _focusPoint - cameraPosition, Vector3.Up );
-		_camera.FieldOfView = 25f;
+		_camera.WorldRotation = Rotation.LookAt( lookTarget - cameraPosition, Vector3.Up );
+		_camera.FieldOfView = 40f;
 		_camera.BackgroundColor = Color.Transparent;
 		_camera.ZNear = 1f;
 		_camera.ZFar = 256f;
@@ -165,7 +175,7 @@
 		}
 	}
 
-	private void RebuildPreview( Player player )
+	private void RebuildPreview( GameModeJobDto job )
 	{
 		DestroyPreviewObjects();
 		EnsureScene();
@@ -178,21 +188,21 @@
 		{
 			_yaw = -10f;
 			_yawVelocity = 0f;
-			_pivot = new GameObject( true, "player_preview_pivot" )
+			_pivot = new GameObject( true, "job_preview_pivot" )
 			{
 				WorldPosition = Origin,
 				WorldRotation = Rotation.From( 0f, _yaw, 0f )
 			};
 
-			_body = new GameObject( true, "player_preview_display" )
+			_body = new GameObject( true, "job_preview_display" )
 			{
 				Parent = _pivot
 			};
 
 			var renderer = _body.AddComponent<SkinnedModelRenderer>();
-			renderer.Model = GetPreviewModel( player );
+			renderer.Model = GetPreviewModel( job );
 
-			JobPreviewClothing.ApplyPlayer( renderer, player );
+			JobPreviewClothing.ApplyJob( renderer, job );
 			EnsureLight();
 			CenterPreview( renderer );
 		}
@@ -208,32 +218,47 @@
 
 		var localCenter = bounds.Center - Origin;
 		var localMins = bounds.Mins - Origin;
-		var width = MathF.Max( MathF.Max( bounds.Size.x, bounds.Size.y ), 18f );
-		var height = MathF.Max( bounds.Size.z, 48f );
+		var rawWidth = MathF.Max( MathF.Max( bounds.Size.x, bounds.Size.y ), 18f );
+		var rawHeight = MathF.Max( bounds.Size.z, 48f );
+
+		// Frame the body rather than oversized clothing attachments.
+		var width = MathF.Min( rawWidth, 46f );
+		var height = MathF.Min( rawHeight, 76f );
 
 		_modelSize = new Vector3( width, width, height );
 		_body!.LocalPosition = new Vector3( -localCenter.x, -localCenter.y, -localMins.z );
-		_focusPoint = Origin + Vector3.Up * Math.Clamp( height * 0.58f, 22f, height * 0.72f );
-		_fitDistance = Math.Clamp( MathF.Max( height * 0.62f, width * 1.3f ), 44f, 96f );
-		_zoomOffset = 0f;
-		_minDistance = Math.Clamp( _fitDistance * 0.72f, 36f, 84f );
-		_maxDistance = Math.Clamp( _fitDistance * 1.45f, 60f, 144f );
+		_focusPoint = Origin + Vector3.Up * Math.Clamp( height * 0.5f, 34f, 52f );
+		_fitDistance = Math.Clamp( MathF.Max( height * 1.18f, width * 2.35f ), 96f, 178f );
+		_zoomOffset = 52f;
+		_minDistance = Math.Clamp( _fitDistance * 0.88f, 68f, 128f );
+		_maxDistance = Math.Clamp( _fitDistance * 1.7f, 108f, 210f );
 	}
 
 	private float CalculateFitDistance( float aspectRatio )
 	{
 		aspectRatio = MathF.Max( aspectRatio, 0.75f );
 
-		const float verticalCoverage = 1.08f;
-		const float horizontalCoverage = 0.98f;
-		const float fieldOfViewDegrees = 25f;
+		const float verticalCoverage = 0.48f;
+		const float horizontalCoverage = 0.44f;
+		const float fieldOfViewDegrees = 40f;
 
 		var halfVerticalFov = MathF.Tan( fieldOfViewDegrees * 0.5f * MathF.PI / 180f );
 		var halfHorizontalFov = halfVerticalFov * aspectRatio;
 		var heightDistance = _modelSize.z / ( 2f * halfVerticalFov * verticalCoverage );
 		var widthDistance = _modelSize.x / ( 2f * halfHorizontalFov * horizontalCoverage );
+		var distance = MathF.Max( _fitDistance, MathF.Max( heightDistance, widthDistance ) );
 
-		return MathF.Max( _fitDistance, MathF.Max( heightDistance, widthDistance ) );
+		if ( _scenePanel != null )
+		{
+			var panelHeight = _scenePanel.Box.Rect.Height;
+			if ( panelHeight > 0f && panelHeight < 400f )
+			{
+				var t = panelHeight / 400f;
+				distance *= 1.58f + ( 1f - 1.58f ) * t;
+			}
+		}
+
+		return distance;
 	}
 
 	private void EnsureLight()
@@ -243,7 +268,7 @@
 			return;
 		}
 
-		_light = new GameObject( true, "player_preview_light" );
+		_light = new GameObject( true, "job_preview_light" );
 		var spotLight = _light.AddComponent<SpotLight>();
 		spotLight.LightColor = Color.White * 2.2f;
 		spotLight.Radius = 320f;
@@ -272,14 +297,35 @@
 
 		using ( _scene.Push() )
 		{
-			_cameraObject = new GameObject( true, "player_preview_camera" );
+			_cameraObject = new GameObject( true, "job_preview_camera" );
 			_camera = _cameraObject.AddComponent<CameraComponent>();
 			_camera.IsMainCamera = true;
 			_camera.BackgroundColor = Color.Transparent;
 			_camera.ZNear = 1f;
 			_camera.ZFar = 256f;
-			_camera.FieldOfView = 25f;
+			_camera.FieldOfView = 40f;
 		}
+	}
+
+	private const string DefaultPreviewModelPath = "models/citizen_human/citizen_human_male.vmdl";
+
+	private static Model GetPreviewModel( GameModeJobDto job )
+	{
+		if ( string.IsNullOrWhiteSpace( job.Model ) )
+		{
+			return Model.Load( DefaultPreviewModelPath );
+		}
+
+		return job.GetPrimaryModel();
+	}
+
+	private static string BuildSignature( GameModeJobDto job )
+	{
+		var avatarData = Player.Local.IsValid()
+			? Player.Local.Network.Owner?.GetUserData( "avatar" ) ?? string.Empty
+			: string.Empty;
+
+		return $"{job.Id}:{job.Model}:{string.Join( ',', job.Clothes )}:{avatarData}";
 	}
 
 	private void ClearPreview()
@@ -319,27 +365,5 @@
 		}
 
 		_light = null;
-	}
-
-	private static string BuildSignature( Player player )
-	{
-		var avatarData = player.Network.Owner?.GetUserData( "avatar" ) ?? string.Empty;
-		var modelHash = player.Renderer.IsValid() && player.Renderer.Model.IsValid() ? player.Renderer.Model.GetHashCode() : 0;
-		return $"{player.SteamId}:{player.Job.Id}:{modelHash}:{avatarData}";
-	}
-
-	private static Model GetPreviewModel( Player player )
-	{
-		if ( player.Renderer.IsValid() && player.Renderer.Model.IsValid() )
-		{
-			return player.Renderer.Model;
-		}
-
-		if ( player.Job.IsValid() )
-		{
-			return player.Job.GetPrimaryModel();
-		}
-
-		return GameModeJobs.Default.GetPrimaryModel();
 	}
 }
