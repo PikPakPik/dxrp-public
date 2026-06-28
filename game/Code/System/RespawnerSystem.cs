@@ -4,6 +4,8 @@ public class RespawnerSystem : SingletonComponent<RespawnerSystem>, IGameEvents
 {
 	private List<Transform> SpawnPoints { get; } = new();
 	private Dictionary<GameModeJobDto, List<Transform>> JobSpawnPoints { get; } = new();
+	private Dictionary<GameModeJobGroupDto, List<Transform>> GroupSpawnPoints { get; } = new();
+	private List<(string[] Tags, Transform Transform)> TagSpawnPoints { get; } = new();
 
 	private bool _mapFitted;
 
@@ -22,6 +24,21 @@ public class RespawnerSystem : SingletonComponent<RespawnerSystem>, IGameEvents
 	{
 		if ( player is not null )
 		{
+			// Restricted players spawn at jail-tagged spawn points
+			if ( player.Restricted )
+			{
+				var jailSpawns = TagSpawnPoints
+					.Where( e => e.Tags.Contains( WorldSpawnPoint.JailTag, StringComparer.OrdinalIgnoreCase ) )
+					.Select( e => e.Transform )
+					.ToList();
+				if ( jailSpawns.Count > 0 )
+				{
+					var jailSpawnPoint = Sandbox.Game.Random.FromList( jailSpawns );
+					return new Transform( jailSpawnPoint.Position, jailSpawnPoint.Rotation );
+				}
+			}
+
+			// Try job-specific spawn
 			var jobSpecificSpawns = JobSpawnPoints.GetValueOrDefault( player.Job );
 			if ( jobSpecificSpawns is { Count: > 0 } )
 			{
@@ -29,15 +46,27 @@ public class RespawnerSystem : SingletonComponent<RespawnerSystem>, IGameEvents
 				return new Transform( jobSpawnPoint.Position, jobSpawnPoint.Rotation );
 			}
 
-			// If player is restricted, use jail spawn points if available
-			if ( player.Restricted )
+			// Try job group spawn
+			var group = player.Job.GetGroup();
+			if ( group is not null )
 			{
-				var jailSpawns = JobSpawnPoints.GetValueOrDefault( GameModeJobs.GetByTagOrFallback( JobTag.PoliticalPrisoner, "Political Prisoner" ) );
-				if ( jailSpawns is { Count: > 0 } )
+				var groupSpawns = GroupSpawnPoints.GetValueOrDefault( group );
+				if ( groupSpawns is { Count: > 0 } )
 				{
-					var jailSpawnPoint = Sandbox.Game.Random.FromList( jailSpawns );
-					return new Transform( jailSpawnPoint.Position, jailSpawnPoint.Rotation );
+					var groupSpawnPoint = Sandbox.Game.Random.FromList( groupSpawns );
+					return new Transform( groupSpawnPoint.Position, groupSpawnPoint.Rotation );
 				}
+			}
+
+			// Try tag-based spawn
+			var tagMatches = TagSpawnPoints
+				.Where( e => e.Tags.All( t => JobTags.HasNamedTag( player.Job, t ) ) )
+				.Select( e => e.Transform )
+				.ToList();
+			if ( tagMatches.Count > 0 )
+			{
+				var tagSpawnPoint = Sandbox.Game.Random.FromList( tagMatches );
+				return new Transform( tagSpawnPoint.Position, tagSpawnPoint.Rotation );
 			}
 		}
 
@@ -51,10 +80,17 @@ public class RespawnerSystem : SingletonComponent<RespawnerSystem>, IGameEvents
 		RefreshSpawnPoints();
 	}
 
+	public void OnGameModeUpdated( GameModeDto? before, GameModeDto? after )
+	{
+		RefreshSpawnPoints();
+	}
+
 	private void RefreshSpawnPoints()
 	{
 		SpawnPoints.Clear();
 		JobSpawnPoints.Clear();
+		GroupSpawnPoints.Clear();
+		TagSpawnPoints.Clear();
 
 		var officialSpawns = Scene.GetAllComponents<WorldSpawnPoint>().ToList();
 
@@ -63,14 +99,33 @@ public class RespawnerSystem : SingletonComponent<RespawnerSystem>, IGameEvents
 		{
 			foreach ( var spawnPoint in officialSpawns )
 			{
-				if ( spawnPoint.Job is not null )
+				var transform = new Transform( spawnPoint.WorldPosition, spawnPoint.WorldRotation );
+
+				switch ( spawnPoint.Type )
 				{
-					JobSpawnPoints.TryAdd( spawnPoint.Job, new List<Transform>() );
-					JobSpawnPoints[spawnPoint.Job].Add( new Transform( spawnPoint.WorldPosition, spawnPoint.WorldRotation ) );
-				}
-				else
-				{
-					SpawnPoints.Add( new Transform( spawnPoint.WorldPosition, spawnPoint.WorldRotation ) );
+					case SpawnType.Job:
+						if ( spawnPoint.Job is not null )
+						{
+							JobSpawnPoints.TryAdd( spawnPoint.Job, new List<Transform>() );
+							JobSpawnPoints[spawnPoint.Job].Add( transform );
+						}
+						break;
+
+					case SpawnType.JobGroup:
+						if ( spawnPoint.Group is not null )
+						{
+							GroupSpawnPoints.TryAdd( spawnPoint.Group, new List<Transform>() );
+							GroupSpawnPoints[spawnPoint.Group].Add( transform );
+						}
+						break;
+
+					case SpawnType.Tag:
+						if ( spawnPoint.Tags.Length > 0 )
+							TagSpawnPoints.Add( (spawnPoint.Tags, transform) );
+						break;
+					default:
+						SpawnPoints.Add( transform );
+						break;
 				}
 			}
 		}
