@@ -14,9 +14,13 @@ public static class GameModeJobs
 		get
 		{
 			var gm = Config.Current.GameMode;
-			return FindById( gm.DefaultJobId )
-				?? gm.Jobs.FirstOrDefault()
-				?? GetByNameOrFallback( "Default" );
+			if ( gm != null )
+			{
+				var job = FindById( gm.DefaultJobId ) ?? gm.Jobs?.FirstOrDefault();
+				if ( job != null ) return job;
+			}
+
+			return GetByNameOrFallback( "Default" );
 		}
 	}
 
