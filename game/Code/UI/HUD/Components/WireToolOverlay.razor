@@ -1,6 +1,7 @@
 @namespace Dxura.RP.Game.UI
 @using Dxura.RP.Game.Tools
 @using Dxura.RP.Game.Wire
+@using Dxura.RP.Shared
 @inherits Panel
 
 <root class="absolute left-1/2 -translate-x-1/2 -translate-y-1/2" style="top: 55%; z-index: 1000;">
@@ -74,7 +75,7 @@
 
 @code
 {
-	bool IsWireToolEquipped => Player.Local.IsValid() && Player.Local.CurrentEquipment?.Identifier == "tool" && BaseTool.CurrentTool is WireTool;
+	bool IsWireToolEquipped => Player.Local.IsValid() && GameModeEquipments.IsTool( Player.Local.CurrentEquipment?.Resource ) && BaseTool.CurrentTool is WireTool;
 	private WireTool? WireTool => BaseTool.CurrentTool as WireTool;
 	private IWireComponent? HoveredWireComponent => WireTool?.HoveredWireComponent;
 	
