@@ -26,8 +26,9 @@ public sealed class ContainerEntity : BaseEntity
 	private ModelRenderer ModelRenderer { get; set; } = null!;
 
 	[Property]
-	private TextRenderer? TextRenderer { get; set; }
-
+	// ReSharper disable once CollectionNeverUpdated.Global
+	public Dictionary<ContainerType, Model> TypeModels { get; set; } = [];
+	
 	[Property]
 	[Group( "Effects" )]
 	private Decal? Decal { get; set; }
@@ -56,18 +57,17 @@ public sealed class ContainerEntity : BaseEntity
 			Sound.Play( _config.UseSound, WorldPosition );
 		}
 
-		if ( newValue <= 0 )
+		if ( newValue > 0 )
 		{
-			if ( _config.DestroyOnEmpty )
-			{
-				GameObject.Destroy();
-				return;
-			}
-
-			Quantity = 0;
+			return;
+		}
+		if ( _config.DestroyOnEmpty )
+		{
+			GameObject.Destroy();
+			return;
 		}
 
-		UpdateText();
+		Quantity = 0;
 	}
 
 	private void UpdateState()
@@ -86,19 +86,14 @@ public sealed class ContainerEntity : BaseEntity
 			}
 		}
 
+		if ( ModelRenderer.IsValid() && TypeModels.TryGetValue( _config.ContainerType, out var model ) )
+		{
+			ModelRenderer.Model = model;
+		}
+
 		if ( ModelRenderer.IsValid() && Color.TryParse( _config.Tint, out var tint ) )
 		{
 			ModelRenderer.Tint = tint;
-		}
-
-		UpdateText();
-	}
-
-	private void UpdateText()
-	{
-		if ( TextRenderer.IsValid() )
-		{
-			TextRenderer.Text = $"{_config.ResourceId} \n {Quantity} {_config.Unit}";
 		}
 	}
 

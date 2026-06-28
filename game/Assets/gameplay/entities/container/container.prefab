@@ -20,16 +20,12 @@
         "__guid": "2991993e-1f12-4562-9dee-baf5b932f09e",
         "__enabled": true,
         "Flags": 0,
-        "ContainedResource": null,
-        "ContainerType": "Solid",
         "Decal": {
           "_type": "component",
           "component_id": "cc79b255-c065-46cb-b40c-440c54e44abc",
           "go": "d8ad0918-3af6-467f-b3a4-2a07de7e7d95",
           "component_type": "Decal"
         },
-        "DefaultQuantity": 0,
-        "DestroyOnEmpty": true,
         "GameModeEntityId": "00000000-0000-0000-0000-000000000000",
         "HealthComponent": {
           "_type": "component",
@@ -53,8 +49,8 @@
         "Owner": 0,
         "Quantity": 0,
         "Resource": {
-          "Id": "0fa150c9-bcfe-4966-a35c-5bbd18eacf4e",
-          "GameModeAddonContentId": "e6dd6c11-18fe-46a9-b7bd-b972b405cef4",
+          "Id": "2f5bd2f5-fc48-4af0-b249-767a2dd97db5",
+          "GameModeAddonContentId": "19b77531-15ad-4840-a8d6-fe4273750447",
           "NameOverride": null,
           "DescriptionOverride": null,
           "Limit": 0,
@@ -71,9 +67,11 @@
           "component_type": "Rigidbody"
         },
         "TextRenderer": null,
-        "Tint": null,
-        "Unit": "units",
-        "UseSound": "sounds/interaction/bag_open.sound"
+        "TypeModels": {
+          "Bag": "gameplay/entities/container/models/bag/bag.vmdl",
+          "Jug": "gameplay/entities/container/models/jug/jug.vmdl",
+          "Packet": "gameplay/entities/container/models/packet/packet.vmdl"
+        }
       },
       {
         "__type": "Sandbox.ModelRenderer",
