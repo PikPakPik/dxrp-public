@@ -63,7 +63,6 @@
 
 									<div class="job-card @( isSelected ? "selected" : "" ) @( isCurrentJob ? "current" : "" )"
 									     onclick="@( () => SelectJobPreview( job ) )">
-										<div class="job-card-chip" style="background-color: @job.Color.Hex()"></div>
 										<div class="job-card-players">
 											@if ( isCurrentJob )
 											{
