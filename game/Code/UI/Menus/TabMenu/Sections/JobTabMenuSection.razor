@@ -65,31 +65,9 @@
 									<div class="job-card @( isSelected ? "selected" : "" ) @( isCurrentJob ? "current" : "" )"
 									     onclick="@( () => SelectJobPreview( job ) )">
 										<div class="job-card-players">
-											@if ( isCurrentJob )
-											{
-												<JobCardPlayerModel IsCurrentJob="@true"
-												                      BorderColor="@job.ColorValue()"
-												                      Size="@(56)"/>
-											}
-											else if ( jobPlayers.Count > 0 )
-											{
-												@foreach ( var jobPlayer in jobPlayers.Take( MaxJobCardAvatars ) )
-												{
-													<JobCardPlayerModel Player="@jobPlayer"
-													                      BorderColor="@job.ColorValue()"
-													                      Size="@(56)"/>
-												}
-												@if ( jobPlayers.Count > MaxJobCardAvatars )
-												{
-													<span class="job-card-players-overflow">+@( jobPlayers.Count - MaxJobCardAvatars )</span>
-												}
-											}
-											else
-											{
-												<JobCardPlayerModel PreviewJob="@job"
-												                      BorderColor="@job.ColorValue()"
-												                      Size="@(56)"/>
-											}
+											<JobCardPlayerModel IsCurrentJob="@true"
+											                      BorderColor="@job.ColorValue()"
+											                      Size="@(56)"/>
 										</div>
 										<div class="job-card-body">
 											<div class="job-card-info">
@@ -129,7 +107,6 @@
 
 @code
 {
-	const int MaxJobCardAvatars = 4;
 	static readonly List<Player> EmptyJobPlayers = [];
 
 	GameModeJobDto? _selectedJob;
