@@ -6,8 +6,8 @@ public static class GameModeJobs
 {
 	private static readonly Dictionary<string, GameModeJobDto> PlaceholderJobs = new( StringComparer.OrdinalIgnoreCase );
 
-	public static IReadOnlyList<GameModeJobDto> All => Config.Current.GameMode.Jobs;
-	public static IReadOnlyList<GameModeJobGroupDto> AllGroups => Config.Current.GameMode.JobGroups;
+	public static IReadOnlyList<GameModeJobDto> All => Config.Current.GameMode?.Jobs ?? [];
+	public static IReadOnlyList<GameModeJobGroupDto> AllGroups => Config.Current.GameMode?.JobGroups ?? [];
 
 	public static GameModeJobDto Default
 	{

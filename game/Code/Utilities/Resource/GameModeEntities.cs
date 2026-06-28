@@ -6,7 +6,7 @@ public static class GameModeEntities
 {
 	private static readonly Dictionary<string, GameModeEntityDto> PlaceholderEntities = new( StringComparer.OrdinalIgnoreCase );
 
-	public static IReadOnlyList<GameModeEntityDto> All => Config.Current.GameMode.Entities;
+	public static IReadOnlyList<GameModeEntityDto> All => Config.Current.GameMode?.Entities ?? [];
 
 	public static GameModeEntityDto? FindByIdentifier( string identifier )
 	{
