@@ -1,5 +1,6 @@
 {
-  "Resource": "gameplay/resources/hemp.resource",
+  "ResourceId": "hemp",
+  "Icon": null,
   "Stages": [
     1,
     2,

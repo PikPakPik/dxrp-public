@@ -472,3 +472,6 @@ game/Code/rpdev.csproj
 game/Editor/rpdev.editor.csproj
 
 game/rpdev.slnx
+game/Code/rp.csproj
+game/Editor/rp.editor.csproj
+game/rp.slnx

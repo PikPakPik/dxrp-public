@@ -1,4 +1,4 @@
-﻿using Sandbox.Diagnostics;
+using Sandbox.Diagnostics;
 using Sandbox.Services;
 
 namespace Dxura.RP.Game;
@@ -19,7 +19,7 @@ public partial class Door
 
 		var hasAccess = Owner != 0 && Owner == player.SteamId ||
 		                Owner != 0 && FriendSystem.Instance.HasDoorPermission( Owner, player.SteamId ) ||
-		                !string.IsNullOrWhiteSpace( OwnerGroupIdentifier ) && player.Job.IsInGroup( OwnerGroupIdentifier ) ||
+		                !string.IsNullOrWhiteSpace( OwnerGroupIdentifier ) && OwnerGroup != null && player.Job.GetGroup()?.Id == OwnerGroup.Id ||
 		                !string.IsNullOrWhiteSpace( OwnerJobIdentifier ) && OwnerJob?.Id == player.Job.Id;
 
 		if ( !hasAccess )

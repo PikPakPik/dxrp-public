@@ -1,9 +1,28 @@
-using Sandbox.Diagnostics;
 namespace Dxura.RP.Game.Entities;
+
+public class ContainerDecalConfig
+{
+	public Vector3 LocalPosition { get; set; }
+	public Rotation LocalRotation { get; set; }
+	public Vector3 Size { get; set; } = new Vector3( 0.4f, 0.4f, 0.4f );
+}
+
+public class ContainerEntityConfig
+{
+	public string ResourceId { get; init; } = string.Empty;
+	public string IconPath { get; init; } = string.Empty;
+	public string Unit { get; init; } = "units";
+	public ContainerType ContainerType { get; init; } = ContainerType.Bag;
+	public int DefaultQuantity { get; init; }
+	public bool DestroyOnEmpty { get; init; } = true;
+	public string? Tint { get; init; }
+	public string? UseSound { get; init; }
+}
+
 
 [Title( "Container" )]
 [Category( "Entities" )]
-public sealed class ContainerEntity : BaseEntity, IDescription
+public sealed class ContainerEntity : BaseEntity
 {
 	[Property]
 	[Sync( SyncFlags.FromHost )]
@@ -11,35 +30,22 @@ public sealed class ContainerEntity : BaseEntity, IDescription
 	public int Quantity { get; set; }
 
 	[Property]
-	public ContainerType ContainerType { get; set; } = ContainerType.Bag;
-
-	[Property]
-	public int DefaultQuantity { get; set; }
-
-	[Property]
-	public string Unit { get; set; } = "units";
-
-	[Property]
-	public bool DestroyOnEmpty { get; set; } = true;
-
-	[Property]
-	public Color? Tint { get; set; }
-
-	[Property]
 	private ModelRenderer ModelRenderer { get; set; } = null!;
 
 	[Property]
-	private TextRenderer? TextRenderer { get; set; }
+	// ReSharper disable once CollectionNeverUpdated.Global
+	public Dictionary<ContainerType, Model> TypeModels { get; set; } = [];
 
 	[Property]
-	[Group( "Effects" )]
-	private SoundEvent? UseSound { get; set; }
+	public Dictionary<ContainerType, ContainerDecalConfig> TypeDecals { get; set; } = [];
 
 	[Property]
 	[Group( "Effects" )]
 	private Decal? Decal { get; set; }
 
 	private ContainerEntityConfig _config = new();
+	
+	public ContainerType ContainerType => _config.ContainerType;
 
 	public string ResourceId => _config.ResourceId;
 
@@ -56,54 +62,56 @@ public sealed class ContainerEntity : BaseEntity, IDescription
 
 	private void OnQuantityChanged( int oldValue, int newValue )
 	{
-		if ( newValue < oldValue )
+		if ( newValue < oldValue && !string.IsNullOrEmpty( _config.UseSound ) )
 		{
-			UseSound.Play( WorldPosition );
+			Sound.Play( _config.UseSound, WorldPosition );
 		}
 
-		if ( newValue <= 0 )
+		if ( newValue > 0 )
 		{
-			if ( DestroyOnEmpty )
-			{
-				GameObject.Destroy();
-				return;
-			}
-
-			Quantity = 0;
+			return;
+		}
+		if ( _config.DestroyOnEmpty )
+		{
+			GameObject.Destroy();
+			return;
 		}
 
-		UpdateText();
+		Quantity = 0;
 	}
 
 	private void UpdateState()
 	{
 		if ( Networking.IsHost && Quantity <= 0 )
 		{
-			Quantity = DefaultQuantity;
+			Quantity = _config.DefaultQuantity;
 		}
 
 		if ( Decal.IsValid() && !string.IsNullOrWhiteSpace( _config.IconPath ) )
 		{
-			var icon = Texture.Load( FileSystem.Mounted, _config.IconPath );
+			var icon = Texture.LoadFromFileSystem( _config.IconPath, FileSystem.Mounted );
+			
 			if ( icon != null )
 			{
 				Decal.Decals = [new DecalDefinition { ColorTexture = icon }];
 			}
 		}
 
-		if ( ModelRenderer.IsValid() && Tint.HasValue )
+		if ( ModelRenderer.IsValid() && TypeModels.TryGetValue( _config.ContainerType, out var model ) )
 		{
-			ModelRenderer.Tint = Tint.Value;
+			ModelRenderer.Model = model;
 		}
 
-		UpdateText();
-	}
-
-	private void UpdateText()
-	{
-		if ( TextRenderer.IsValid() )
+		if ( Decal.IsValid() && TypeDecals.TryGetValue( _config.ContainerType, out var decalConfig ) )
 		{
-			TextRenderer.Text = $"{_config.ResourceId} \n {Quantity} {Unit}";
+			Decal.GameObject.LocalPosition = decalConfig.LocalPosition;
+			Decal.GameObject.LocalRotation = decalConfig.LocalRotation;
+			Decal.Size = decalConfig.Size;
+		}
+
+		if ( ModelRenderer.IsValid() && Color.TryParse( _config.Tint, out var tint ) )
+		{
+			ModelRenderer.Tint = tint;
 		}
 	}
 

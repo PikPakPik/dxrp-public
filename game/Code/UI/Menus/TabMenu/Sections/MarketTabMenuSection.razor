@@ -24,41 +24,47 @@
 
 			@foreach ( var group in allItems )
 			{
-				<div class="category">
-					<div class="category-bar">
+				var isCollapsed = _collapsedCategories.Contains( group.Key );
+
+				<div class="category @( isCollapsed ? "collapsed" : "" )">
+					<div class="category-bar" onclick="@( () => ToggleCategory( group.Key ) )">
+						<i class="material-icons category-toggle-icon">@( isCollapsed ? "chevron_right" : "expand_more" )</i>
 						<span class="category-name">@GetCategoryText( group.Key )</span>
 						<span class="category-count">@group.Count()</span>
 					</div>
 
-					<div class="card-rail">
-						@foreach ( var (item, isPermitted) in group )
-						{
-							<div class="entity-card @( isPermitted ? "" : "is-locked" )"
-							     @onclick=@( () => HandleClick( item, isPermitted ) )
-							     tooltip="@( !string.IsNullOrEmpty( GameModeMarketItems.DisplayDescription( item ) ) ? GameModeMarketItems.DisplayDescription( item ) : null )">
-								@{ var chipColor = GetItemColor( item ); }
-								@if ( chipColor != Color.White )
-								{
-									<div class="card-chip" style="background-color: @chipColor.Hex"></div>
-								}
-								<div class="card-inner">
-									@if ( !isPermitted )
+					@if ( !isCollapsed )
+					{
+						<div class="card-rail">
+							@foreach ( var (item, isPermitted) in group )
+							{
+								<div class="entity-card @( isPermitted ? "" : "is-locked" )"
+								     @onclick=@( () => HandleClick( item, isPermitted ) )
+								     tooltip="@( !string.IsNullOrEmpty( GameModeMarketItems.DisplayDescription( item ) ) ? GameModeMarketItems.DisplayDescription( item ) : null )">
+									@{ var chipColor = GetItemColor( item ); }
+									@if ( chipColor != Color.White )
 									{
-										<div class="card-lock">
-											<i class="material-icons">lock</i>
-										</div>
+										<div class="card-chip" style="background-color: @chipColor.Hex"></div>
 									}
-									<div class="card-top">
-										<span class="card-name">@GameModeMarketItems.DisplayName( item )</span>
-										<span class="card-limit">@GetLimitText( item )</span>
-									</div>
-									<div class="card-bottom">
-										<span class="card-price">$@GetPriceText( item)</span>
+									<div class="card-inner">
+										@if ( !isPermitted )
+										{
+											<div class="card-lock">
+												<i class="material-icons">lock</i>
+											</div>
+										}
+										<div class="card-top">
+											<span class="card-name">@GameModeMarketItems.DisplayName( item )</span>
+											<span class="card-limit">@GetLimitText( item )</span>
+										</div>
+										<div class="card-bottom">
+											<span class="card-price">$@GetPriceText( item)</span>
+										</div>
 									</div>
 								</div>
-							</div>
-						}
-					</div>
+							}
+						</div>
+					}
 				</div>
 			}
 
@@ -76,6 +82,7 @@
 @code
 {
 	private bool _showLocked;
+	HashSet<string> _collapsedCategories = TabMenuSectionPreferences.LoadCollapsedMarketCategories();
 
 	protected override int BuildHash()
 	{
@@ -87,7 +94,26 @@
 		var ownedEquipmentCount = Player.Local.IsValid()
 			? Player.Local.Equipment.Count( equipment => equipment.IsValid() && equipment.Enabled && equipment.MarketItemId != Guid.Empty )
 			: 0;
-		return HashCode.Combine( Player.Local.Job, _showLocked, ownedWorldCount, ownedEquipmentCount );
+
+		var collapsedHash = 0;
+		foreach ( var category in _collapsedCategories )
+		{
+			collapsedHash = HashCode.Combine( collapsedHash, category.GetHashCode() );
+		}
+
+		return HashCode.Combine( Player.Local.Job, _showLocked, ownedWorldCount, ownedEquipmentCount, collapsedHash );
+	}
+
+	private void ToggleCategory( string categoryKey )
+	{
+		Sound.Play( "pop" );
+
+		if ( !_collapsedCategories.Add( categoryKey ) )
+		{
+			_collapsedCategories.Remove( categoryKey );
+		}
+
+		TabMenuSectionPreferences.SaveCollapsedMarketCategories( _collapsedCategories );
 	}
 
 	private static string GetCategoryText( string? category )
