@@ -69,28 +69,28 @@
 	[Property] Player Player { get; set; } = null!;
 
 	private bool ShowNameplate => Player.IsValid() && !Player.IsLocalPlayer && Config.Current.Game.ShowNamePlate && !Player.GameObject.Tags.Has( Constants.OccludeTag ) && !HasCameraEquipped();
-	private bool ShowHealthInfo =>  ShowNameplate && 
-	                                 Player.Local.IsValid() && 
-	                                 Player.Local.Job.IsMedicRole() && 
-	                                 Player != Player.Local &&
-	                                 HasMedkitEquipped();
-	
+	private bool ShowHealthInfo => ShowNameplate &&
+	                               Player.Local.IsValid() &&
+	                               Player.Local.Job.IsMedicRole() &&
+	                               Player != Player.Local &&
+	                               HasMedkitEquipped();
+
 	private bool HasCameraEquipped()
 	{
 		if ( !Player.Local.IsValid() )
 			return false;
-			
+
 		var currentEquipment = Player.Local.CurrentEquipment;
 		return currentEquipment.IsValid() && currentEquipment.Identifier == "camera";
 	}
-	
+
 	private bool HasMedkitEquipped()
 	{
 		if ( !Player.Local.IsValid() )
 			return false;
-			
+
 		var currentEquipment = Player.Local.CurrentEquipment;
-		return currentEquipment.IsValid() && currentEquipment.Identifier == "medkit";
+		return currentEquipment.IsValid() && currentEquipment.Identifier == "848f8ecd-5c8b-4b4c-9191-900ec948fe14";
 	}
 
 	private string GetHealthText()
