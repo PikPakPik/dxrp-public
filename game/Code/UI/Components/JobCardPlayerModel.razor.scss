@@ -10,7 +10,7 @@ JobCardPlayerModel {
     display: flex;
     width: 100%;
     height: 100%;
-    border-radius: $space-2;
+    border-radius: 50%;
     overflow: hidden;
     background-color: rgba($color-secondary, 0.85);
   }
@@ -32,7 +32,7 @@ JobCardPlayerModel {
     justify-content: center;
     width: 100%;
     height: 100%;
-    border-radius: $space-2;
+    border-radius: 50%;
     border: 2px solid rgba(white, 0.2);
     padding: 3px;
     background-color: rgba($color-primary, 0.95);
@@ -44,7 +44,7 @@ JobCardPlayerModel {
     justify-content: center;
     width: 100%;
     height: 100%;
-    border-radius: $space-1;
+    border-radius: 50%;
 
     .material-icons {
       font-family: Material Icons;
