@@ -7,8 +7,6 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 {
 	private PressurePlateWireData _data = new();
 
-	private GameObject? _lastHitObject;
-	private GameObject? _triggerSourceObject;
 	private bool _hasBeenTriggeredSinceLastWireTick;
 	private bool _wasOccupied;
 	private bool _isPlateOccupied;
@@ -33,9 +31,6 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 
 	[WireOutput( "object_count" )]
 	public float ObjectCount { get; set; }
-
-	[WireOutput( "trigger_info" )]
-	public object TriggerInfo { get; set; } = "?";
 
 	[WireInput( "reset_count" )]
 	public bool ResetCount
@@ -82,11 +77,9 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 	{
 		var objects = FindObjectsInZone();
 		var occupied = objects.Count > 0;
-		var primary = GetPrimaryObject( objects );
 		var totalMass = SumMass( objects );
 
 		var stateChanged = occupied != _isPlateOccupied
-		                   || primary != _lastHitObject
 		                   || objects.Count != _objectCountOnPlate
 		                   || Math.Abs( totalMass - _totalMassOnPlate ) > 0.01f;
 
@@ -97,14 +90,13 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 				_hasBeenTriggeredSinceLastWireTick = true;
 			}
 
-			SyncZoneStateHost( occupied, totalMass, objects.Count, primary );
+			SyncZoneStateHost( occupied, totalMass, objects.Count );
 		}
 
 		_isPlateOccupied = occupied;
 		_totalMassOnPlate = totalMass;
 		_objectCountOnPlate = objects.Count;
 		_animatedMassOnPlate = totalMass;
-		_lastHitObject = primary;
 	}
 
 	private List<GameObject> FindObjectsInZone()
@@ -141,30 +133,6 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 		}
 
 		return results;
-	}
-
-	private GameObject? GetPrimaryObject( List<GameObject> objects )
-	{
-		if ( objects.Count == 0 )
-		{
-			return null;
-		}
-
-		var plateCenter = GetDetectionBounds().Center;
-		GameObject? best = null;
-		var bestDistance = float.MaxValue;
-
-		foreach ( var root in objects )
-		{
-			var distance = GetSamplePoint( root ).Distance( plateCenter );
-			if ( distance < bestDistance )
-			{
-				bestDistance = distance;
-				best = root;
-			}
-		}
-
-		return best;
 	}
 
 	private static float SumMass( IEnumerable<GameObject> objects )
@@ -277,7 +245,7 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 	}
 
 	[Rpc.Host( NetFlags.Unreliable )]
-	private void SyncZoneStateHost( bool occupied, float totalMass, int objectCount, GameObject? primary )
+	private void SyncZoneStateHost( bool occupied, float totalMass, int objectCount )
 	{
 		if ( Rpc.CallerId != NetworkOwner )
 		{
@@ -288,21 +256,6 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 		_totalMassOnPlate = totalMass;
 		_objectCountOnPlate = objectCount;
 		_animatedMassOnPlate = totalMass;
-
-		if ( primary == _lastHitObject )
-		{
-			return;
-		}
-
-		if ( primary.IsValid() )
-		{
-			_lastHitObject = primary;
-			_triggerSourceObject = primary;
-		}
-		else
-		{
-			_lastHitObject = null;
-		}
 	}
 
 	public void OnWireTick()
@@ -316,34 +269,18 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 			TriggerCount++;
 		}
 
-		GameObject? infoObject;
-		if ( isCurrentlyTriggered )
-		{
-			infoObject = _lastHitObject;
-		}
-		else if ( hasBeenTriggered )
-		{
-			infoObject = _triggerSourceObject;
-		}
-		else
-		{
-			infoObject = null;
-		}
-
 		if ( isCurrentlyTriggered )
 		{
 			TriggerMass = _totalMassOnPlate;
 			ObjectCount = _objectCountOnPlate;
-			TriggerInfo = infoObject.IsValid() ? GetTriggerInfo( infoObject ) : "?";
 		}
 		else
 		{
 			TriggerMass = 0f;
 			ObjectCount = 0f;
-			TriggerInfo = "?";
 		}
 
-		// Update Triggered after info/mass so wired listeners see the correct values.
+		// Update Triggered after mass/count so wired listeners see the correct values.
 		if ( hasBeenTriggered != wasTriggered )
 		{
 			Triggered = hasBeenTriggered;
@@ -394,75 +331,6 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 	{
 		var rigidbody = obj.GetComponent<Rigidbody>();
 		return rigidbody.IsValid() ? rigidbody.Mass : 0f;
-	}
-
-	private object GetTriggerInfo( GameObject infoObject )
-	{
-		switch ( _data.FilterType )
-		{
-			case TriggerFilterType.PlayerOnly:
-				return GetPlayerIdentifier( infoObject );
-			case TriggerFilterType.EntityOnly:
-				return GetEntityIdentifier( infoObject );
-			case TriggerFilterType.ConstructOnly:
-				return GetConstructIdentifier( infoObject );
-			default:
-				return GetDefaultIdentifier( infoObject );
-		}
-	}
-
-	private static object GetDefaultIdentifier( GameObject infoObject )
-	{
-		var playerId = GetPlayerIdentifier( infoObject );
-		if ( playerId is not "?" )
-		{
-			return playerId;
-		}
-
-		var entityId = GetEntityIdentifier( infoObject );
-		if ( entityId is not "?" )
-		{
-			return entityId;
-		}
-
-		var constructId = GetConstructIdentifier( infoObject );
-		if ( constructId is not "?" )
-		{
-			return constructId;
-		}
-
-		var description = infoObject.GetComponent<IDescription>();
-		return ResolvePhrase( description?.DisplayName ) ?? infoObject.Name;
-	}
-
-	private static object GetPlayerIdentifier( GameObject infoObject )
-	{
-		var player = infoObject.GetComponent<Player>();
-		return player.IsValid() ? player.SteamId.ToString() : "?";
-	}
-
-	private static object GetEntityIdentifier( GameObject infoObject )
-	{
-		var entity = infoObject.GetComponent<BaseEntity>();
-		return entity.IsValid() && entity.Resource.IsValid()
-			? ResolvePhrase( entity.Resource.DisplayName() ) ?? "?"
-			: "?";
-	}
-
-	private static object GetConstructIdentifier( GameObject infoObject )
-	{
-		var construct = infoObject.GetComponent<BaseConstruct>();
-		return construct.IsValid() ? construct.Type.ToString() : "?";
-	}
-
-	private static string? ResolvePhrase( string? value )
-	{
-		if ( string.IsNullOrEmpty( value ) )
-		{
-			return value;
-		}
-
-		return value.StartsWith( '#' ) ? Language.GetPhrase( value[1..] ) : value;
 	}
 
 	protected override void OnDataChanged( IConstructData oldData, IConstructData newData )
