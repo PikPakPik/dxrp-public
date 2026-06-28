@@ -23,16 +23,15 @@
 }
 
 <root class="selected-job-pane">
-	<div class="job-detail-header">
-		<div class="job-detail-chip" style="background-color: @Job.Color.Hex()"></div>
-		<div class="job-detail-title">
-			<span class="job-detail-name">@Job.DisplayName()</span>
-		</div>
-	</div>
+	<div class="job-detail-preview">
+		<JobRenderPreview Job="@Job"/>
 
-	<div class="job-detail-body">
-		<div class="job-detail-preview">
-			<JobRenderPreview Job="@Job"/>
+		<div class="job-detail-overlay">
+		<div class="job-detail-header">
+			<div class="job-detail-chip" style="background-color: @Job.Color.Hex()"></div>
+			<div class="job-detail-title">
+				<span class="job-detail-name">@Job.DisplayName()</span>
+			</div>
 		</div>
 
 		<div class="job-detail-info">
@@ -129,6 +128,8 @@
 		</div>
 	</div>
 </root>
+
+
 
 @code
 {

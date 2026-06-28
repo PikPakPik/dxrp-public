@@ -22,7 +22,6 @@
 @code
 {
 	const string FillColor = "#199c3b";
-
 	const int RingWidth = 3;
 
 	public int CurrentPlayers { get; set; }
@@ -40,14 +39,15 @@
 		return $"width: {Size}px; height: {Size}px; min-width: {Size}px; min-height: {Size}px;";
 	}
 
-	private string BuildCenterStyle()
-	{
-		return $"top: {RingWidth}px; left: {RingWidth}px; right: {RingWidth}px; bottom: {RingWidth}px;";
-	}
-
 	private string BuildProgressStyle( float fillPercent )
 	{
 		var sweep = fillPercent.Clamp( 0, 99.9f );
 		return $"background: conic-gradient({FillColor} 0%, {FillColor} {sweep:0.#}%, transparent {sweep:0.#}%, transparent 100%);";
 	}
+
+	private string BuildCenterStyle()
+	{
+		return $"top: {RingWidth}px; left: {RingWidth}px; right: {RingWidth}px; bottom: {RingWidth}px;";
+	}
+
 }

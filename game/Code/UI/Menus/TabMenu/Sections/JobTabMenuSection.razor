@@ -8,7 +8,7 @@
 <root>
 	@{
 		var visibleJobs = GetVisibleJobs().ToList();
-		EnsureSelectedJob( visibleJobs );
+		var effectiveSelected = GetEffectiveSelected( visibleJobs );
 		var playersByJobId = BuildPlayersByJobMap();
 
 		var groupedJobs = visibleJobs
@@ -60,7 +60,7 @@
 									var currentPlayers = jobPlayers.Count;
 									var isFull = job.MaxCount > 0 && currentPlayers >= job.MaxCount;
 									var isCurrentJob = Player.Local.Job == job;
-									var isSelected = _selectedJob == job;
+									var isSelected = effectiveSelected == job;
 
 									<div class="job-card @( isSelected ? "selected" : "" ) @( isCurrentJob ? "current" : "" )"
 									     onclick="@( () => SelectJobPreview( job ) )">
@@ -111,9 +111,9 @@
 		</div>
 
 		<div class="job-detail-panel">
-			@if ( _selectedJob != null )
+			@if ( effectiveSelected != null )
 			{
-				<SelectedJobPane Job="@_selectedJob"
+				<SelectedJobPane Job="@effectiveSelected"
 				                 OnSelect="@ConfirmJobSelection"/>
 			}
 			else
@@ -209,14 +209,12 @@
 			.ThenBy( x => x.DisplayName() );
 	}
 
-	private void EnsureSelectedJob( List<GameModeJobDto> visibleJobs )
+	private GameModeJobDto? GetEffectiveSelected( List<GameModeJobDto> visibleJobs )
 	{
 		if ( _selectedJob != null && visibleJobs.Contains( _selectedJob ) )
-		{
-			return;
-		}
+			return _selectedJob;
 
-		_selectedJob = visibleJobs.FirstOrDefault( x => x == Player.Local.Job ) ?? visibleJobs.FirstOrDefault();
+		return visibleJobs.FirstOrDefault( x => x == Player.Local.Job ) ?? visibleJobs.FirstOrDefault();
 	}
 
 	private static Guid GetGroupKey( Guid? groupId ) => groupId ?? Guid.Empty;

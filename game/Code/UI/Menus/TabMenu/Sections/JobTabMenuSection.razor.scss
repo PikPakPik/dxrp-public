@@ -23,9 +23,9 @@ JobTabMenuSection {
   .job-list-panel {
     display: flex;
     flex-direction: column;
-    width: 70%;
+    width: 75%;
     min-width: 0;
-    flex-grow: 7;
+    flex-grow: 75;
     flex-shrink: 1;
     min-height: 0;
     border-right: 1px solid rgba(white, 0.06);
@@ -125,7 +125,7 @@ JobTabMenuSection {
     border-radius: $space-2;
     overflow: hidden;
     background-color: rgba($color-primary, 0.9);
-    border: 1px solid rgba(white, 0.05);
+    border: 1px solid rgba(white, 0.03);
     cursor: pointer;
     transition: background-color 0.15s ease, border-color 0.15s ease;
 
@@ -135,13 +135,10 @@ JobTabMenuSection {
     }
 
     &.selected {
-      background-color: rgba($color-accent, 0.07);
-      border-color: rgba($color-accent, 0.28);
+      background-color: rgba($color-primary, 1);
+      border-color: rgba($color-accent, 0.35);
     }
 
-    &.current:not(.selected) {
-      border-color: rgba($color-good, 0.4);
-    }
 
     JobSlotRing .ring-center {
       background-color: $color-primary;
@@ -151,9 +148,6 @@ JobTabMenuSection {
       background-color: $color-primary;
     }
 
-    &.selected JobSlotRing .ring-center {
-      background-color: mix($color-primary, $color-accent, 88%);
-    }
   }
 
   .job-card-players {
@@ -236,9 +230,9 @@ JobTabMenuSection {
   .job-detail-panel {
     display: flex;
     flex-direction: column;
-    width: 30%;
+    width: 25%;
     min-width: 0;
-    flex-grow: 3;
+    flex-grow: 25;
     flex-shrink: 1;
     min-height: 0;
     background-color: rgba($color-primary, 0.4);

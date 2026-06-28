@@ -40,7 +40,7 @@
 	private float _yaw = -10f;
 	private float _yawVelocity;
 	private float _cameraPitchDegrees = 12f;
-	private float _lookTargetRaise = 8f;
+	private float _lookTargetRaise = -7f;
 	private bool _isDragging;
 	private Vector2 _lastMousePosition;
 
@@ -226,20 +226,20 @@
 		var height = MathF.Min( rawHeight, 76f );
 
 		_modelSize = new Vector3( width, width, height );
-		_body!.LocalPosition = new Vector3( -localCenter.x, -localCenter.y, -localMins.z );
-		_focusPoint = Origin + Vector3.Up * Math.Clamp( height * 0.5f, 34f, 52f );
-		_fitDistance = Math.Clamp( MathF.Max( height * 1.18f, width * 2.35f ), 96f, 178f );
-		_zoomOffset = 52f;
-		_minDistance = Math.Clamp( _fitDistance * 0.88f, 68f, 128f );
-		_maxDistance = Math.Clamp( _fitDistance * 1.7f, 108f, 210f );
+		_body!.LocalPosition = new Vector3( -localCenter.x, -localCenter.y, -localMins.z + 5f );
+		_focusPoint = Origin + Vector3.Up * Math.Clamp( height * 0.85f, 56f, 78f );
+		_fitDistance = Math.Clamp( MathF.Max( height * 0.45f, width * 0.9f ), 30f, 60f );
+		_zoomOffset = 0f;
+		_minDistance = Math.Clamp( _fitDistance * 0.7f, 22f, 40f );
+		_maxDistance = Math.Clamp( _fitDistance * 1.4f, 30f, 52f );
 	}
 
 	private float CalculateFitDistance( float aspectRatio )
 	{
 		aspectRatio = MathF.Max( aspectRatio, 0.75f );
 
-		const float verticalCoverage = 0.48f;
-		const float horizontalCoverage = 0.44f;
+		const float verticalCoverage = 0.78f;
+		const float horizontalCoverage = 0.62f;
 		const float fieldOfViewDegrees = 40f;
 
 		var halfVerticalFov = MathF.Tan( fieldOfViewDegrees * 0.5f * MathF.PI / 180f );
