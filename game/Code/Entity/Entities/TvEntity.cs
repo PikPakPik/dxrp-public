@@ -85,35 +85,16 @@ public class TvEntity : BaseEntity, IDescription, Component.IPressable
 	{
 		_lastCheck = 0;
 		var playerPosition = Player.Local.Controller.EyePosition;
-		var playerDistance = playerPosition.Distance( WorldPosition );
+		var inRange = playerPosition.Distance( WorldPosition ) <= TvRange;
 
-		// Only do raycast check if we're within basic distance range
-		if ( playerDistance <= TvRange )
+		switch ( _isCurrentlyPlaying )
 		{
-			// Perform raycast from player to TV to check for obstacles
-			var originPos = WorldPosition + WorldRotation * (Vector3.Up * 30 * WorldScale.z) + WorldRotation * Vector3.Forward * 5;
-			var direction = (originPos - playerPosition).Normal;
-
-			var trace = Scene.Trace.Ray( new Ray( playerPosition, direction ), TvRange )
-				.WithTag( "solid" )
-				.WithoutTags( Constants.PlayerTag )
-				.Run();
-
-			var isVisible = trace.GameObject == GameObject;
-
-			switch ( _isCurrentlyPlaying )
-			{
-				case false when playerDistance <= TvRange && isVisible && HasVideoContent():
-					StartPlayback();
-					break;
-				case true when playerDistance > TvRange || !isVisible:
-					StopPlayback();
-					break;
-			}
-		}
-		else if ( _isCurrentlyPlaying )
-		{
-			StopPlayback();
+			case false when inRange && HasVideoContent():
+				StartPlayback();
+				break;
+			case true when !inRange:
+				StopPlayback();
+				break;
 		}
 	}
 
