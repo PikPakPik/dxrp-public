@@ -11,7 +11,7 @@ public partial class Player : IContextualObject, Component.IPressable
 	public float ContextMaxDistance => Config.Current.Game.PlayerInteractDistance;
 	public bool LookOpacity => false;
 	public string InputHint => "use";
-	public string? DisplayText => Job.Interaction;
+	public string? DisplayText =>  Language.GetPhrase( Job.Interaction );
 
 
 	private void OnStartInteract()
@@ -26,7 +26,7 @@ public partial class Player : IContextualObject, Component.IPressable
 			return false;
 		}
 
-		if ( string.Equals( Job.Interaction, "HitRequest", StringComparison.OrdinalIgnoreCase ) )
+		if ( string.Equals( Job.Interaction, "hit.request", StringComparison.OrdinalIgnoreCase ) )
 		{
 			var hitUi = GameManager.ShowUi<HitRequestModal>();
 			hitUi?.Hitman = this;
