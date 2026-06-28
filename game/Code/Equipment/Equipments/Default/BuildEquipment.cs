@@ -1,6 +1,7 @@
 using Dxura.RP.Game.Commands;
 using Dxura.RP.Game.Utilities;
 using Dxura.RP.Shared;
+using Sandbox.Movement;
 namespace Dxura.RP.Game.Equipments;
 
 public class BuildEquipment : InputWeaponComponent, IEquipmentEvents
@@ -188,6 +189,11 @@ public class BuildEquipment : InputWeaponComponent, IEquipmentEvents
 			GrabEnd();
 		}
 
+		if ( GrabbedObject.IsValid() && IsLadder( GrabbedObject ) )
+		{
+			ForceExitLadderMode( Equipment.Owner );
+		}
+
 		if ( BeamActive )
 		{
 			Input.MouseWheel = 0;
@@ -227,6 +233,27 @@ public class BuildEquipment : InputWeaponComponent, IEquipmentEvents
 		var angularVelocity = HeldRigid.AngularVelocity;
 		Rotation.SmoothDamp( HeldRigid.WorldRotation, HoldRot, ref angularVelocity, 0.075f, Time.Delta );
 		HeldRigid.AngularVelocity = angularVelocity;
+	}
+
+	private static void ForceExitLadderMode( Player? player )
+	{
+		if ( !player.IsValid() || !player.Controller.IsValid() )
+		{
+			return;
+		}
+
+		var ladderMode = player.Controller.Components.Get<MoveModeLadder>();
+		if ( !ladderMode.IsValid() )
+		{
+			return;
+		}
+
+		ladderMode.ClimbingObject = null;
+	}
+
+	private static bool IsLadder( GameObject target )
+	{
+		return target.Tags.Has( Constants.LadderTag );
 	}
 
 	private void TryStartGrab( Vector3 eyePos, Rotation eyeRot, Vector3 eyeDir )
@@ -293,6 +320,11 @@ public class BuildEquipment : InputWeaponComponent, IEquipmentEvents
 		GrabbedPos = target.Transform.World.PointToLocal( tr.EndPosition );
 
 		GrabInit( rigidBody, eyePos, tr.EndPosition, eyeRot );
+
+		if ( IsLadder( target ) )
+		{
+			ForceExitLadderMode( Equipment.Owner );
+		}
 
 		// Check if the object already has a highlight component
 		var existingOutline = target.GetComponent<HighlightOutline>();
