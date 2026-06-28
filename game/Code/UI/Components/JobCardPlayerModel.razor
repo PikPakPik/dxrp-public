@@ -16,7 +16,7 @@
 		</div>
 	</root>
 }
-else if ( HasPreview )
+else if ( Job.IsValid() )
 {
 	<root style="@BuildRootStyle()">
 		<div class="model-shell" style="@BuildShellStyle()">
@@ -27,18 +27,16 @@ else if ( HasPreview )
 
 @code
 {
-	public Player? Player { get; set; }
-	public GameModeJobDto? PreviewJob { get; set; }
-	public bool IsCurrentJob { get; set; }
-	public int Size { get; set; } = 44;
-	public Color BorderColor { get; set; } = Color.White;
+	public GameModeJobDto? Job { get; set; }
+	public int Size { get; set; } = 56;
 
-	private bool HasPreview => Player is { IsValid: true } || PreviewJob.IsValid();
+	private bool IsCurrentJob => Job.IsValid() && Player.Local.IsValid() && Player.Local.Job == Job;
+	private Color BorderColor => Job.ColorValue();
 
 	protected override int BuildHash()
 	{
 		var key = BuildSignature();
-		return HashCode.Combine( Player, PreviewJob, IsCurrentJob, Size, BorderColor, ThumbnailCache.IsPortraitCached( key ) );
+		return HashCode.Combine( Job, Size, ThumbnailCache.IsPortraitCached( key ) );
 	}
 
 	private string BuildRootStyle()
@@ -63,39 +61,26 @@ else if ( HasPreview )
 
 	private Texture GetPortraitTexture()
 	{
+		if ( !Job.IsValid() )
+			return Texture.Transparent;
+
 		var key = BuildSignature();
 		if ( string.IsNullOrWhiteSpace( key ) )
 			return Texture.Transparent;
 
-		if ( Player is { IsValid: true } player )
-			return ThumbnailCache.GetCharacterPortrait( key, player.GetPrimaryModel(),
-				r => player.Job.BuildClothing( player ).Apply( r ) );
-
-		if ( PreviewJob is { } previewJob && previewJob.IsValid() )
-			return ThumbnailCache.GetCharacterPortrait( key, previewJob,
-				r => previewJob.BuildClothing().Apply( r ) );
-
-		return Texture.Transparent;
+		return ThumbnailCache.GetCharacterPortrait( key, Job,
+			r => Job.BuildClothing().Apply( r ) );
 	}
 
 	private string BuildSignature()
 	{
-		if ( Player is { IsValid: true } player )
-		{
-			var avatarData = player.Network.Owner?.GetUserData( "avatar" ) ?? string.Empty;
-			var modelHash = player.Renderer.IsValid() && player.Renderer.Model.IsValid() ? player.Renderer.Model.GetHashCode() : 0;
-			return $"portrait:player:{player.SteamId}:{player.Job.Id}:{modelHash}:{avatarData}";
-		}
+		if ( !Job.IsValid() )
+			return string.Empty;
 
-		if ( PreviewJob is { } previewJob && previewJob.IsValid() )
-		{
-			var avatarData = Player.Local.IsValid()
-				? Player.Local.Network.Owner?.GetUserData( "avatar" ) ?? string.Empty
-				: string.Empty;
+		var avatarData = Player.Local.IsValid()
+			? Player.Local.Network.Owner?.GetUserData( "avatar" ) ?? string.Empty
+			: string.Empty;
 
-			return $"portrait:job:{previewJob.Id}:{previewJob.Model}:{string.Join( ',', previewJob.Clothes )}:{avatarData}";
-		}
-
-		return string.Empty;
+		return $"portrait:job:{Job.Id}:{Job.Model}:{string.Join( ',', Job.Clothes )}:{avatarData}";
 	}
 }
