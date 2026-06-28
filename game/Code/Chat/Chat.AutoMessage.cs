@@ -25,6 +25,12 @@ public sealed partial class Chat
 
 		_lastAutoMessage = 0;
 
+		// Don't auto message when no one is connected.
+		if ( !GameUtils.Players.Any() )
+		{
+			return;
+		}
+
 		var message = Sandbox.Game.Random.FromArray( config.AutoMessages );
 		
 		if (string.IsNullOrEmpty(message ))
