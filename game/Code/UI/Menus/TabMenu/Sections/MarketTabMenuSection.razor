@@ -63,14 +63,6 @@
 									{
 										<div class="card-chip" style="background-color: @chipColor.Hex"></div>
 									}
-									{
-										<div class="card-chip" style="background-color: @chipColor.Hex"></div>
-									}
-									<div class="card-inner">
-										@if ( !isPermitted )
-									{
-										<div class="card-chip" style="background-color: @chipColor.Hex"></div>
-									}
 									<div class="card-inner">
 										@if ( !isPermitted )
 										{
@@ -80,24 +72,19 @@
 										}
 										<div class="card-top">
 											<span class="card-name">@GameModeMarketItems.DisplayName( item )</span>
-											<span class="card-limit">@GetLimitText( item )</span>
+											<span class="card-limit">@GetLimitText( item, isStaffPurchase )</span>
 										</div>
+										<div class="card-bottom">
+											<span class="card-price">@GetPriceText( item, isStaffPurchase )</span>
+										</div>
+									</div>
+									@if ( isStaffPurchase )
+									{
+										<div class="card-staff-border"></div>
 									}
-									<div class="card-top">
-										<span class="card-name">@GameModeMarketItems.DisplayName( item )</span>
-										<span class="card-limit">@GetLimitText( item, isStaffPurchase )</span>
-									</div>
-									<div class="card-bottom">
-										<span class="card-price">@GetPriceText( item, isStaffPurchase )</span>
-									</div>
 								</div>
-								@if ( isStaffPurchase )
-								{
-									<div class="card-staff-border"></div>
-								}
-							</div>
-						}
-					</div>
+							}
+						</div>
 					}
 				</div>
 			}
