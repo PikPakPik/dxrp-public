@@ -28,6 +28,6 @@ public enum ConstructType
 	CameraWire = 1015,
 	TargetWire = 1016,
 	SynthesizerWire = 1017,
-	MetaWire = 1018
+	MetaWire = 1018,
 	PressurePlateWire = 1019
 }
