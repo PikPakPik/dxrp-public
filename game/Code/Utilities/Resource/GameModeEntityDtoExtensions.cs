@@ -27,7 +27,8 @@ public static class GameModeEntityDtoExtensions
 	public static string Name( this GameModeEntityDto? dto )
 	{
 		var name = dto?.NameOverride ?? dto.Content()?.Name ?? string.Empty;
-		return string.IsNullOrEmpty( name ) ? name : Language.GetPhrase( name );
+		if ( string.IsNullOrEmpty( name ) ) return name;
+		return name.StartsWith( '#' ) ? Language.GetPhrase( name[1..] ) : Language.GetPhrase( name );
 	}
 
 	public static string Description( this GameModeEntityDto? dto )
