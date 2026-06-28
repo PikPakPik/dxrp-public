@@ -7,6 +7,11 @@ JobTabMenuSection {
   min-height: 0;
   padding: 0;
 
+  i.material-icons,
+  .material-icons {
+    font-family: Material Icons;
+  }
+
   .job-menu {
     display: flex;
     flex-direction: row;
@@ -18,9 +23,9 @@ JobTabMenuSection {
   .job-list-panel {
     display: flex;
     flex-direction: column;
-    width: 50%;
+    width: 70%;
     min-width: 0;
-    flex-grow: 1;
+    flex-grow: 7;
     flex-shrink: 1;
     min-height: 0;
     border-right: 1px solid rgba(white, 0.06);
@@ -43,27 +48,62 @@ JobTabMenuSection {
     flex-direction: column;
     width: 100%;
     flex-shrink: 0;
-    margin-bottom: $space-5;
+    margin-bottom: $space-4;
 
     &:last-child {
       margin-bottom: 0;
+    }
+
+    &.collapsed {
+      margin-bottom: $space-2;
     }
   }
 
   .job-group-title {
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
+    gap: $space-2;
     width: 100%;
     padding: $space-2 $space-4;
     margin-bottom: $space-3;
-    text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    font-size: $text-sm;
+    font-size: $text-base;
     font-weight: 700;
     color: $color-white;
     border-radius: $space-1;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+
+    &:hover {
+      filter: brightness(1.08);
+    }
+
+    .group-toggle-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      text-transform: none;
+    }
+
+    > span:not(.job-group-count) {
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .job-group-count {
+      flex-shrink: 0;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px $space-2;
+      border-radius: 999px;
+      background-color: rgba(black, 0.2);
+      color: rgba(white, 0.85);
+    }
+  }
+
+  .job-group.collapsed .job-group-title {
+    margin-bottom: 0;
   }
 
   .job-list-grid {
@@ -80,10 +120,10 @@ JobTabMenuSection {
     gap: $space-2;
     flex-grow: 1;
     flex-shrink: 0;
-    flex-basis: 30%;
+    flex-basis: 48%;
     min-width: 0;
-    min-height: 76px;
-    padding: $space-3 $space-3 $space-4;
+    min-height: 96px;
+    padding: $space-3;
     border-radius: $space-2;
     background-color: rgba($color-primary, 0.65);
     border: 1px solid rgba(white, 0.04);
@@ -173,12 +213,65 @@ JobTabMenuSection {
     }
   }
 
+  .job-list-description {
+    font-size: $text-sm;
+    line-height: 1.45;
+    color: $color-gray-400;
+    max-height: 2.9em;
+    overflow: hidden;
+  }
+
+  .job-list-loadout {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $space-1;
+    margin-top: auto;
+  }
+
+  .loadout-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 2px;
+    background-color: rgba(black, 0.35);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .loadout-icon-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $color-gray-400;
+
+    .material-icons {
+      font-size: 16px;
+    }
+  }
+
+  .loadout-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 5px;
+    font-size: 11px;
+    font-weight: 700;
+    color: $color-gray-400;
+    background-color: rgba(black, 0.25);
+    border-radius: 2px;
+  }
+
   .job-detail-panel {
     display: flex;
     flex-direction: column;
-    width: 50%;
+    width: 30%;
     min-width: 0;
-    flex-grow: 1;
+    flex-grow: 3;
     flex-shrink: 1;
     min-height: 0;
     background-color: rgba($color-primary, 0.4);

@@ -99,6 +99,7 @@
   "tabmenu.jobs.full": "Job is full",
   "tabmenu.jobs.unavailable": "Unavailable",
   "tabmenu.jobs.no_loadout": "No equipment",
+  "tabmenu.jobs.more_equipment": "{0} more items",
   "tabmenu.market": "Market",
   "tabmenu.market.show_locked": "Show Locked",
   "tabmenu.market.hide_locked": "Hide Locked",

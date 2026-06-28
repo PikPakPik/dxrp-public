@@ -99,6 +99,7 @@
   "tabmenu.jobs.full": "정원 초과",
   "tabmenu.jobs.unavailable": "사용 불가",
   "tabmenu.jobs.no_loadout": "장비 없음",
+  "tabmenu.jobs.more_equipment": "{0}개 더",
   "tabmenu.market": "상점",
   "tabmenu.market.show_locked": "구입불가 보기",
   "tabmenu.market.hide_locked": "구입불가 숨기기",

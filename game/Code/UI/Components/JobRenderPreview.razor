@@ -39,6 +39,8 @@
 	private float _maxDistance = 128f;
 	private float _yaw = -10f;
 	private float _yawVelocity;
+	private float _cameraPitchDegrees = 12f;
+	private float _lookTargetRaise = 8f;
 	private bool _isDragging;
 	private Vector2 _lastMousePosition;
 
@@ -150,11 +152,18 @@
 			? _scenePanel.Box.Rect.Width / _scenePanel.Box.Rect.Height
 			: 1f;
 		var distance = Math.Clamp( CalculateFitDistance( aspectRatio ) + _zoomOffset, _minDistance, _maxDistance );
-		var cameraPosition = _focusPoint + new Vector3( distance, -2f, 0f );
+		var pitch = _cameraPitchDegrees * MathF.PI / 180f;
+		var cameraOffset = new Vector3(
+			distance * MathF.Cos( pitch ),
+			-2f,
+			distance * MathF.Sin( pitch )
+		);
+		var cameraPosition = _focusPoint + cameraOffset;
+		var lookTarget = _focusPoint + Vector3.Up * _lookTargetRaise;
 
 		_camera.WorldPosition = cameraPosition;
-		_camera.WorldRotation = Rotation.LookAt( _focusPoint - cameraPosition, Vector3.Up );
-		_camera.FieldOfView = 25f;
+		_camera.WorldRotation = Rotation.LookAt( lookTarget - cameraPosition, Vector3.Up );
+		_camera.FieldOfView = 36f;
 		_camera.BackgroundColor = Color.Transparent;
 		_camera.ZNear = 1f;
 		_camera.ZFar = 256f;
@@ -209,32 +218,47 @@
 
 		var localCenter = bounds.Center - Origin;
 		var localMins = bounds.Mins - Origin;
-		var width = MathF.Max( MathF.Max( bounds.Size.x, bounds.Size.y ), 18f );
-		var height = MathF.Max( bounds.Size.z, 48f );
+		var rawWidth = MathF.Max( MathF.Max( bounds.Size.x, bounds.Size.y ), 18f );
+		var rawHeight = MathF.Max( bounds.Size.z, 48f );
+
+		// Frame the body rather than oversized clothing attachments.
+		var width = MathF.Min( rawWidth, 46f );
+		var height = MathF.Min( rawHeight, 76f );
 
 		_modelSize = new Vector3( width, width, height );
 		_body!.LocalPosition = new Vector3( -localCenter.x, -localCenter.y, -localMins.z );
-		_focusPoint = Origin + Vector3.Up * Math.Clamp( height * 0.58f, 22f, height * 0.72f );
-		_fitDistance = Math.Clamp( MathF.Max( height * 0.55f, width * 1.15f ), 40f, 90f );
-		_zoomOffset = 0f;
-		_minDistance = Math.Clamp( _fitDistance * 0.72f, 32f, 72f );
-		_maxDistance = Math.Clamp( _fitDistance * 1.45f, 56f, 132f );
+		_focusPoint = Origin + Vector3.Up * Math.Clamp( height * 0.5f, 34f, 52f );
+		_fitDistance = Math.Clamp( MathF.Max( height * 1.05f, width * 2.1f ), 82f, 158f );
+		_zoomOffset = 34f;
+		_minDistance = Math.Clamp( _fitDistance * 0.85f, 58f, 110f );
+		_maxDistance = Math.Clamp( _fitDistance * 1.65f, 96f, 190f );
 	}
 
 	private float CalculateFitDistance( float aspectRatio )
 	{
 		aspectRatio = MathF.Max( aspectRatio, 0.75f );
 
-		const float verticalCoverage = 1.25f;
-		const float horizontalCoverage = 1.15f;
-		const float fieldOfViewDegrees = 25f;
+		const float verticalCoverage = 0.62f;
+		const float horizontalCoverage = 0.58f;
+		const float fieldOfViewDegrees = 36f;
 
 		var halfVerticalFov = MathF.Tan( fieldOfViewDegrees * 0.5f * MathF.PI / 180f );
 		var halfHorizontalFov = halfVerticalFov * aspectRatio;
 		var heightDistance = _modelSize.z / ( 2f * halfVerticalFov * verticalCoverage );
 		var widthDistance = _modelSize.x / ( 2f * halfHorizontalFov * horizontalCoverage );
+		var distance = MathF.Max( _fitDistance, MathF.Max( heightDistance, widthDistance ) );
 
-		return MathF.Max( _fitDistance, MathF.Max( heightDistance, widthDistance ) );
+		if ( _scenePanel != null )
+		{
+			var panelHeight = _scenePanel.Box.Rect.Height;
+			if ( panelHeight > 0f && panelHeight < 320f )
+			{
+				var t = panelHeight / 320f;
+				distance *= 1.42f + ( 1f - 1.42f ) * t;
+			}
+		}
+
+		return distance;
 	}
 
 	private void EnsureLight()
@@ -279,7 +303,7 @@
 			_camera.BackgroundColor = Color.Transparent;
 			_camera.ZNear = 1f;
 			_camera.ZFar = 256f;
-			_camera.FieldOfView = 25f;
+			_camera.FieldOfView = 36f;
 		}
 	}
 

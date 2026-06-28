@@ -99,6 +99,7 @@
   "tabmenu.jobs.full": "Métier complet",
   "tabmenu.jobs.unavailable": "Indisponible",
   "tabmenu.jobs.no_loadout": "Aucun équipement",
+  "tabmenu.jobs.more_equipment": "{0} objets de plus",
   "tabmenu.market": "Marché",
   "tabmenu.market.show_locked": "Afficher verrouillés",
   "tabmenu.market.hide_locked": "Cacher verrouillés",

@@ -18,6 +18,8 @@
 	var isCurrentJob = Player.Local.Job == Job;
 	var canChange = !isCurrentJob && Job.Selectable && !needsMorePlayTime && !isFull;
 	var loadout = GetDisplayLoadout( Job ).ToList();
+	var visibleLoadout = loadout.Take( MaxVisibleLoadoutIcons ).ToList();
+	var hiddenLoadoutCount = loadout.Count - visibleLoadout.Count;
 }
 
 <root class="selected-job-pane">
@@ -28,14 +30,11 @@
 	</div>
 
 	<div class="job-detail-body">
-		<div class="job-detail-info">
-			<div class="detail-section">
-				<div class="detail-section-title">#tabmenu.jobs.description</div>
-				<div class="detail-section-body">
-					@Job.DisplayDescription()
-				</div>
-			</div>
+		<div class="job-detail-preview">
+			<JobRenderPreview Job="@Job"/>
+		</div>
 
+		<div class="job-detail-info">
 			<div class="job-detail-stats">
 				<div class="stat-chip salary">
 					<i class="material-icons">payments</i>
@@ -68,34 +67,41 @@
 				</div>
 			}
 
-			<div class="detail-section">
-				<div class="detail-section-title">#tabmenu.jobs.loadout</div>
-				@if ( loadout.Count > 0 )
-				{
-					<div class="loadout-grid">
-						@foreach ( var equipment in loadout )
+			@if ( !string.IsNullOrWhiteSpace( Job.DisplayDescription() ) )
+			{
+				<div class="detail-section">
+					<div class="detail-section-title">#tabmenu.jobs.description</div>
+					<div class="detail-section-body">
+						@Job.DisplayDescription()
+					</div>
+				</div>
+			}
+
+			@if ( loadout.Count > 0 )
+			{
+				<div class="detail-section">
+					<div class="detail-section-title">#tabmenu.jobs.loadout</div>
+					<div class="loadout-icons">
+						@foreach ( var equipment in visibleLoadout )
 						{
-							<div class="loadout-item">
-								@if ( !string.IsNullOrEmpty( equipment.DisplayIcon() ) )
-								{
-									<div class="loadout-icon" style="background-image:url(@equipment.DisplayIcon());"></div>
-								}
-								else
-								{
-									<div class="loadout-icon loadout-icon-fallback">
-										<i class="material-icons">inventory_2</i>
-									</div>
-								}
-								<span class="loadout-name">@equipment.DisplayName()</span>
-							</div>
+							@if ( !string.IsNullOrEmpty( equipment.DisplayIcon() ) )
+							{
+								<div class="loadout-icon" style="background-image:url(@equipment.DisplayIcon());" tooltip="@equipment.DisplayName()"></div>
+							}
+							else
+							{
+								<div class="loadout-icon loadout-icon-fallback" tooltip="@equipment.DisplayName()">
+									<i class="material-icons">inventory_2</i>
+								</div>
+							}
+						}
+						@if ( hiddenLoadoutCount > 0 )
+						{
+							<div class="loadout-more" tooltip="@string.Format( Language.GetPhrase( "tabmenu.jobs.more_equipment" ), hiddenLoadoutCount )">+@hiddenLoadoutCount</div>
 						}
 					</div>
-				}
-				else
-				{
-					<div class="detail-section-body muted">#tabmenu.jobs.no_loadout</div>
-				}
-			</div>
+				</div>
+			}
 
 			<div class="job-detail-actions">
 				@if ( isCurrentJob )
@@ -118,21 +124,19 @@
 				}
 			</div>
 		</div>
-
-		<div class="job-detail-preview">
-			<JobRenderPreview Job="@Job"/>
-		</div>
 	</div>
 </root>
 
 @code
 {
+	const int MaxVisibleLoadoutIcons = 6;
+
 	public GameModeJobDto? Job { get; set; }
 	public Action<GameModeJobDto>? OnSelect { get; set; }
 
 	bool IgnoreJobRequirements => GameManager.Instance.IsValid() && GameManager.Instance.IgnoreJobRequirements;
 
-	private static IEnumerable<GameModeEquipmentDto> GetDisplayLoadout( GameModeJobDto job )
+	public static IEnumerable<GameModeEquipmentDto> GetDisplayLoadout( GameModeJobDto job )
 	{
 		return job.GameModeEquipmentIds
 			.Select( id => GameModeEquipments.FindById( id ) )

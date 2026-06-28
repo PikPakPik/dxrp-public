@@ -99,6 +99,7 @@
   "tabmenu.jobs.full": "Brak wolnych miejsc",
   "tabmenu.jobs.unavailable": "Niedostępne",
   "tabmenu.jobs.no_loadout": "Brak wyposażenia",
+  "tabmenu.jobs.more_equipment": "Jeszcze {0}",
   "tabmenu.market": "Sklep",
   "tabmenu.market.show_locked": "Pokaż zablokowane",
   "tabmenu.market.hide_locked": "Ukryj zablokowane",

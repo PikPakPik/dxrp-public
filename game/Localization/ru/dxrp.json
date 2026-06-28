@@ -99,6 +99,7 @@
   "tabmenu.jobs.full": "Мест нет",
   "tabmenu.jobs.unavailable": "Недоступно",
   "tabmenu.jobs.no_loadout": "Нет снаряжения",
+  "tabmenu.jobs.more_equipment": "Ещё {0}",
   "tabmenu.market": "Магазин",
   "tabmenu.market.show_locked": "Показать закрытые",
   "tabmenu.market.hide_locked": "Скрыть закрытые",

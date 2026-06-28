@@ -15,6 +15,7 @@
 			.Select( g => new
 			{
 				Group = GameModeJobs.FindGroupById( g.Key ),
+				GroupId = g.Key,
 				Jobs = g.ToList()
 			} )
 			.OrderBy( x => x.Group?.Name ?? "zzzz" )
@@ -30,8 +31,13 @@
 					var groupJobs = groupEntry.Jobs;
 					if ( groupJobs.Count == 0 ) continue;
 
-					<div class="job-group">
-						<div class="job-group-title" style="background-color: @(group?.Color.Hex() ?? "#4B5563")">
+					var isCollapsed = IsGroupCollapsed( groupEntry.GroupId );
+
+					<div class="job-group @( isCollapsed ? "collapsed" : "" )">
+						<div class="job-group-title"
+						     style="background-color: @(group?.Color.Hex() ?? "#4B5563")"
+						     onclick="@( () => ToggleGroup( groupEntry.GroupId ) )">
+							<i class="material-icons group-toggle-icon">@( isCollapsed ? "expand_less" : "expand_more" )</i>
 							@if ( group != null )
 							{
 								<span>@group.DisplayName()</span>
@@ -40,44 +46,77 @@
 							{
 								<span>Ungrouped</span>
 							}
+							<span class="job-group-count">@groupJobs.Count</span>
 						</div>
 
-						<div class="job-list-grid">
-							@foreach ( var job in groupJobs )
-							{
-								var currentPlayers = GameUtils.GetPlayersByJob( job ).Count();
-								var isFull = job.MaxCount > 0 && currentPlayers >= job.MaxCount;
-								var isCurrentJob = Player.Local.Job == job;
-								var isSelected = _selectedJob == job;
+						@if ( !isCollapsed )
+						{
+							<div class="job-list-grid">
+								@foreach ( var job in groupJobs )
+								{
+									var currentPlayers = GameUtils.GetPlayersByJob( job ).Count();
+									var isFull = job.MaxCount > 0 && currentPlayers >= job.MaxCount;
+									var isCurrentJob = Player.Local.Job == job;
+									var isSelected = _selectedJob == job;
+									var loadout = SelectedJobPane.GetDisplayLoadout( job ).ToList();
+									var visibleLoadout = loadout.Take( MaxCardLoadoutIcons ).ToList();
+									var hiddenLoadoutCount = loadout.Count - visibleLoadout.Count;
 
-								<div class="job-list-item @( isSelected ? "selected" : "" ) @( isCurrentJob ? "current" : "" )"
-								     onclick="@( () => SelectJobPreview( job ) )">
-									<div class="job-list-header">
-										<div class="job-list-name" style="color: @job.Color.Hex()">@job.DisplayName()</div>
-										@if ( isCurrentJob )
-										{
-											<div class="current-tag">#tabmenu.jobs.current</div>
-										}
-									</div>
-									<div class="job-list-meta">
-										<span class="salary">
-											<i class="material-icons">payments</i>
-											<span>$@(job.Salary.ToString("N0"))</span>
-										</span>
-										<span class="player-count @(isFull ? "full" : "")">
-											<i class="material-icons">group</i>
-											<span>@currentPlayers/@( job.MaxCount == 0 ? "∞" : job.MaxCount.ToString() )</span>
-										</span>
-										@if ( job.VoteRequired && !IgnoreJobRequirements )
-										{
-											<span class="vote-badge">
-												<i class="material-icons">how_to_vote</i>
+									<div class="job-list-item @( isSelected ? "selected" : "" ) @( isCurrentJob ? "current" : "" )"
+									     onclick="@( () => SelectJobPreview( job ) )">
+										<div class="job-list-header">
+											<div class="job-list-name" style="color: @job.Color.Hex()">@job.DisplayName()</div>
+											@if ( isCurrentJob )
+											{
+												<div class="current-tag">#tabmenu.jobs.current</div>
+											}
+										</div>
+										<div class="job-list-meta">
+											<span class="salary">
+												<i class="material-icons">payments</i>
+												<span>$@(job.Salary.ToString("N0"))</span>
 											</span>
+											<span class="player-count @(isFull ? "full" : "")">
+												<i class="material-icons">group</i>
+												<span>@currentPlayers/@( job.MaxCount == 0 ? "∞" : job.MaxCount.ToString() )</span>
+											</span>
+											@if ( job.VoteRequired && !IgnoreJobRequirements )
+											{
+												<span class="vote-badge">
+													<i class="material-icons">how_to_vote</i>
+												</span>
+											}
+										</div>
+										@if ( !string.IsNullOrWhiteSpace( job.DisplayDescription() ) )
+										{
+											<div class="job-list-description">@job.DisplayDescription()</div>
+										}
+										@if ( loadout.Count > 0 )
+										{
+											<div class="job-list-loadout">
+												@foreach ( var equipment in visibleLoadout )
+												{
+													@if ( !string.IsNullOrEmpty( equipment.DisplayIcon() ) )
+													{
+														<div class="loadout-icon" style="background-image:url(@equipment.DisplayIcon());" tooltip="@equipment.DisplayName()"></div>
+													}
+													else
+													{
+														<div class="loadout-icon loadout-icon-fallback" tooltip="@equipment.DisplayName()">
+															<i class="material-icons">inventory_2</i>
+														</div>
+													}
+												}
+												@if ( hiddenLoadoutCount > 0 )
+												{
+													<div class="loadout-more">+@hiddenLoadoutCount</div>
+												}
+											</div>
 										}
 									</div>
-								</div>
-							}
-						</div>
+								}
+							</div>
+						}
 					</div>
 				}
 			</div>
@@ -102,13 +141,22 @@
 
 @code
 {
+	const int MaxCardLoadoutIcons = 10;
+
 	GameModeJobDto? _selectedJob;
+	HashSet<Guid> _collapsedGroupIds = [];
 
 	bool IgnoreJobRequirements => GameManager.Instance.IsValid() && GameManager.Instance.IgnoreJobRequirements;
 
 	protected override int BuildHash()
 	{
-		return HashCode.Combine( GameModeJobs.All, (int)(Player.Local.PlayTime / 60f), Player.Local.Job, IgnoreJobRequirements, _selectedJob?.Id, Time.Delta );
+		var collapsedHash = 0;
+		foreach ( var groupId in _collapsedGroupIds )
+		{
+			collapsedHash = HashCode.Combine( collapsedHash, groupId );
+		}
+
+		return HashCode.Combine( GameModeJobs.All, (int)(Player.Local.PlayTime / 60f), Player.Local.Job, IgnoreJobRequirements, _selectedJob?.Id, collapsedHash, Time.Delta );
 	}
 
 	private IEnumerable<GameModeJobDto> GetVisibleJobs()
@@ -134,6 +182,21 @@
 		}
 
 		_selectedJob = visibleJobs.FirstOrDefault( x => x == Player.Local.Job ) ?? visibleJobs.FirstOrDefault();
+	}
+
+	private static Guid GetGroupKey( Guid? groupId ) => groupId ?? Guid.Empty;
+
+	private bool IsGroupCollapsed( Guid? groupId ) => _collapsedGroupIds.Contains( GetGroupKey( groupId ) );
+
+	private void ToggleGroup( Guid? groupId )
+	{
+		Sound.Play( "pop" );
+
+		var key = GetGroupKey( groupId );
+		if ( !_collapsedGroupIds.Add( key ) )
+		{
+			_collapsedGroupIds.Remove( key );
+		}
 	}
 
 	private void SelectJobPreview( GameModeJobDto job )
