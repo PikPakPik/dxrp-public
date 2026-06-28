@@ -9,9 +9,21 @@ public class TextTool() : BaseConstructTool<TextData>( ConstructType.Text )
 
 	protected override TextData GetPreviewDisplayData()
 	{
-		if ( !string.IsNullOrEmpty( Data.Text ) ) return Data;
+		var lines = Lines;
+		if ( lines.Any( l => !string.IsNullOrEmpty( l.Text ) ) ) return Data;
+
 		var key = Input.GetButtonOrigin( "BuildMenu" );
-		return Data with { Text = string.Format( Language.GetPhrase( "tool.text.preview_placeholder" ), key ) };
+		var previewLines = new List<TextLineData>( lines );
+
+		if ( previewLines.Count == 0 )
+			previewLines.Add( new TextLineData() );
+
+		previewLines[0] = previewLines[0] with
+		{
+			Text = string.Format( Language.GetPhrase( "tool.text.preview_placeholder" ), key )
+		};
+
+		return Data with { Lines = previewLines };
 	}
 
 	public int SelectedLine { get; set; } = 0;
