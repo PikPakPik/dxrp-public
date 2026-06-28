@@ -36,7 +36,7 @@
 
 					<div class="job-group @( isCollapsed ? "collapsed" : "" )">
 						<div class="job-group-title"
-						     style="background-color: @groupColor.Hex()"
+						     style="background-color: @groupColor.ToColor().WithAlpha( 0.45f ).Hex"
 						     onclick="@( () => ToggleGroup( groupEntry.GroupId ) )">
 							<i class="material-icons group-toggle-icon">@( isCollapsed ? "expand_less" : "expand_more" )</i>
 							@if ( group != null )

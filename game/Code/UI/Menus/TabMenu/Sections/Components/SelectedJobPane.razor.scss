@@ -234,10 +234,15 @@ SelectedJobPane {
   .job-detail-actions {
     flex-shrink: 0;
     padding-top: $space-1;
+    width: 100%;
   }
 
   .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
+    text-align: center;
     transition: background-color 0.15s ease;
 
     &:hover {
