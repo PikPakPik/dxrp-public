@@ -33,6 +33,9 @@ public sealed class ContainerEntity : BaseEntity
 	private ModelRenderer ModelRenderer { get; set; } = null!;
 
 	[Property]
+	private ModelCollider ModelCollider { get; set; } = null!;
+
+	[Property]
 	// ReSharper disable once CollectionNeverUpdated.Global
 	public Dictionary<ContainerType, Model> TypeModels { get; set; } = [];
 
@@ -100,6 +103,11 @@ public sealed class ContainerEntity : BaseEntity
 		if ( ModelRenderer.IsValid() && TypeModels.TryGetValue( _config.ContainerType, out var model ) )
 		{
 			ModelRenderer.Model = model;
+
+			if ( ModelCollider.IsValid() )
+			{
+				ModelCollider.Model = model;
+			}
 		}
 
 		if ( Decal.IsValid() && TypeDecals.TryGetValue( _config.ContainerType, out var decalConfig ) )
