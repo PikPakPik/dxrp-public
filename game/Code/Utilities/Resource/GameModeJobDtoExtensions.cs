@@ -215,7 +215,7 @@ public static class GameModeJobDtoExtensions
 		}
 
 		var prerequisiteJobs = GameModeJobs.GetPrerequisiteJobs( job );
-		if ( !ignoreJobRequirements && prerequisiteJobs.Length > 0 && !prerequisiteJobs.Contains( player.Job ) )
+		if ( !ignoreJobRequirements && prerequisiteJobs.Length > 0 && !prerequisiteJobs.Any( p => p.Id == player.Job?.Id ) )
 		{
 			player.Error( "#notify.job.prerequisite" );
 			return false;
