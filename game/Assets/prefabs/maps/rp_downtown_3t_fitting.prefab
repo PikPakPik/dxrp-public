@@ -3994,7 +3994,7 @@
                         "IdValue": "92ff1211-d124-40d5-8eb3-b9ac86e4973b"
                       },
                       "Property": "OwnerGroupIdentifier",
-                      "Value": "6e44bceb-56bb-5557-8925-3912208572f2"
+                      "Value": "0dd27d1f-d522-5f0f-af21-059a70033f07"
                     }
                   ],
                   "MovedObjects": []
@@ -4486,14 +4486,6 @@
                       },
                       "Property": "Position",
                       "Value": "-3012.98291,1089.35303,-2.41493392"
-                    },
-                    {
-                      "Target": {
-                        "Type": "Component",
-                        "IdValue": "92ff1211-d124-40d5-8eb3-b9ac86e4973b"
-                      },
-                      "Property": "OwnerJobIdentifier",
-                      "Value": "6e44bceb-56bb-5557-8925-3912208572f2"
                     }
                   ],
                   "MovedObjects": []
