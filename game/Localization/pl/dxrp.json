@@ -1561,6 +1561,7 @@
   "settings.misc.civilian_clothing": "Ubrania pracy cywila: ",
   "settings.misc.radio_distance": "Odległość radia: ",
   "settings.misc.radio_autoplay": "Automatyczne odtwarzanie radia: ",
+  "settings.misc.tv_line_of_sight": "Widoczność TV: ",
   "settings.misc.clothing_note": "Powyższe ustawienie zacznie obowiązywać dla każdego gracza po kolejnym odrodzeniu.",
   "inventory.title": "Ekwipunek",
   "inventory.items": "{0} przedmiotów",
