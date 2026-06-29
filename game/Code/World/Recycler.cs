@@ -116,7 +116,7 @@ public sealed class Recycler : Component, Component.ITriggerListener, IGameEvent
 
 	private void DropKnife()
 	{
-		var knifeResource = GameModeEquipments.FindByIdentifier( "knife" );
+		var knifeResource = GameModeEquipments.FindById( Constants.KnifeEquipmentId );
 		if ( knifeResource == null )
 		{
 			return;
@@ -127,7 +127,7 @@ public sealed class Recycler : Component, Component.ITriggerListener, IGameEvent
 
 	private void DropPistol()
 	{
-		var pistolResource = GameModeEquipments.FindByIdentifier( "usp" );
+		var pistolResource = GameModeEquipments.FindById( Constants.UspEquipmentId );
 		if ( pistolResource == null )
 		{
 			return;

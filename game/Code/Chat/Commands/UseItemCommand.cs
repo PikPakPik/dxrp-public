@@ -81,7 +81,11 @@ public class UseInventoryItemCommand : ICommand
 				return;
 			}
 
-			var entityDto = GameModeEntities.FindByIdentifier( item.Definition.GrantIdentifier );
+			var entityDto = item.Definition.GrantIdentifier switch
+			{
+				"mystery_box" => GameModeEntities.FindById( Constants.MysteryBoxEntityId ),
+				_ => null
+			};
 
 			if ( entityDto == null || !entityDto.IsValid() )
 			{

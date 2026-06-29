@@ -6,21 +6,6 @@ public static class GameModeEquipments
 {
 	public static IReadOnlyList<GameModeEquipmentDto> All => Config.Current.GameMode.Equipments;
 
-	public static GameModeEquipmentDto? FindByIdentifier( string identifier )
-	{
-		if ( string.IsNullOrWhiteSpace( identifier ) )
-		{
-			return null;
-		}
-
-		if ( Guid.TryParse( identifier, out var guid ) )
-		{
-			return FindById( guid );
-		}
-
-		return All.FirstOrDefault( x => string.Equals( x.Identifier(), identifier, StringComparison.OrdinalIgnoreCase ) );
-	}
-
 	public static GameModeEquipmentDto? FindById( Guid? contentId )
 	{
 		if ( !contentId.HasValue )
@@ -43,7 +28,7 @@ public static class GameModeEquipments
 
 	public static bool IsTool( GameModeEquipmentDto? equipment )
 	{
-		return equipment?.GameModeAddonContentId == Constants.ToolGameModeContentId;
+		return equipment?.GameModeAddonContentId == Constants.ToolEquipmentId;
 	}
 
 	public static GameModeEquipmentDto? FindByPrefabPath( string prefabPath )

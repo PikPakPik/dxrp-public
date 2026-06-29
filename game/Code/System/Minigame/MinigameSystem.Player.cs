@@ -43,7 +43,10 @@ public partial class MinigameSystem
 			var isFirst = true;
 			foreach ( var equipmentIdentifier in CurrentMinigame.StartingEquipmentIdentifiers )
 			{
-				var startingEquipment = GameModeEquipments.FindByIdentifier( equipmentIdentifier );
+				if ( !Guid.TryParse( equipmentIdentifier, out var equipmentContentId ) )
+					continue;
+
+				var startingEquipment = GameModeEquipments.FindById( equipmentContentId );
 				if ( startingEquipment == null )
 				{
 					continue;

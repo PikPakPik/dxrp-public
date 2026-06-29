@@ -223,19 +223,19 @@ public partial class Governance
 		}
 
 		// MP5
-		var mp5 = GameModeEquipments.FindByIdentifier( "mp5" );
+		var mp5 = GameModeEquipments.FindById( Constants.Mp5EquipmentId );
 		if ( IsUpgradeActive( PdUpgradeType.Mp5 ) && mp5 != null )
 		{
 			player.GiveHost( mp5, makeActive: false, canDrop: false );
 		}
 
-		var shotgun = GameModeEquipments.FindByIdentifier( "spaghelli" );
+		var shotgun = GameModeEquipments.FindById( Constants.SpaghelliEquipmentId );
 		if ( IsUpgradeActive( PdUpgradeType.Shotgun ) && shotgun != null )
 		{
 			player.GiveHost( shotgun, makeActive: false, canDrop: false );
 		}
 
-		var m4 = GameModeEquipments.FindByIdentifier( "m4a1" );
+		var m4 = GameModeEquipments.FindById( Constants.M4a1EquipmentId );
 		if ( IsUpgradeActive( PdUpgradeType.M4 ) && m4 != null )
 		{
 			player.GiveHost( m4, makeActive: false, canDrop: false );
