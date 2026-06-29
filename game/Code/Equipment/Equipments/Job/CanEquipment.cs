@@ -1,11 +1,17 @@
 namespace Dxura.RP.Game.Equipments;
 
-public class CanEquipment : InputWeaponComponent
+public class CanEquipment : InputWeaponComponent, IInputHints
 {
 	[Property] [Group( "Effects" )]
 	public required SoundEvent JiggleSoundEvent { get; set; }
 	[Property] [Group( "Effects" )]
 	public required SoundEvent TauntSoundEvent { get; set; }
+
+	IEnumerable<(string Action, string Label)> IInputHints.GetInputHints()
+	{
+		yield return ("attack1", "#input.can.shake");
+		yield return ("attack2", "#input.can.taunt");
+	}
 
 	protected override void OnInputDown()
 	{

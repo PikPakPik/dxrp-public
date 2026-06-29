@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Dxura.RP.Game.Equipments;
 
-public class WeaponCheckerEquipment : InputWeaponComponent, IEquipmentEvents
+public class WeaponCheckerEquipment : InputWeaponComponent, IEquipmentEvents, IInputHints
 {
 	[Property] [Group( "Effects" )]
 	public required SoundEvent SearchingSoundEvent { get; set; }
@@ -18,6 +18,11 @@ public class WeaponCheckerEquipment : InputWeaponComponent, IEquipmentEvents
 
 	private const float SearchDuration = 5f;
 	private const float SoundInterval = 1f;
+
+	IEnumerable<(string Action, string Label)> IInputHints.GetInputHints()
+	{
+		yield return ("attack1", "#input.weapon_checker.search");
+	}
 
 	protected override void OnInputDown()
 	{

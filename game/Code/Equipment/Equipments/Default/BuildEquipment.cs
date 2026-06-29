@@ -4,7 +4,7 @@ using Dxura.RP.Shared;
 using Sandbox.Movement;
 namespace Dxura.RP.Game.Equipments;
 
-public class BuildEquipment : InputWeaponComponent, IEquipmentEvents
+public class BuildEquipment : InputWeaponComponent, IEquipmentEvents, IInputHints
 {
 	[Property] public float MinTargetDistance { get; set; } = 0.0f;
 	[Property] public float MaxTargetDistance { get; set; } = 10000.0f;
@@ -54,6 +54,23 @@ public class BuildEquipment : InputWeaponComponent, IEquipmentEvents
 	}
 
 	private bool _rotating;
+
+	IEnumerable<(string Action, string Label)> IInputHints.GetInputHints()
+	{
+		if ( Input.Down( "attack1" ) )
+		{
+			yield return ("use", "#input.build.rotate");
+			yield return ("attack2", "#input.build.freeze");
+			if ( Input.Down( "use" ) )
+				yield return ("run", "#input.build.snap");
+		}
+		else
+		{
+			yield return ("attack1", "#input.build.grab");
+		}
+	}
+
+	int IInputHints.GetInputHintsHash() => HashCode.Combine( Input.Down( "attack1" ), Input.Down( "use" ) );
 
 	protected override void OnUpdate()
 	{
