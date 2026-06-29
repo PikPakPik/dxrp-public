@@ -87,11 +87,22 @@ public static class Constants
 	public static readonly string[] TraceIgnoreTags = ["trigger", "movement", "playercolliders", FadedTag, InvisibleTag];
 
 	//
-	// Equipment IDs
+	// Equipment content IDs — match GameModeAddonContentDto.Id for the corresponding item
 	//
 
-	public static readonly Guid ToolGameModeContentId = new( "37580dd6-fcbd-477a-99c2-5109c1da20d8" );
-	public static readonly Guid HandsEquipmentId = new( "2e3ff5a0-f2a2-4036-9542-41b1f56d0b13" );
-	public static readonly Guid MedkitEquipmentId = new( "848f8ecd-5c8b-4b4c-9191-900ec948fe14" );
-	public static readonly Guid CameraEquipmentId = new( "83dd6a00-ea58-48db-a869-782d148fa81c" );
+	public static readonly Guid HandsEquipmentId    = new( "2e3ff5a0-f2a2-4036-9542-41b1f56d0b13" );
+	public static readonly Guid MedkitEquipmentId   = new( "848f8ecd-5c8b-4b4c-9191-900ec948fe14" );
+	public static readonly Guid CameraEquipmentId   = new( "83dd6a00-ea58-48db-a869-782d148fa81c" );
+	public static readonly Guid ToolEquipmentId     = new( "37580dd6-fcbd-477a-99c2-5109c1da20d8" );
+	public static readonly Guid KnifeEquipmentId    = new( "f06e0079-c9c7-4845-8580-a3b7a3b548a0" );
+	public static readonly Guid UspEquipmentId      = new( "823befaf-d245-466c-b981-772d3bd1c47b" );
+	public static readonly Guid Mp5EquipmentId      = new( "436a800c-1a82-4778-9f2f-e0db69336623" );
+	public static readonly Guid SpaghelliEquipmentId = new( "6e3e22d7-9892-4e3c-a03e-074f22b10103" );
+	public static readonly Guid M4a1EquipmentId     = new( "b2842f29-1db5-43d8-8ac7-886757f59380" );
+
+	//
+	// Entity content IDs — match GameModeAddonContentDto.Id for the corresponding entity
+	//
+
+	public static readonly Guid MysteryBoxEntityId = new( "927bc1e4-1bf1-4972-b1f1-6262fefa5075" );
 }
