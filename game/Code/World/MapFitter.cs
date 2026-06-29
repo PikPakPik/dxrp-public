@@ -67,8 +67,6 @@ public sealed class MapFitter : SingletonComponent<MapFitter>
 
 	private void OnMapLoaded()
 	{
-		Debug.ToggleSoundScape();
-		
 		if ( !TryResolveMapInstance() )
 		{
 			return;
