@@ -10484,6 +10484,14 @@
                         },
                         {
                           "Target": {
+                            "Type": "Component",
+                            "IdValue": "92ff1211-d124-40d5-8eb3-b9ac86e4973b"
+                          },
+                          "Property": "OwnerGroupIdentifier",
+                          "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
+                        },
+                        {
+                          "Target": {
                             "Type": "GameObject",
                             "IdValue": "2f2c076b-22e0-48a5-afaa-461dbfd68225"
                           },
@@ -10750,6 +10758,14 @@
                           },
                           "Property": "OpenSound",
                           "Value": "sounds/interaction/metal/metal-door-open-close.sound"
+                        },
+                        {
+                          "Target": {
+                            "Type": "Component",
+                            "IdValue": "92ff1211-d124-40d5-8eb3-b9ac86e4973b"
+                          },
+                          "Property": "OwnerGroupIdentifier",
+                          "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
                         },
                         {
                           "Target": {
@@ -11022,6 +11038,14 @@
                         },
                         {
                           "Target": {
+                            "Type": "Component",
+                            "IdValue": "92ff1211-d124-40d5-8eb3-b9ac86e4973b"
+                          },
+                          "Property": "OwnerGroupIdentifier",
+                          "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
+                        },
+                        {
+                          "Target": {
                             "Type": "GameObject",
                             "IdValue": "2f2c076b-22e0-48a5-afaa-461dbfd68225"
                           },
@@ -11288,6 +11312,14 @@
                           },
                           "Property": "OpenSound",
                           "Value": "sounds/interaction/metal/metal-door-open-close.sound"
+                        },
+                        {
+                          "Target": {
+                            "Type": "Component",
+                            "IdValue": "92ff1211-d124-40d5-8eb3-b9ac86e4973b"
+                          },
+                          "Property": "OwnerGroupIdentifier",
+                          "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
                         },
                         {
                           "Target": {
@@ -11560,6 +11592,14 @@
                         },
                         {
                           "Target": {
+                            "Type": "Component",
+                            "IdValue": "92ff1211-d124-40d5-8eb3-b9ac86e4973b"
+                          },
+                          "Property": "OwnerGroupIdentifier",
+                          "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
+                        },
+                        {
+                          "Target": {
                             "Type": "GameObject",
                             "IdValue": "2f2c076b-22e0-48a5-afaa-461dbfd68225"
                           },
@@ -11826,6 +11866,14 @@
                           },
                           "Property": "OpenSound",
                           "Value": "sounds/interaction/metal/metal-door-open-close.sound"
+                        },
+                        {
+                          "Target": {
+                            "Type": "Component",
+                            "IdValue": "92ff1211-d124-40d5-8eb3-b9ac86e4973b"
+                          },
+                          "Property": "OwnerGroupIdentifier",
+                          "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
                         },
                         {
                           "Target": {
@@ -12098,6 +12146,14 @@
                         },
                         {
                           "Target": {
+                            "Type": "Component",
+                            "IdValue": "92ff1211-d124-40d5-8eb3-b9ac86e4973b"
+                          },
+                          "Property": "OwnerGroupIdentifier",
+                          "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
+                        },
+                        {
+                          "Target": {
                             "Type": "GameObject",
                             "IdValue": "2f2c076b-22e0-48a5-afaa-461dbfd68225"
                           },
@@ -12364,6 +12420,14 @@
                           },
                           "Property": "OpenSound",
                           "Value": "sounds/interaction/metal/metal-door-open-close.sound"
+                        },
+                        {
+                          "Target": {
+                            "Type": "Component",
+                            "IdValue": "92ff1211-d124-40d5-8eb3-b9ac86e4973b"
+                          },
+                          "Property": "OwnerGroupIdentifier",
+                          "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
                         },
                         {
                           "Target": {
@@ -12641,6 +12705,14 @@
                           },
                           "Property": "OpenSound",
                           "Value": "sounds/interaction/metal/metal-door-open-close.sound"
+                        },
+                        {
+                          "Target": {
+                            "Type": "Component",
+                            "IdValue": "92ff1211-d124-40d5-8eb3-b9ac86e4973b"
+                          },
+                          "Property": "OwnerGroupIdentifier",
+                          "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
                         },
                         {
                           "Target": {
