@@ -67,10 +67,17 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 			UpdatePlateAnimation();
 		}
 
+	}
+
+	protected override void OnFixedUpdate()
+	{
+		base.OnFixedUpdate();
+		
 		if ( IsOwner )
 		{
 			CheckZone();
 		}
+		
 	}
 
 	private void CheckZone()
@@ -306,7 +313,7 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 
 	private void UpdatePlateAnimation()
 	{
-		if ( !PlateModel.IsValid() || !PlateRenderer.IsValid() )
+		if ( !PlateModel.IsValid() || !PlateRenderer.IsValid() || GameObject.Tags.Has( Constants.OccludeTag ) )
 		{
 			return;
 		}
@@ -324,6 +331,7 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 			PressurePlateWireDefinition.PressedPlateColor,
 			pressFactor
 		);
+		
 		PlateRenderer.Tint = Color.Lerp( PlateRenderer.Tint, targetPlateColor, lerpSpeed );
 	}
 
