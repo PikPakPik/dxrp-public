@@ -731,9 +731,9 @@
   "MenuIcon": null,
   "DontBreakAsTemplate": false,
   "__references": [
-    "facepunch.door_handle_a#143562",
-    "facepunch.wooden_door_01c#143452",
-    "facepunch.wooden_door_frame_double_01b#107466"
+    "facepunch.door_handle_a#288906",
+    "facepunch.wooden_door_01c#275040",
+    "facepunch.wooden_door_frame_double_01b#275036"
   ],
   "__version": 2
 }

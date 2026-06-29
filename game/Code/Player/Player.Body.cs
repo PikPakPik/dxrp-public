@@ -146,13 +146,12 @@ public partial class Player
 		// Resolve cloud model (may need to download/mount the package)
 		var model = await Job.GetPrimaryModelAsync();
 
-		await Dresser.Apply();
-
-		// Set model after Dresser.Apply() so it isn't overwritten by the clothing container
 		if ( Renderer.IsValid() )
 		{
 			Renderer.Model = model;
 		}
+
+		await Dresser.Apply();
 
 		if ( !GameObject.IsValid() || !ModelHitboxes.IsValid() )
 		{

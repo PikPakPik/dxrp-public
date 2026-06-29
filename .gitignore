@@ -43,7 +43,8 @@ Exports/*
 mono_crash.*
 
 # Build results
-[Dd]ebug/
+[Dd]ebug/[Bb]in/
+[Dd]ebug/[Oo]bj/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/

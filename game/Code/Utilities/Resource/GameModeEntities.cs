@@ -18,14 +18,24 @@ public static class GameModeEntities
 		return All.FirstOrDefault( x => string.Equals( x.Identifier(), identifier, StringComparison.OrdinalIgnoreCase ) );
 	}
 
-	public static GameModeEntityDto? FindById( Guid? id )
+	public static GameModeEntityDto? FindById( Guid? contentId )
 	{
-		if ( !id.HasValue )
+		if ( !contentId.HasValue )
 		{
 			return null;
 		}
 
-		return All.FirstOrDefault( x => x.Id == id.Value );
+		return All.FirstOrDefault( x => x.GameModeAddonContentId == contentId.Value );
+	}
+
+	public static GameModeEntityDto? FindByDtoId( Guid? dtoId )
+	{
+		if ( !dtoId.HasValue )
+		{
+			return null;
+		}
+
+		return All.FirstOrDefault( x => x.Id == dtoId.Value );
 	}
 
 	public static GameModeEntityDto? FindByPrefabPath( string prefabPath )

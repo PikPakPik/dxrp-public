@@ -66,7 +66,7 @@ public partial class Player
 		// Don't give equipment if restricted (only hands)
 		if ( Restricted )
 		{
-			GiveHost( GameModeEquipments.Hands, true, false );
+			GiveHost( GameModeEquipments.FindById( Constants.HandsEquipmentId ), true, false );
 			return;
 		}
 
@@ -86,7 +86,7 @@ public partial class Player
 		else
 		{
 			// Always give hands
-			GiveHost( GameModeEquipments.Hands, isFirst, false );
+			GiveHost( GameModeEquipments.FindById( Constants.HandsEquipmentId ), isFirst, false );
 			isFirst = false;
 		}
 
@@ -101,7 +101,7 @@ public partial class Player
 		var ids = Config.Current.GameMode.DefaultEquipmentIds;
 		foreach ( var id in ids )
 		{
-			var equipment = GameModeEquipments.FindById( id );
+			var equipment = GameModeEquipments.FindByDtoId( id );
 			if ( equipment != null )
 			{
 				yield return equipment;
@@ -113,7 +113,7 @@ public partial class Player
 	{
 		foreach ( var id in job.GameModeEquipmentIds )
 		{
-			var equipment = GameModeEquipments.FindById( id );
+			var equipment = GameModeEquipments.FindByDtoId( id );
 			if ( equipment != null )
 			{
 				yield return equipment;
@@ -537,7 +537,7 @@ public partial class Player
 	/// </summary>
 	public void Remove( GameModeEquipmentDto resource )
 	{
-		var equipment = Equipment.FirstOrDefault( w => string.Equals( w.Identifier, resource.Identifier(), StringComparison.OrdinalIgnoreCase ) );
+		var equipment = Equipment.FirstOrDefault( w => w.EquipmentId == resource.GameModeAddonContentId );
 		if ( !equipment.IsValid() )
 		{
 			return;
@@ -604,7 +604,7 @@ public partial class Player
 			Transform = new Transform(), Parent = WeaponGameObject
 		} );
 		var component = gameObject.Components.Get<Equipment>( FindMode.EverythingInSelfAndDescendants );
-		component.Identifier = resource.Identifier();
+		component.EquipmentId = resource.GameModeAddonContentId;
 		component.OwnerId = Id;
 		component.CanDrop = canDrop;
 		gameObject.NetworkSpawn( Network.Owner );
@@ -619,19 +619,12 @@ public partial class Player
 
 	public Equipment? FindEquipment( GameModeEquipmentDto resource )
 	{
-		return Equipment.FirstOrDefault( weapon => weapon.Enabled && string.Equals( weapon.Identifier, resource.Identifier(), StringComparison.OrdinalIgnoreCase ) );
+		return Equipment.FirstOrDefault( weapon => weapon.Enabled && weapon.EquipmentId == resource.Id );
 	}
 
-	/// <summary>
-	///     Finds bare hands: <see cref="GameModeEquipments.Hands" /> lookup can miss when the content key differs (e.g. prefab name), so we also match <see cref="HandsEquipment" />.
-	/// </summary>
 	private Equipment? ResolveHandsEquipment()
 	{
-		var byHandsComponent = Equipment.FirstOrDefault( eq =>
-			eq.Enabled &&
-			eq.Components.Get<HandsEquipment>( FindMode.EverythingInSelfAndDescendants ).IsValid() );
-
-		return byHandsComponent ?? FindEquipment( GameModeEquipments.Hands );
+		return FindEquipment( GameModeEquipments.FindById( Constants.HandsEquipmentId ) );
 	}
 
 	public bool CanPurchaseEquipment( GameModeEquipmentDto resource )

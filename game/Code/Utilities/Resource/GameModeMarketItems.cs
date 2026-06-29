@@ -26,7 +26,7 @@ public static class GameModeMarketItems
 			return null;
 		}
 
-		return GameModeEntities.FindById( item.ReferenceId.Value );
+		return GameModeEntities.FindByDtoId( item.ReferenceId.Value );
 	}
 
 	public static GameModeEquipmentDto? ResolveEquipment( GameModeMarketItemDto? item )
@@ -36,7 +36,7 @@ public static class GameModeMarketItems
 			return null;
 		}
 
-		return GameModeEquipments.FindById( item.ReferenceId.Value );
+		return GameModeEquipments.FindByDtoId( item.ReferenceId.Value );
 	}
 
 	public static string DisplayName( GameModeMarketItemDto? item )
@@ -90,7 +90,7 @@ public static class GameModeMarketItems
 
 		if ( item.Type == GameModeMarketItemType.Entity )
 		{
-			return GetOwnedEntityCount( player, item.ReferenceId );
+			return GetOwnedEntityCount( player, ResolveEntity( item )?.GameModeAddonContentId );
 		}
 
 		var worldOwned = player.Scene.GetAllComponents<ShipmentEntity>()
@@ -107,11 +107,11 @@ public static class GameModeMarketItems
 		{
 			return 0;
 		}
-
-		return player.Scene.GetAllComponents<BaseEntity>()
+		
+		return player.Scene.Components.GetAll<BaseEntity>( FindMode.EverythingInChildren )
 			.Count( entity => entity.IsValid() &&
 			                 entity.Owner == player.SteamId &&
-			                 entity.GameModeEntityId == entityId.Value );
+			                 entity.EntityId == entityId.Value );
 	}
 
 	public static bool CanPurchase( Player player, GameModeMarketItemDto? item )
@@ -129,7 +129,7 @@ public static class GameModeMarketItems
 				{
 					return false;
 				}
-				if ( entity.Limit > 0 && GetOwnedEntityCount( player, entity.Id ) >= entity.Limit )
+				if ( entity.Limit > 0 && GetOwnedEntityCount( player, entity.GameModeAddonContentId ) >= entity.Limit )
 				{
 					return false;
 				}

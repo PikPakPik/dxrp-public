@@ -1,4 +1,3 @@
-using Dxura.RP.Shared;
 using Sandbox.Diagnostics;
 
 namespace Dxura.RP.Game;
@@ -10,9 +9,9 @@ public class Equipment : Component, IEquipment, IDescription
 {
 	[Property]
 	[Group( "Identity" )]
-	public string Identifier { get; set; } = "";
+	public Guid EquipmentId { get; set; }
 
-	public GameModeEquipmentDto? Resource => GameModeEquipments.GetByIdentifierOrFallback( Identifier );
+	public GameModeEquipmentDto? Resource => GameModeEquipments.FindById( EquipmentId );
 
 	/// <summary>
 	///     A tag binder for this equipment.

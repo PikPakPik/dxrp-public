@@ -1,17 +1,22 @@
 namespace Dxura.RP.Game;
 
-public class DebugPlayerSpawner : Component
+public class DebugPlayerSpawner : Component, IGameEvents
 {
-	[Property]
-	private string Name { get; set; } = "Joe Doe";
+	[Property] private string Name { get; set; } = "Joe Doe";
+	[Property] private string JobIdentifier { get; set; }
 
-	[Property]
-	private string JobIdentifier { get; set; }
+	private bool _spawned;
 
-	protected override void OnStart()
+	public void OnGameModeUpdated( GameModeDto? before, GameModeDto? after )
 	{
-		var debugPlayer = GameNetworkManager.Instance.PlayerPrefab.Clone();
+		if ( after == null || _spawned )
+		{
+			return;
+		}
 
+		_spawned = true;
+
+		var debugPlayer = GameNetworkManager.Instance.PlayerPrefab.Clone();
 		if ( !debugPlayer.IsValid() )
 		{
 			return;
@@ -21,25 +26,26 @@ public class DebugPlayerSpawner : Component
 
 		var player = debugPlayer.GetComponent<Player>();
 		player.SteamId = Random.Shared.NextInt64( 69420197960265728, 69420297960265728 );
-		player.SteamName = $"{Name}";
-		// player.Job = GameUtils.;
+		player.SteamName = Name;
 		player.IsDebugPlayer = true;
-
 		player.Controller.Enabled = false;
-		var rb = player.GetComponent<Rigidbody>();
-		rb.MotionEnabled = false;
+		player.GetComponent<Rigidbody>().MotionEnabled = false;
 
 		debugPlayer.NetworkSpawn( NetworkSpawnOptions.Default );
-
 		debugPlayer.Network.DropOwnership();
 
-		// Add the player to the game network manager
 		GameNetworkManager.Instance.Players.Add( player.SteamId, player );
 
-		player.SpawnHost();
+		player.AssignJobForcedHost( GameModeJobs.FindByReference( JobIdentifier ) ?? GameModeJobs.Default );
 		player.TeleportHost( new Transform( WorldPosition, WorldRotation ) );
 
 		GameObject.Destroy();
+	}
+
+	private Color IdentifierColor()
+	{
+		var hue = Math.Abs( (Name ?? string.Empty).GetHashCode() ) % 360 / 360f;
+		return new ColorHsv( hue * 360f, 0.8f, 0.9f );
 	}
 
 	protected override void DrawGizmos()
@@ -47,9 +53,8 @@ public class DebugPlayerSpawner : Component
 		base.DrawGizmos();
 
 		var model = Model.Load( "models/editor/spawnpoint.vmdl" );
-
 		Gizmo.Hitbox.Model( model );
-		Gizmo.Draw.Color = Color.Black.WithAlpha( Gizmo.IsHovered || Gizmo.IsSelected ? 0.7f : 0.5f );
+		Gizmo.Draw.Color = IdentifierColor().WithAlpha( Gizmo.IsHovered || Gizmo.IsSelected ? 0.9f : 0.6f );
 		var so = Gizmo.Draw.Model( model );
 		if ( so is not null )
 		{

@@ -308,7 +308,7 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 			return;
 		}
 
-		if ( entity.Limit > 0 && GameModeMarketItems.GetOwnedEntityCount( player, entity.Id ) >= entity.Limit )
+		if ( entity.Limit > 0 && GameModeMarketItems.GetOwnedEntityCount( player, entity.GameModeAddonContentId ) >= entity.Limit )
 		{
 			player.Error( "#generic.forbidden" );
 			return;
@@ -323,7 +323,6 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 		var baseEntityComponent = entityToSpawn.GetComponent<BaseEntity>();
 		if ( baseEntityComponent != null )
 		{
-			baseEntityComponent.Identifier = entity.Identifier();
 			baseEntityComponent.Owner = player.SteamId;
 			baseEntityComponent.ConfigureGameModeEntityHost( entity );
 		}
@@ -396,7 +395,6 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 				var baseEntityComponent = entityToSpawn.GetComponent<BaseEntity>();
 				if ( baseEntityComponent != null )
 				{
-					baseEntityComponent.Identifier = entity.Identifier();
 					baseEntityComponent.Owner = player.SteamId;
 					baseEntityComponent.ConfigureGameModeEntityHost( entity );
 				}
@@ -432,7 +430,6 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 					}
 
 					shipmentBaseEntity.Owner = player.SteamId;
-					shipmentBaseEntity.Identifier = equipment.Identifier();
 					shipmentEntity.MarketItemId = marketItem.Id;
 					shipmentEntity.ConfigureHost( equipment, marketItem.Quantity );
 

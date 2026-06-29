@@ -149,7 +149,7 @@
 	public static IEnumerable<GameModeEquipmentDto> GetDisplayLoadout( GameModeJobDto job )
 	{
 		return job.GameModeEquipmentIds
-			.Select( id => GameModeEquipments.FindById( id ) )
+			.Select( id => GameModeEquipments.FindByDtoId( id ) )
 			.Where( equipment => equipment != null )
 			.Select( equipment => equipment! )
 			.Where( equipment => !GameModeEquipments.IsTool( equipment ) )

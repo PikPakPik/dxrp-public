@@ -30,8 +30,8 @@
   "Weight": 50,
   "Duration": 120,
   "LobbyDuration": 15,
-  "StartingEquipment": [
-    "gameplay/equipment/weapons/knife/knife.equip"
+  "StartingEquipmentIdentifiers": [
+    "f06e0079-c9c7-4845-8580-a3b7a3b548a0"
   ],
   "GiveMaxAmmo": true,
   "SpawnRuleset": "OneLife",

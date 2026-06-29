@@ -461,6 +461,8 @@
   "tool.wire.notifier.chime.description": "Opcjonalny dźwięk odtwarzany u właściciela po wyzwoleniu",
   "tool.wire.trigger.name": "Wyzwalacz",
   "tool.wire.trigger.description": "Wykrywa przerwanie linii lasera i wyprowadza sygnały wyzwalające",
+  "tool.wire.pressureplate.name": "Płyta Naciskowa",
+  "tool.wire.pressureplate.description": "Wykrywa obiekty w konfigurowalnej strefie i wyprowadza sygnały wyzwalające, w tym masę",
   "tool.wire.delay.name": "Opóźnienie",
   "tool.wire.delay.description": "Opóźnia sygnały wejściowe o określony czas",
   "tool.wire.memory.name": "Pamięć",

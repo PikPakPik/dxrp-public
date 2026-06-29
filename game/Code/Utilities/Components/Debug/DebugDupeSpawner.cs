@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 namespace Dxura.RP.Game;
 
-public class DebugDupe : Component, IGameEvents
+public class DebugDupeSpawner : Component, IGameEvents
 {
 	[Property]
 	private string DupeJson { get; set; } = "";
@@ -50,14 +50,19 @@ public class DebugDupe : Component, IGameEvents
 		_ = Construct.Current.SpawnDupe( Player.Local, dupe, null, WorldPosition );
 	}
 
+	private Color IdentifierColor()
+	{
+		var hue = Math.Abs( (DupeJson ?? string.Empty).GetHashCode() ) % 360 / 360f;
+		return new ColorHsv( hue * 360f, 0.8f, 0.9f );
+	}
+
 	protected override void DrawGizmos()
 	{
 		base.DrawGizmos();
 
 		var model = Model.Load( "models/editor/node_hint.vmdl_c" );
-
 		Gizmo.Hitbox.Model( model );
-		Gizmo.Draw.Color = Color.Black.WithAlpha( Gizmo.IsHovered || Gizmo.IsSelected ? 0.7f : 0.5f );
+		Gizmo.Draw.Color = IdentifierColor().WithAlpha( Gizmo.IsHovered || Gizmo.IsSelected ? 0.9f : 0.6f );
 		var so = Gizmo.Draw.Model( model );
 		if ( so is not null )
 		{

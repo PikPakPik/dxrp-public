@@ -10,7 +10,7 @@ public partial class MinigameSystem
 	private class PlayerPreviousState
 	{
 		public float Health { get; set; }
-		public List<Tuple<string, Tuple<int, int>>> StashedEquipment { get; set; } = new();
+		public List<Tuple<Guid, Tuple<int, int>>> StashedEquipment { get; set; } = new();
 		public required Transform ReturnPoint { get; set; }
 	}
 
@@ -143,7 +143,7 @@ public partial class MinigameSystem
 			var ammoCount = ammoComponent.IsValid() ? ammoComponent.Ammo : 0;
 			var reserveAmmoCount = ammoComponent.IsValid() ? ammoComponent.ReserveAmmo : 0;
 
-			state.StashedEquipment.Add( new Tuple<string, Tuple<int, int>>( equipment.Identifier, new Tuple<int, int>( ammoCount, reserveAmmoCount ) ) );
+			state.StashedEquipment.Add( new Tuple<Guid, Tuple<int, int>>( equipment.EquipmentId, new Tuple<int, int>( ammoCount, reserveAmmoCount ) ) );
 		}
 
 		Log.Info( $"[Minigame] Stashed equipment for {player.DisplayName}" );
@@ -153,12 +153,12 @@ public partial class MinigameSystem
 	{
 		foreach ( var equipmentTuple in state.StashedEquipment )
 		{
-			var identifier = equipmentTuple.Item1;
+			var equipmentId = equipmentTuple.Item1;
 			var ammoCounts = equipmentTuple.Item2;
-			var equipmentResource = GameModeEquipments.FindByIdentifier( identifier );
+			var equipmentResource = GameModeEquipments.FindById( equipmentId );
 			if ( equipmentResource == null )
 			{
-				Log.Warning( $"[Minigame] Failed to find equipment '{identifier}' for {player.DisplayName}" );
+				Log.Warning( $"[Minigame] Failed to find equipment '{equipmentId}' for {player.DisplayName}" );
 				continue;
 			}
 

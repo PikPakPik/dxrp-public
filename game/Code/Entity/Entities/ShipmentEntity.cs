@@ -16,7 +16,7 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 	public int Quantity { get; private set; }
 
 	[Property]
-	public string EquipmentIdentifier { get; set; } = "";
+	public Guid EquipmentId { get; set; }
 
 	[Property]
 	public int MaxQuantity { get; set; } = 10;
@@ -35,7 +35,7 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 	{
 		get
 		{
-			var name = Resource.DisplayName();
+			var name = GameModeEntity.DisplayName();
 			if ( name.StartsWith( '#' ) )
 			{
 				name = Language.GetPhrase( name[1..] );
@@ -86,7 +86,7 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 			Quantity = MaxQuantity;
 		}
 
-		var equipment = GameModeEquipments.FindByIdentifier( EquipmentIdentifier );
+		var equipment = GameModeEquipments.FindById( EquipmentId );
 		EquipmentRenderer.Model = equipment.GetWorldModel();
 		EquipmentRenderer.WorldScale = 1.1f;
 		TypeText.Text = equipment.DisplayName();
@@ -97,7 +97,7 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 	{
 		Assert.True( Networking.IsHost );
 
-		EquipmentIdentifier = equipment.Identifier();
+		EquipmentId = equipment.GameModeAddonContentId;
 		MaxQuantity = Math.Max( 1, quantity );
 		Quantity = MaxQuantity;
 		UpdateState();
@@ -158,7 +158,7 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 
 	private void InternalUse()
 	{
-		var equipment = GameModeEquipments.FindByIdentifier( EquipmentIdentifier );
+		var equipment = GameModeEquipments.FindById( EquipmentId );
 		if ( equipment == null )
 		{
 			return;
@@ -179,7 +179,7 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 		Assert.True( Networking.IsHost );
 
 		// Drop everything on destroy 
-		var equipment = GameModeEquipments.FindByIdentifier( EquipmentIdentifier );
+		var equipment = GameModeEquipments.FindById( EquipmentId );
 		if ( equipment != null )
 		{
 			for ( var x = 0; x < Quantity; x++ )

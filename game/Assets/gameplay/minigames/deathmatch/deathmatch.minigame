@@ -30,10 +30,11 @@
   "Weight": 50,
   "Duration": 180,
   "LobbyDuration": 15,
-  "StartingEquipment": [
-    "gameplay/equipment/weapons/mp5/mp5.equip",
-    "gameplay/equipment/weapons/usp/usp.equip",
-    "gameplay/equipment/weapons/knife/knife.equip"
+  "StartingEquipmentIdentifiers": [
+    "823befaf-d245-466c-b981-772d3bd1c47b",
+    "436a800c-1a82-4778-9f2f-e0db69336623",
+    "6e3e22d7-9892-4e3c-a03e-074f22b10103",
+    "f06e0079-c9c7-4845-8580-a3b7a3b548a0"
   ],
   "GiveMaxAmmo": true,
   "SpawnRuleset": "Respawn",

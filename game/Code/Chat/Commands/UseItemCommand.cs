@@ -83,7 +83,7 @@ public class UseInventoryItemCommand : ICommand
 
 			var entityDto = GameModeEntities.FindByIdentifier( item.Definition.GrantIdentifier );
 
-			if ( !entityDto.IsValid() )
+			if ( entityDto == null || !entityDto.IsValid() )
 			{
 				await Refund(caller, itemId );
 				return;
@@ -91,7 +91,7 @@ public class UseInventoryItemCommand : ICommand
 
 			// Check limit (TODO Consolidate):
 			var totalEntities = Sandbox.Game.ActiveScene.Components.GetAll<BaseEntity>( FindMode.EverythingInChildren )
-				.Count( x => x.Owner == caller.SteamId && x.GameModeEntityId == entityDto!.Id );
+				.Count( x => x.Owner == caller.SteamId && x.EntityId == entityDto!.GameModeAddonContentId );
 
 			if ( entityDto.Limit > 0 && totalEntities >= entityDto.Limit )
 			{
@@ -113,7 +113,6 @@ public class UseInventoryItemCommand : ICommand
 			var baseEntityComponent = entityToSpawn.GetComponent<BaseEntity>();
 			if ( baseEntityComponent != null )
 			{
-				baseEntityComponent.Identifier = entityDto.Identifier();
 				baseEntityComponent.Owner = caller.SteamId;
 				baseEntityComponent.ConfigureGameModeEntityHost( entityDto );
 			}

@@ -1762,9 +1762,9 @@
   "MenuIcon": null,
   "DontBreakAsTemplate": false,
   "__references": [
-    "facepunch.dirt_ground_02_blend#111290",
-    "facepunch.grass_mud_blend_01a#47043",
-    "facepunch.wire_cage_b_painted#111152"
+    "facepunch.dirt_ground_02_blend#291702",
+    "facepunch.grass_mud_blend_01a#271788",
+    "facepunch.wire_cage_b_painted#293152"
   ],
   "__version": 2
 }

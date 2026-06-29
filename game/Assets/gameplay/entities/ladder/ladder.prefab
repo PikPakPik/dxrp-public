@@ -91,6 +91,18 @@
         "OnComponentUpdate": null
       },
       {
+        "__type": "Dxura.RP.Game.LadderClimbGuard",
+        "__guid": "c4a8e1f2-3b6d-4a9e-8f1c-2d5e7a9b0c3d",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      },
+      {
         "__type": "Dxura.RP.Game.BaseEntity",
         "__guid": "398e2386-f98d-4e95-be8e-6979982663f0",
         "__enabled": true,

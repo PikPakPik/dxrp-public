@@ -127,12 +127,10 @@ MarketTabMenuSection {
     display: flex;
     flex-direction: row;
     align-items: stretch;
-    width: 180px;
-    min-width: 180px;
-    min-height: 120px;
-    height: auto;
+    width: 165px;
+    min-width: 165px;
+    height: 105px;
     flex-shrink: 0;
-    overflow: visible;
     cursor: pointer;
     border-radius: $space-2;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -166,11 +164,9 @@ MarketTabMenuSection {
     flex-direction: column;
     justify-content: space-between;
     flex-grow: 1;
-    min-height: 120px;
     height: 100%;
     padding: $space-3;
     background-color: $color-secondary;
-    overflow: visible;
   }
 
   .card-lock {

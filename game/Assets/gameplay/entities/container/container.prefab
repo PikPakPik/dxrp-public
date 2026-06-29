@@ -34,6 +34,12 @@
           "component_type": "HealthComponent"
         },
         "Identifier": "",
+        "ModelCollider": {
+          "_type": "component",
+          "component_id": "0f8028dc-ed15-4fb6-84d7-44ee154659f1",
+          "go": "1d238c76-04ec-4a1d-9583-c46f0647c27f",
+          "component_type": "ModelCollider"
+        },
         "ModelRenderer": {
           "_type": "component",
           "component_id": "f98bc092-8788-4954-9d09-2648285ad48d",
@@ -49,8 +55,8 @@
         "Owner": 0,
         "Quantity": 0,
         "Resource": {
-          "Id": "de602ccd-7f8c-4c19-a85b-9bb3b8d2b475",
-          "GameModeAddonContentId": "fbd9925a-de6d-4a71-86cd-751e2b691976",
+          "Id": "726eedf3-c0dc-4d80-9418-d9679906ef6b",
+          "GameModeAddonContentId": "557d805c-d0de-442d-a00a-94bedc1adc6f",
           "NameOverride": null,
           "DescriptionOverride": null,
           "Limit": 0,
@@ -117,32 +123,6 @@
         "Tint": "1,1,1,1"
       },
       {
-        "__type": "Sandbox.BoxCollider",
-        "__guid": "8a0a3b15-da28-4b21-90ee-4cbaae20cc40",
-        "__enabled": true,
-        "Flags": 0,
-        "Center": "-0.156147495,0.110166498,1.94528794",
-        "ColliderFlags": 0,
-        "Elasticity": null,
-        "Friction": null,
-        "IsTrigger": false,
-        "OnComponentDestroy": null,
-        "OnComponentDisabled": null,
-        "OnComponentEnabled": null,
-        "OnComponentFixedUpdate": null,
-        "OnComponentStart": null,
-        "OnComponentUpdate": null,
-        "OnObjectTriggerEnter": null,
-        "OnObjectTriggerExit": null,
-        "OnTriggerEnter": null,
-        "OnTriggerExit": null,
-        "RollingResistance": null,
-        "Scale": "5.26500082,13.0664196,19.72328",
-        "Static": false,
-        "Surface": null,
-        "SurfaceVelocity": "0,0,0"
-      },
-      {
         "__type": "Sandbox.Rigidbody",
         "__guid": "e16ecaeb-8b4e-43c3-a470-21743bb194c1",
         "__enabled": true,
@@ -191,6 +171,31 @@
         "OnComponentFixedUpdate": null,
         "OnComponentStart": null,
         "OnComponentUpdate": null
+      },
+      {
+        "__type": "Sandbox.ModelCollider",
+        "__guid": "0f8028dc-ed15-4fb6-84d7-44ee154659f1",
+        "__enabled": true,
+        "Flags": 0,
+        "ColliderFlags": 0,
+        "Elasticity": null,
+        "Friction": null,
+        "IsTrigger": false,
+        "Model": "gameplay/entities/container/models/bag/bag.vmdl",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "OnObjectTriggerEnter": null,
+        "OnObjectTriggerExit": null,
+        "OnTriggerEnter": null,
+        "OnTriggerExit": null,
+        "RollingResistance": null,
+        "Static": false,
+        "Surface": null,
+        "SurfaceVelocity": "0,0,0"
       }
     ],
     "Children": [
@@ -260,7 +265,7 @@
                       "CacheToDisk": true,
                       "FormatOverride": "RGBA8888"
                     },
-                    "compiled": null
+                    "compiled": "textures/generated/imagefile/501930c8f105eed1.vtex"
                   },
                   "NormalTexture": null,
                   "RoughMetalOcclusionTexture": null,

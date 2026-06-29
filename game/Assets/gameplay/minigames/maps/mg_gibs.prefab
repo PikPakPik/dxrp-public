@@ -6933,19 +6933,19 @@
   "DontBreakAsTemplate": false,
   "__references": [
     "facepunch.catwalk_ladder_a#48203",
-    "facepunch.concrete_wall_bare_02#47059",
-    "facepunch.corrugated_wall_a_sheet_128#108333",
-    "facepunch.floor_grass_a#18648",
+    "facepunch.concrete_wall_bare_02#292993",
+    "facepunch.corrugated_wall_a_sheet_128#289745",
+    "facepunch.floor_grass_a#271842",
     "facepunch.leftfootgibcap#109930",
     "facepunch.metal_01a#9574",
     "facepunch.pelvisgibcap#109933",
-    "facepunch.plywood_panels#111271",
+    "facepunch.plywood_panels#291707",
     "facepunch.rightfootgibcap#109934",
-    "facepunch.shipping_container_closed_dev#58564",
-    "facepunch.shipping_container_open_dev#58563",
+    "facepunch.shipping_container_closed_dev#139197",
+    "facepunch.shipping_container_open_dev#139198",
     "facepunch.torntorsogib#109945",
-    "facepunch.tree_oak_small_a#145474",
-    "facepunch.water_drum_01#123277"
+    "facepunch.tree_oak_small_a#288917",
+    "facepunch.water_drum_01#274756"
   ],
   "__version": 2
 }

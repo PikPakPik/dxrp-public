@@ -13,7 +13,7 @@ public interface IHandEvents : ISceneEvent<IHandEvents>
 /// <summary>
 /// Handles the functionality for picking up, holding, rotating, and throwing objects in the game.
 /// </summary>
-public class HandsEquipment : InputWeaponComponent, IEquipmentEvents
+public class HandsEquipment : InputWeaponComponent, IEquipmentEvents, IInputHints
 {
 	[Property] private float ThrowForce { get; set; } = 500f;
 	[Property] private float MaxReleaseVelocity { get; set; } = 500f;
@@ -523,6 +523,23 @@ public class HandsEquipment : InputWeaponComponent, IEquipmentEvents
 
 		Equipment.HoldType = isRelease ? AnimationHelper.HoldTypes.None : AnimationHelper.HoldTypes.HoldItem;
 	}
+
+	IEnumerable<(string Action, string Label)> IInputHints.GetInputHints()
+	{
+		if ( IsHolding() )
+		{
+			yield return ("attack1", "#input.hands.drop");
+			yield return ("attack2", "#input.hands.throw");
+			yield return ("use", "#input.hands.rotate");
+		}
+		else
+		{
+			yield return ("attack1", "#input.hands.grab");
+			yield return ("attack2", string.Format( Language.GetPhrase( "input.hands.pocket" ), PocketSystem.LocalPocketCount, Config.Current.Game.MaxPocketItems ));
+		}
+	}
+
+	int IInputHints.GetInputHintsHash() => HashCode.Combine( IsHolding(), PocketSystem.LocalPocketCount );
 
 	private static bool ShouldPlayPickupAnimation( GameObject? target )
 	{

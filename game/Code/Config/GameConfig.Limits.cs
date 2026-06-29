@@ -31,5 +31,6 @@ public abstract partial class GameConfig
 	public virtual uint TargetWireLimit { get; set; } = 3;
 	public virtual uint SynthesizerWireLimit { get; set; } = 1;
 	public virtual uint MetaWireLimit { get; set; } = 3;
+	public virtual uint PressurePlateWireLimit { get; set; } = 3;
 }
 

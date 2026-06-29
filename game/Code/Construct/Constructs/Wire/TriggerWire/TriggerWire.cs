@@ -194,8 +194,8 @@ public class TriggerWire() : BaseWireConstruct( ConstructType.TriggerWire ), IWi
 						break;
 					case TriggerFilterType.EntityOnly:
 						var entity = infoObject.GetComponent<BaseEntity>();
-						TriggerInfo = entity.IsValid() && entity.Resource.IsValid()
-							? ResolvePhrase( entity.Resource.DisplayName() )
+						TriggerInfo = entity.IsValid() && entity.GameModeEntity.IsValid()
+							? ResolvePhrase( entity.GameModeEntity.DisplayName() )
 							: "?";
 						break;
 					case TriggerFilterType.ConstructOnly:

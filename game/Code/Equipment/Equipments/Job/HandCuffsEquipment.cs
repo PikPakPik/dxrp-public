@@ -1,12 +1,18 @@
 namespace Dxura.RP.Game.Equipments;
 
-public class HandCuffsEquipment : InputWeaponComponent
+public class HandCuffsEquipment : InputWeaponComponent, IInputHints
 {
 	[Property] [Group( "Effects" )] private SoundEvent? UseSound { get; set; }
 
 	[Property] [Group( "Effects" )] private SoundEvent? ArrestSound { get; set; }
 
 	[Property] [Group( "Effects" )] private SoundEvent? ReleaseSound { get; set; }
+
+	IEnumerable<(string Action, string Label)> IInputHints.GetInputHints()
+	{
+		yield return ("attack1", "#input.handcuffs.arrest");
+		yield return ("attack2", "#input.handcuffs.unarrest");
+	}
 
 	protected override void OnInputDown()
 	{

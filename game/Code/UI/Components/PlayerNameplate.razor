@@ -69,28 +69,29 @@
 	[Property] Player Player { get; set; } = null!;
 
 	private bool ShowNameplate => Player.IsValid() && !Player.IsLocalPlayer && Config.Current.Game.ShowNamePlate && !Player.GameObject.Tags.Has( Constants.OccludeTag ) && !HasCameraEquipped();
-	private bool ShowHealthInfo =>  ShowNameplate && 
-	                                 Player.Local.IsValid() && 
-	                                 Player.Local.Job.IsMedicRole() && 
-	                                 Player != Player.Local &&
-	                                 HasMedkitEquipped();
-	
+	private bool ShowHealthInfo => ShowNameplate &&
+	                               Player.Local.IsValid() &&
+	                               Player.Local.Job.IsMedicRole() &&
+	                               Player != Player.Local &&
+	                               HasMedkitEquipped();
+
 	private bool HasCameraEquipped()
 	{
 		if ( !Player.Local.IsValid() )
 			return false;
-			
+
 		var currentEquipment = Player.Local.CurrentEquipment;
-		return currentEquipment.IsValid() && currentEquipment.Identifier == "camera";
+		return currentEquipment.IsValid() && currentEquipment.EquipmentId == Constants.CameraEquipmentId;
 	}
-	
+
 	private bool HasMedkitEquipped()
 	{
 		if ( !Player.Local.IsValid() )
 			return false;
-			
+
 		var currentEquipment = Player.Local.CurrentEquipment;
-		return currentEquipment.IsValid() && currentEquipment.Identifier == "medkit";
+		
+		return currentEquipment.IsValid() && currentEquipment.EquipmentId == Constants.MedkitEquipmentId;
 	}
 
 	private string GetHealthText()
@@ -129,7 +130,7 @@
 		
 		var isTalking = Player.Voice.LastPlayed < 0.25f;
 		var localPlayerJob = localIsValid ? Player.Local.Job.Id.ToString() : "";
-		var currentEquipment = localIsValid ? Player.Local.CurrentEquipment?.Identifier : "";
+		var currentEquipment = localIsValid ? Player.Local.CurrentEquipment?.EquipmentId.ToString() : "";
 		var health = Player.HealthComponent.IsValid() ? Player.HealthComponent.Health : 0;
 		
 		var hash = new HashCode();

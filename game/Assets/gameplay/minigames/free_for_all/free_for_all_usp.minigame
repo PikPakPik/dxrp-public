@@ -30,8 +30,8 @@
   "Weight": 50,
   "Duration": 120,
   "LobbyDuration": 15,
-  "StartingEquipment": [
-    "gameplay/equipment/weapons/usp/usp.equip"
+  "StartingEquipmentIdentifiers": [
+    "823befaf-d245-466c-b981-772d3bd1c47b"
   ],
   "GiveMaxAmmo": true,
   "SpawnRuleset": "OneLife",
