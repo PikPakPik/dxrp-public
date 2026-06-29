@@ -29157,11 +29157,11 @@
   "MenuIcon": null,
   "DontBreakAsTemplate": false,
   "__references": [
-    "facepunch.metal_door_01a#143444",
-    "facepunch.metaldoor04a#143447",
-    "facepunch.wooden_door_01a#143450",
-    "facepunch.wooden_door_01b#143451",
-    "facepunch.wooden_door_01d#143453"
+    "facepunch.metal_door_01a#275632",
+    "facepunch.metaldoor04a#275635",
+    "facepunch.wooden_door_01a#275037",
+    "facepunch.wooden_door_01b#275039",
+    "facepunch.wooden_door_01d#275043"
   ],
   "__version": 2
 }
