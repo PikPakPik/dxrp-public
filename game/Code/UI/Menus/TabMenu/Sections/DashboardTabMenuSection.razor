@@ -107,7 +107,7 @@
 			</div>
 		}
 
-		@if ( ServerApiLink.HasAuthorizationKey )
+		@if ( !string.IsNullOrEmpty( ServerApiLink.Current?.TenantId ) )
 		{
 			<TempPlayerUpgrader></TempPlayerUpgrader>
 		}
