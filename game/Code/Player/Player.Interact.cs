@@ -6,12 +6,12 @@ public partial class Player : IContextualObject, Component.IPressable
 	public Vector3 ContextPosition => WorldPosition + Controller.BodyHeight * 0.60f * Vector3.Up;
 	public bool ShouldShow()
 	{
-		return !IsDead && !IsLocalPlayer && !HasStatus( Constants.CloakStatus ) && !string.IsNullOrWhiteSpace( Job.Interaction );
+		return !IsDead && !IsLocalPlayer && !HasStatus( Constants.CloakStatus ) && !string.IsNullOrWhiteSpace( Job?.Interaction );
 	}
 	public float ContextMaxDistance => Config.Current.Game.PlayerInteractDistance;
 	public bool LookOpacity => false;
 	public string InputHint => "use";
-	public string? DisplayText => Job.Interaction;
+	public string? DisplayText => Language.GetPhrase( Job?.Interaction ?? string.Empty );
 
 
 	private void OnStartInteract()
@@ -26,7 +26,7 @@ public partial class Player : IContextualObject, Component.IPressable
 			return false;
 		}
 
-		if ( string.Equals( Job.Interaction, "HitRequest", StringComparison.OrdinalIgnoreCase ) )
+		if ( string.Equals( Job.Interaction, "hit.request", StringComparison.OrdinalIgnoreCase ) )
 		{
 			var hitUi = GameManager.ShowUi<HitRequestModal>();
 			hitUi?.Hitman = this;

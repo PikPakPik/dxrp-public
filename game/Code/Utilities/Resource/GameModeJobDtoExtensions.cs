@@ -42,6 +42,18 @@ public static class GameModeJobDtoExtensions
 		return group != null && string.Equals( group.Name, groupIdentifier, StringComparison.OrdinalIgnoreCase );
 	}
 
+	public static Model GetPrimaryModel( this Player? player )
+	{
+		if ( player.IsValid() && player!.Renderer.IsValid() && player.Renderer.Model.IsValid() )
+		{
+			return player.Renderer.Model;
+		}
+
+		return player.IsValid() && player!.Job.IsValid()
+			? player.Job.GetPrimaryModel()
+			: GameModeJobs.Default.GetPrimaryModel();
+	}
+
 	public static Model GetPrimaryModel( this GameModeJobDto? job )
 	{
 		var modelPath = ResolveModelPath( job );
@@ -60,7 +72,25 @@ public static class GameModeJobDtoExtensions
 
 		if ( IsCloudIdent( modelPath ) )
 		{
-			return await Cloud.Load<Model>( modelPath ) ?? Model.Load( "models/citizen/citizen.vmdl" );
+			var package = await Package.Fetch( modelPath, false );
+			if ( package == null )
+			{
+				return Model.Load( "models/citizen_human/citizen_human_male.vmdl" );
+			}
+
+			if ( !package.IsMounted() )
+			{
+				await package.MountAsync();
+			}
+
+			modelPath = package.GetMeta( "PrimaryAsset", "" );
+
+			if ( string.IsNullOrWhiteSpace( modelPath ) )
+			{
+				return Model.Load( "models/citizen_human/citizen_human_male.vmdl" );
+			}
+
+			return await Model.LoadAsync( modelPath ) ?? Model.Load( "models/citizen_human/citizen_human_male.vmdl" );
 		}
 
 		return Model.Load( modelPath );
@@ -69,17 +99,33 @@ public static class GameModeJobDtoExtensions
 	private static string ResolveModelPath( GameModeJobDto? job )
 	{
 		var modelPath = job?.Model;
-		if ( string.IsNullOrWhiteSpace( modelPath ) )
-		{
-			modelPath = GameModeJobs.Default.Model;
-		}
+		return string.IsNullOrWhiteSpace( modelPath ) ? "models/citizen_human/citizen_human_male.vmdl" : modelPath;
+	}
 
-		return string.IsNullOrWhiteSpace( modelPath ) ? "models/citizen/citizen.vmdl" : modelPath;
+	public static bool HasCloudModel( this GameModeJobDto? job )
+	{
+		var modelPath = job?.Model;
+		return !string.IsNullOrWhiteSpace( modelPath ) && IsCloudIdent( modelPath );
 	}
 
 	private static bool IsCloudIdent( string path )
 	{
 		return !path.Contains( '/' ) && path.Contains( '.' );
+	}
+
+	public static string FormatPlayerSlots( this GameModeJobDto? job, int currentPlayers )
+	{
+		if ( job == null )
+		{
+			return "0";
+		}
+
+		if ( job.MaxCount <= 0 )
+		{
+			return currentPlayers.ToString();
+		}
+
+		return $"{currentPlayers}/{job.MaxCount}";
 	}
 
 	public static bool HasTag( this GameModeJobDto? job, JobTag tag )
@@ -176,6 +222,47 @@ public static class GameModeJobDtoExtensions
 		}
 
 		return true;
+	}
+
+	public static ClothingContainer BuildClothing( this GameModeJobDto job, Player? avatarSource = null,
+		bool includeJobClothing = true )
+	{
+		var clothing = new ClothingContainer();
+
+		if ( !job.HasCloudModel() )
+		{
+			var source = avatarSource ?? (Player.Local.IsValid() ? Player.Local : null);
+			var avatarData = source?.Network.Owner?.GetUserData( "avatar" );
+			if ( !string.IsNullOrWhiteSpace( avatarData ) )
+			{
+				clothing.Deserialize( avatarData );
+			}
+
+			if ( includeJobClothing )
+			{
+				clothing.AddRange( job.GetClothingEntries() );
+			}
+		}
+
+		return clothing;
+	}
+
+	public static ClothingContainer BuildClothing( this Player player )
+	{
+		var clothing = new ClothingContainer();
+		var avatarData = player.Network.Owner?.GetUserData( "avatar" );
+
+		if ( !string.IsNullOrWhiteSpace( avatarData ) )
+		{
+			clothing.Deserialize( avatarData );
+		}
+
+		if ( player.Job.IsValid() )
+		{
+			clothing.AddRange( player.Job.GetClothingEntries() );
+		}
+
+		return clothing;
 	}
 
 	public static IEnumerable<ClothingContainer.ClothingEntry> GetClothingEntries( this GameModeJobDto job )

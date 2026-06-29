@@ -10,7 +10,7 @@ public partial class Player
 
 	private void OnSecondlyUpdateApi()
 	{
-		if ( !ServerApiLink.HasAuthorizationKey )
+		if ( string.IsNullOrEmpty( ServerApiLink.Current?.TenantId ) )
 		{
 			return;
 		}

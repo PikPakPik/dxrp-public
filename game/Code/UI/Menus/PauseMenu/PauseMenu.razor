@@ -108,7 +108,7 @@
 		        {
 			        <Settings/>
 		        }
-		        else if ( ServerApiLink.HasAuthorizationKey )
+		        else if ( !string.IsNullOrEmpty( ServerApiLink.Current?.TenantId ) )
 		        {
 			        <Inventory/>
 		        }

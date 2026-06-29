@@ -6,4 +6,5 @@ public record NotifierWireData : IConstructData
 	public string Message { get; set; } = "Value Changed";
 	public bool IncludeValue { get; set; } = false;
 	public bool IgnoreFalsyValue { get; set; } = true;
+	public NotifierWireChime Chime { get; set; } = NotifierWireChime.None;
 }

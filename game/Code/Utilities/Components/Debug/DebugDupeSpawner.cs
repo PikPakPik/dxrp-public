@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 namespace Dxura.RP.Game;
 
-public class DebugDupe : Component, IGameEvents
+public class DebugDupeSpawner : Component, IGameEvents
 {
 	[Property]
 	private string DupeJson { get; set; } = "";

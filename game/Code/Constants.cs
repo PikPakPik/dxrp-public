@@ -67,6 +67,7 @@ public static class Constants
 	public const string NonRecyclableTag = "non_recyclable";
 
 	public const string GrabbedTag = "grabbed";
+	public const string LadderTag = "ladder";
 	public const string PryingTag = "prying";
 
 	public const string PocketTag = "pocket";

@@ -242,6 +242,8 @@ public class CameraEquipment : InputWeaponComponent, IEquipmentEvents
 			// Send screenshot to server API
 			var success = await PlayerApiClient.ShareScreenshot( payload );
 
+			await GameTask.MainThread();
+
 			if ( success )
 			{
 				Notify.Success( "#equipment.camera.share.success" );

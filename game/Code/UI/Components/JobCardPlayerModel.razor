@@ -1,0 +1,86 @@
+@namespace Dxura.RP.Game.UI
+@using Dxura.RP.Shared
+@using Sandbox
+@using Sandbox.UI
+@inherits Panel
+
+@attribute [StyleSheet]
+
+@if ( IsCurrentJob )
+{
+	<root style="@BuildRootStyle()" class="current-job-badge">
+		<div class="current-badge-ring" style="@BuildRingStyle()">
+			<div class="current-badge-fill" style="@BuildFillStyle()">
+				<i class="material-icons">check</i>
+			</div>
+		</div>
+	</root>
+}
+else if ( Job.IsValid() )
+{
+	<root style="@BuildRootStyle()">
+		<div class="model-shell" style="@BuildShellStyle()">
+			<Image Texture="@GetPortraitTexture()" class="model-image"/>
+		</div>
+	</root>
+}
+
+@code
+{
+	public GameModeJobDto? Job { get; set; }
+	public int Size { get; set; } = 56;
+
+	private bool IsCurrentJob => Job.IsValid() && Player.Local.IsValid() && Player.Local.Job == Job;
+	private Color BorderColor => Job.ColorValue();
+
+	protected override int BuildHash()
+	{
+		var key = BuildSignature();
+		return HashCode.Combine( Job, Size, ThumbnailCache.IsPortraitCached( key ) );
+	}
+
+	private string BuildRootStyle()
+	{
+		return $"width: {Size}px; height: {Size}px; min-width: {Size}px; min-height: {Size}px;";
+	}
+
+	private string BuildShellStyle()
+	{
+		return $"border: 2px solid {BorderColor.Hex};";
+	}
+
+	private string BuildRingStyle()
+	{
+		return $"border-color: {BorderColor.Hex};";
+	}
+
+	private string BuildFillStyle()
+	{
+		return $"background-color: {BorderColor.Hex};";
+	}
+
+	private Texture GetPortraitTexture()
+	{
+		if ( !Job.IsValid() )
+			return Texture.Transparent;
+
+		var key = BuildSignature();
+		if ( string.IsNullOrWhiteSpace( key ) )
+			return Texture.Transparent;
+
+		return ThumbnailCache.GetCharacterPortrait( key, Job,
+			r => Job.BuildClothing().Apply( r ) );
+	}
+
+	private string BuildSignature()
+	{
+		if ( !Job.IsValid() )
+			return string.Empty;
+
+		var avatarData = Player.Local.IsValid()
+			? Player.Local.Network.Owner?.GetUserData( "avatar" ) ?? string.Empty
+			: string.Empty;
+
+		return $"portrait:job:{Job.Id}:{Job.Model}:{string.Join( ',', Job.Clothes )}:{avatarData}";
+	}
+}

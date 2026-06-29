@@ -1,5 +1,12 @@
 namespace Dxura.RP.Game.Entities;
 
+public class ContainerDecalConfig
+{
+	public Vector3 LocalPosition { get; set; }
+	public Rotation LocalRotation { get; set; }
+	public Vector3 Size { get; set; } = new Vector3( 0.4f, 0.4f, 0.4f );
+}
+
 public class ContainerEntityConfig
 {
 	public string ResourceId { get; init; } = string.Empty;
@@ -26,7 +33,14 @@ public sealed class ContainerEntity : BaseEntity
 	private ModelRenderer ModelRenderer { get; set; } = null!;
 
 	[Property]
-	private TextRenderer? TextRenderer { get; set; }
+	private ModelCollider ModelCollider { get; set; } = null!;
+
+	[Property]
+	// ReSharper disable once CollectionNeverUpdated.Global
+	public Dictionary<ContainerType, Model> TypeModels { get; set; } = [];
+
+	[Property]
+	public Dictionary<ContainerType, ContainerDecalConfig> TypeDecals { get; set; } = [];
 
 	[Property]
 	[Group( "Effects" )]
@@ -56,18 +70,17 @@ public sealed class ContainerEntity : BaseEntity
 			Sound.Play( _config.UseSound, WorldPosition );
 		}
 
-		if ( newValue <= 0 )
+		if ( newValue > 0 )
 		{
-			if ( _config.DestroyOnEmpty )
-			{
-				GameObject.Destroy();
-				return;
-			}
-
-			Quantity = 0;
+			return;
+		}
+		if ( _config.DestroyOnEmpty )
+		{
+			GameObject.Destroy();
+			return;
 		}
 
-		UpdateText();
+		Quantity = 0;
 	}
 
 	private void UpdateState()
@@ -80,25 +93,33 @@ public sealed class ContainerEntity : BaseEntity
 		if ( Decal.IsValid() && !string.IsNullOrWhiteSpace( _config.IconPath ) )
 		{
 			var icon = Texture.LoadFromFileSystem( _config.IconPath, FileSystem.Mounted );
+			
 			if ( icon != null )
 			{
 				Decal.Decals = [new DecalDefinition { ColorTexture = icon }];
 			}
 		}
 
+		if ( ModelRenderer.IsValid() && TypeModels.TryGetValue( _config.ContainerType, out var model ) )
+		{
+			ModelRenderer.Model = model;
+
+			if ( ModelCollider.IsValid() )
+			{
+				ModelCollider.Model = model;
+			}
+		}
+
+		if ( Decal.IsValid() && TypeDecals.TryGetValue( _config.ContainerType, out var decalConfig ) )
+		{
+			Decal.GameObject.LocalPosition = decalConfig.LocalPosition;
+			Decal.GameObject.LocalRotation = decalConfig.LocalRotation;
+			Decal.Size = decalConfig.Size;
+		}
+
 		if ( ModelRenderer.IsValid() && Color.TryParse( _config.Tint, out var tint ) )
 		{
 			ModelRenderer.Tint = tint;
-		}
-
-		UpdateText();
-	}
-
-	private void UpdateText()
-	{
-		if ( TextRenderer.IsValid() )
-		{
-			TextRenderer.Text = $"{_config.ResourceId} \n {Quantity} {_config.Unit}";
 		}
 	}
 

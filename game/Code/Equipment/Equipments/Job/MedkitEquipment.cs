@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Dxura.RP.Game.Equipments;
 
-public class MedKitEquipment : InputWeaponComponent, IEquipmentEvents
+public class MedKitEquipment : InputWeaponComponent, IEquipmentEvents, IInputHints
 {
 	[Property] [Group( "Effects" )] private SoundEvent? HealSound { get; set; }
 	[Property] [Group( "Effects" )] private SoundEvent? ReviveSound { get; set; }
@@ -19,6 +19,12 @@ public class MedKitEquipment : InputWeaponComponent, IEquipmentEvents
 	private Guid? _cachedDeadBodyId;
 	private Vector3 _cachedDeadBodyStartPosition;
 
+
+	IEnumerable<(string Action, string Label)> IInputHints.GetInputHints()
+	{
+		yield return ("attack1", "#input.medkit.heal_revive");
+		yield return ("attack2", "#input.medkit.heal_self");
+	}
 
 	protected override void OnInput()
 	{

@@ -4,11 +4,16 @@ using System;
 
 namespace Dxura.RP.Game.Equipments;
 
-public class FiberWireEquipment : InputWeaponComponent, IEquipmentEvents
+public class FiberWireEquipment : InputWeaponComponent, IEquipmentEvents, IInputHints
 {
 	[Property] [Group( "Effects" )] private SoundEvent? SnapSound { get; set; }
 	[Property] [Group( "Effects" )] private SoundEvent? SnapMissSound { get; set; }
 
+
+	IEnumerable<(string Action, string Label)> IInputHints.GetInputHints()
+	{
+		yield return ("attack1", "#input.fiber_wire.snap_neck");
+	}
 
 	protected override void OnInputDown()
 	{

@@ -43,7 +43,8 @@ Exports/*
 mono_crash.*
 
 # Build results
-[Dd]ebug/
+[Dd]ebug/[Bb]in/
+[Dd]ebug/[Oo]bj/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
@@ -472,3 +473,6 @@ game/Code/rpdev.csproj
 game/Editor/rpdev.editor.csproj
 
 game/rpdev.slnx
+game/Code/rp.csproj
+game/Editor/rp.editor.csproj
+game/rp.slnx

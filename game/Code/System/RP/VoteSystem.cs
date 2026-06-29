@@ -421,6 +421,12 @@ public class VoteSystem : SingletonComponent<VoteSystem>, IGameEvents
 			return;
 		}
 
+		// Target cannot vote on their own vote
+		if ( voteInfo.TargetId.HasValue && voter.SteamId == voteInfo.TargetId.Value )
+		{
+			return;
+		}
+
 		// Check if player has already voted
 		var voteKey = $"{voteId}:{voter.SteamId}";
 		if ( PlayerVoteRecords.TryGetValue( voteKey, out var previousVote ) )

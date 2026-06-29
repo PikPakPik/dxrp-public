@@ -4,7 +4,7 @@ using System;
 
 namespace Dxura.RP.Game.Equipments;
 
-public class PryBarEquipment : InputWeaponComponent, IEquipmentEvents
+public class PryBarEquipment : InputWeaponComponent, IEquipmentEvents, IInputHints
 {
 	[Property] [Group( "Effects" )] private SoundEvent? PryingSound { get; set; }
 
@@ -22,6 +22,11 @@ public class PryBarEquipment : InputWeaponComponent, IEquipmentEvents
 
 	private string _targetName = "";
 	private float _localPryStartTime;
+
+	IEnumerable<(string Action, string Label)> IInputHints.GetInputHints()
+	{
+		yield return ("attack1", "#input.pry_bar.pry");
+	}
 
 	protected override void OnInputDown()
 	{

@@ -6,6 +6,11 @@ MarketTabMenuSection {
   width: 100%;
   height: 100%;
 
+  i.material-icons,
+  .material-icons {
+    font-family: Material Icons;
+  }
+
   .market {
     display: flex;
     flex-direction: column;
@@ -34,7 +39,7 @@ MarketTabMenuSection {
     font-size: $text-sm;
     color: $color-gray-400;
     transition: all 0.15s ease;
-    i { font-size: $text-base; }
+    i { font-size: $text-lg; }
 
     &:hover {
       color: $color-tertiary;
@@ -49,8 +54,8 @@ MarketTabMenuSection {
   .market-scroll {
     display: flex;
     flex-direction: column;
-    gap: $space-5;
-    overflow-y: scroll;
+    gap: $space-4;
+    overflow-y: auto;
     overflow-x: hidden;
     flex-grow: 1;
     padding: 0;
@@ -62,15 +67,37 @@ MarketTabMenuSection {
     flex-direction: column;
     gap: $space-3;
     flex-shrink: 0;
+
+    &.collapsed {
+      gap: 0;
+    }
   }
 
   .category-bar {
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: $space-2;
+    padding: $space-2 $space-3;
+    background-color: rgba($color-secondary, 0.6);
+    border-radius: $space-1;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+
+    &:hover {
+      filter: brightness(1.08);
+    }
+  }
+
+  .category-toggle-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    text-transform: none;
+    color: $color-gray-400;
   }
 
   .category-name {
+    flex-grow: 1;
     font-size: $text-base;
     font-weight: 600;
     color: $color-accent;
@@ -78,9 +105,10 @@ MarketTabMenuSection {
   }
 
   .category-count {
+    flex-shrink: 0;
     font-size: $text-xs;
     color: $color-gray-400;
-    background-color: $color-secondary;
+    background-color: rgba(black, 0.25);
     padding: 2px $space-2;
     border-radius: $space-3;
   }
@@ -97,11 +125,12 @@ MarketTabMenuSection {
   // Card
   .entity-card {
     display: flex;
-    width: 150px;
-    min-width: 150px;
-    height: 90px;
+    flex-direction: row;
+    align-items: stretch;
+    width: 165px;
+    min-width: 165px;
+    height: 105px;
     flex-shrink: 0;
-    overflow: hidden;
     cursor: pointer;
     border-radius: $space-2;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -124,9 +153,9 @@ MarketTabMenuSection {
 
   // Entity color as a subtle tinted layer
   .card-chip {
-    width: 8px;
-    min-width: 8px;
-    height: 100%;
+    width: 10px;
+    min-width: 10px;
+    align-self: stretch;
     flex-shrink: 0;
   }
 
@@ -146,7 +175,7 @@ MarketTabMenuSection {
     right: $space-2;
 
     i {
-      font-size: $text-sm;
+      font-size: $text-lg;
       color: white;
       opacity: 0.4;
     }
@@ -159,14 +188,20 @@ MarketTabMenuSection {
   }
 
   .card-name {
-    font-size: $text-sm;
+    font-size: $text-base;
     font-weight: 700;
     color: white;
+    line-height: 1.3;
+    white-space: normal;
+    overflow: visible;
   }
 
   .card-limit {
-    font-size: $text-xs;
+    font-size: $text-sm;
     color: $color-gray-400;
+    line-height: 1.3;
+    white-space: normal;
+    overflow: visible;
   }
 
   .card-bottom {
@@ -176,7 +211,7 @@ MarketTabMenuSection {
   }
 
   .card-price {
-    font-size: $text-base;
+    font-size: $text-lg;
     font-weight: 700;
     color: #54be35;
   }

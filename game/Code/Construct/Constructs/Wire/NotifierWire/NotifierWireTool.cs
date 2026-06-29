@@ -44,4 +44,16 @@ public class NotifierWireTool() : BaseConstructTool<NotifierWireData>( Construct
 			IgnoreFalsyValue = value
 		};
 	}
+
+	[Property]
+	[Title( "#tool.wire.notifier.chime" )]
+	[Description( "#tool.wire.notifier.chime.description" )]
+	public NotifierWireChime Chime
+	{
+		get => Data.Chime;
+		set => Data = Data with
+		{
+			Chime = value
+		};
+	}
 }

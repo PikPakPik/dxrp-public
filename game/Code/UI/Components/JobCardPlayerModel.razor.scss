@@ -1,0 +1,58 @@
+@import "../styles.scss";
+
+JobCardPlayerModel {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  pointer-events: none;
+
+  .model-shell {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: rgba($color-secondary, 0.85);
+  }
+
+  .model-image,
+  Image {
+    width: 100%;
+    height: 100%;
+  }
+
+  &.current-job-badge {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .current-badge-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid rgba(white, 0.2);
+    padding: 3px;
+    background-color: rgba($color-primary, 0.95);
+  }
+
+  .current-badge-fill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+
+    .material-icons {
+      font-family: Material Icons;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+      color: rgba(black, 0.82);
+      text-transform: none;
+    }
+  }
+}

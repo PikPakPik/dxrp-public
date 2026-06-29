@@ -6,17 +6,21 @@ public static class GameModeJobs
 {
 	private static readonly Dictionary<string, GameModeJobDto> PlaceholderJobs = new( StringComparer.OrdinalIgnoreCase );
 
-	public static IReadOnlyList<GameModeJobDto> All => Config.Current.GameMode.Jobs;
-	public static IReadOnlyList<GameModeJobGroupDto> AllGroups => Config.Current.GameMode.JobGroups;
+	public static IReadOnlyList<GameModeJobDto> All => Config.Current.GameMode?.Jobs ?? [];
+	public static IReadOnlyList<GameModeJobGroupDto> AllGroups => Config.Current.GameMode?.JobGroups ?? [];
 
 	public static GameModeJobDto Default
 	{
 		get
 		{
 			var gm = Config.Current.GameMode;
-			return FindById( gm.DefaultJobId )
-				?? gm.Jobs.FirstOrDefault()
-				?? GetByNameOrFallback( "Default" );
+			if ( gm != null )
+			{
+				var job = FindById( gm.DefaultJobId ) ?? gm.Jobs?.FirstOrDefault();
+				if ( job != null ) return job;
+			}
+
+			return GetByNameOrFallback( "Default" );
 		}
 	}
 

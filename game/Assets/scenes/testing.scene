@@ -317,6 +317,7 @@
                   "__enabled": true,
                   "Flags": 0,
                   "__version": 2,
+                  "Billboard": "None",
                   "BlendMode": "Normal",
                   "FogStrength": 1,
                   "HorizontalAlignment": "Center",
@@ -789,6 +790,7 @@
                   "__enabled": true,
                   "Flags": 0,
                   "__version": 2,
+                  "Billboard": "None",
                   "BlendMode": "Normal",
                   "FogStrength": 1,
                   "HorizontalAlignment": "Center",
@@ -933,6 +935,7 @@
                   "__enabled": true,
                   "Flags": 0,
                   "__version": 2,
+                  "Billboard": "None",
                   "BlendMode": "Normal",
                   "FogStrength": 1,
                   "HorizontalAlignment": "Center",
@@ -1077,6 +1080,7 @@
                   "__enabled": true,
                   "Flags": 0,
                   "__version": 2,
+                  "Billboard": "None",
                   "BlendMode": "Normal",
                   "FogStrength": 1,
                   "HorizontalAlignment": "Center",
@@ -1267,6 +1271,7 @@
                   "__enabled": true,
                   "Flags": 0,
                   "__version": 2,
+                  "Billboard": "None",
                   "BlendMode": "Normal",
                   "FogStrength": 1,
                   "HorizontalAlignment": "Center",
@@ -1411,6 +1416,7 @@
                   "__enabled": true,
                   "Flags": 0,
                   "__version": 2,
+                  "Billboard": "None",
                   "BlendMode": "Normal",
                   "FogStrength": 1,
                   "HorizontalAlignment": "Center",
@@ -9156,6 +9162,7 @@
                   "__enabled": true,
                   "Flags": 0,
                   "__version": 2,
+                  "Billboard": "None",
                   "BlendMode": "Normal",
                   "FogStrength": 1,
                   "HorizontalAlignment": "Center",
@@ -10148,6 +10155,7 @@
               "__enabled": true,
               "Flags": 0,
               "__version": 2,
+              "Billboard": "None",
               "BlendMode": "Normal",
               "FogStrength": 1,
               "HorizontalAlignment": "Center",
@@ -10279,6 +10287,7 @@
               "__guid": "ed1f00f1-80fa-4e06-a25a-82c5c9bac013",
               "__enabled": true,
               "Flags": 0,
+              "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
               "LightColor": "1,1,1,1",
@@ -10325,7 +10334,7 @@
             "Property": "LastRepairTime",
             "Value": {
               "Absolute": 0,
-              "Relative": 316.65173
+              "Relative": 5744.8555
             }
           }
         ],
@@ -11325,7 +11334,8 @@
         "398e2386-f98d-4e95-be8e-6979982663f0": "4911ac33-400c-4b2d-9c32-a1fd7cfacd0f",
         "b96314ce-bdcb-4df2-a7ac-2adc6f5630dd": "7b5b9224-ee16-44d6-8629-f55ec198d20f",
         "56c35e76-ca69-4255-af67-5266c7f00444": "02296eb0-e616-48c6-ba78-b18ddc10b41c",
-        "7ad69bd7-082e-4e3d-9517-991ff861b8cf": "34af63ff-5b72-441f-bef1-11603bba2f11"
+        "7ad69bd7-082e-4e3d-9517-991ff861b8cf": "34af63ff-5b72-441f-bef1-11603bba2f11",
+        "c4a8e1f2-3b6d-4a9e-8f1c-2d5e7a9b0c3d": "6bc58d12-e1d0-8f4f-8ef8-597fc760ba9b"
       }
     },
     {
@@ -11406,14 +11416,7 @@
         "MovedObjects": []
       },
       "__PrefabIdToInstanceId": {
-        "1d238c76-04ec-4a1d-9583-c46f0647c27f": "0070b0ed-c925-44e5-8699-d7d8467835d3",
-        "2991993e-1f12-4562-9dee-baf5b932f09e": "b3bab9c1-5041-4da2-97f2-d2fd84536af4",
-        "f98bc092-8788-4954-9d09-2648285ad48d": "b6ed5bd6-b4bd-404a-9b21-c4c7fed8590b",
-        "8a0a3b15-da28-4b21-90ee-4cbaae20cc40": "e7d57754-396f-4a47-b447-ce9c2d22a96c",
-        "e16ecaeb-8b4e-43c3-a470-21743bb194c1": "1f491318-7441-4216-a6fd-7810f1d8e715",
-        "d8ad0918-3af6-467f-b3a4-2a07de7e7d95": "aeb82de2-9d09-49e2-b988-fd6edf1fd982",
-        "cc79b255-c065-46cb-b40c-440c54e44abc": "d4b0b313-fe19-4e29-b8a3-084eb7b77936",
-        "7570b657-4025-42ae-9f71-e8a2241aa8ae": "ad0800c2-ab2a-4a3e-bea9-d5c5f694c459"
+        "f92b2c24-01dc-4f80-a617-d005409ddf17": "bf5e886e-3a48-87db-bec4-0607c5e74dcf"
       }
     },
     {
@@ -11444,14 +11447,7 @@
         "MovedObjects": []
       },
       "__PrefabIdToInstanceId": {
-        "1d238c76-04ec-4a1d-9583-c46f0647c27f": "dbd2b4e9-d44b-447e-9d75-b816b9684c23",
-        "fee6d0f5-077c-4d6d-a521-51501ab05fbd": "302c407d-1338-4afa-bd2f-2f84c073c9a2",
-        "f98bc092-8788-4954-9d09-2648285ad48d": "afa2dcca-c1d8-4e66-b331-38dc245acd74",
-        "8a0a3b15-da28-4b21-90ee-4cbaae20cc40": "89fb99f4-c47f-497f-a887-2f8773c33529",
-        "e16ecaeb-8b4e-43c3-a470-21743bb194c1": "f3fda558-d578-4f39-8ade-e7bc9e1f3324",
-        "4d2120ac-7a22-4d91-adbd-6b94d64f8f71": "b1108a09-9fa1-4504-a53f-fe88dd73c1f8",
-        "1577f844-10d0-4cc5-9cac-d85bc6ddc424": "8ffe2e76-2fd6-41d8-b34c-adb11851f490",
-        "69f5ec91-985a-4f13-ad62-0a85f6c6524c": "56972993-e289-4b17-bced-165f2671073e"
+        "68b58e46-a054-4115-8d4f-31b8a87a44e5": "24d24de0-6be6-8cc0-813e-9e49a0d63d48"
       }
     },
     {
@@ -11482,15 +11478,7 @@
         "MovedObjects": []
       },
       "__PrefabIdToInstanceId": {
-        "62fe86a0-f154-4344-ba7c-96e01b66863a": "e8a5a3e4-ca12-4730-a5d2-f266b0b7aa9d",
-        "c0d5c28c-9e89-4c85-9035-ab3f775cb89a": "fed3c38b-a42b-49b1-b394-a8a2d71f8e02",
-        "bc3e07fc-a636-440f-94f6-b5bec552c34e": "35a26cb1-83db-4b2e-9822-9b5291de96cd",
-        "3f574e3e-1c0b-49ae-b5c8-3a2d2891c66a": "fe6cb02d-7a2e-400b-92df-426e1fea9478",
-        "665843dc-c4e3-4e0d-8062-3937e4bcca0c": "d478c13e-9e50-4d72-9869-3735b7020734",
-        "e4bc34a2-d14d-4b21-8b64-eea16d822bae": "f688387d-8fd1-460b-9e95-ff1755eece10",
-        "1cceb205-b993-4f1a-b674-5974a183d629": "082e7caf-0055-4ba2-9285-bd3402214fa6",
-        "bf741592-f9e3-4720-9e2d-4de9e550ac92": "938f95d8-269e-4a98-8847-7927b984acb9",
-        "e598a17b-5bd6-48a0-83bb-746234253bd9": "606ae2e2-cdb3-4cca-bfad-cc7e1b3a7f71"
+        "5ba131f8-29b3-4376-8ef9-1026ca6710e9": "c9bb6cc0-919a-8a02-af63-55a0527e4f2b"
       }
     },
     {
@@ -11673,6 +11661,7 @@
               "__enabled": true,
               "Flags": 0,
               "__version": 2,
+              "Billboard": "None",
               "BlendMode": "Normal",
               "FogStrength": 1,
               "HorizontalAlignment": "Center",
@@ -12452,8 +12441,8 @@
             "Property": "TimeUntilDestroy",
             "Value": {
               "Absolute": 0,
-              "Relative": -316.65173,
-              "Passed": 316.65173,
+              "Relative": -5744.8555,
+              "Passed": 5744.8555,
               "Fraction": 1
             }
           }
@@ -17772,6 +17761,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -17939,6 +17929,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -18106,6 +18097,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -18273,6 +18265,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -18440,6 +18433,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -18607,6 +18601,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -18774,6 +18769,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -18941,6 +18937,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -19108,6 +19105,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -19275,6 +19273,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -19442,6 +19441,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -19609,6 +19609,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -19776,6 +19777,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -19943,6 +19945,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -21807,6 +21810,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -21974,6 +21978,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -22419,6 +22424,7 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 2,
+          "Billboard": "None",
           "BlendMode": "Normal",
           "FogStrength": 1,
           "HorizontalAlignment": "Center",
@@ -23768,7 +23774,7 @@
           {
             "Id": {
               "Type": "GameObject",
-              "IdValue": "86420ef0-6834-4a83-82bc-b3ee483e22d7"
+              "IdValue": "959181a9-fe44-400c-90cf-e506d0d5d5db"
             },
             "Parent": {
               "Type": "GameObject",
@@ -23781,7 +23787,7 @@
             "ContainerProperty": "Children",
             "IsContainerArray": true,
             "Data": {
-              "__guid": "86420ef0-6834-4a83-82bc-b3ee483e22d7",
+              "__guid": "959181a9-fe44-400c-90cf-e506d0d5d5db",
               "__version": 2,
               "Flags": 0,
               "Name": "Clothing - flatcap",
@@ -23802,18 +23808,18 @@
           {
             "Id": {
               "Type": "Component",
-              "IdValue": "f1533cca-1212-4ef8-9332-946fbaac1dcd"
+              "IdValue": "cb80e454-060c-45d1-be91-a57b82b50587"
             },
             "Parent": {
               "Type": "GameObject",
-              "IdValue": "86420ef0-6834-4a83-82bc-b3ee483e22d7"
+              "IdValue": "959181a9-fe44-400c-90cf-e506d0d5d5db"
             },
             "PreviousElement": null,
             "ContainerProperty": "Components",
             "IsContainerArray": true,
             "Data": {
               "__type": "Sandbox.SkinnedModelRenderer",
-              "__guid": "f1533cca-1212-4ef8-9332-946fbaac1dcd",
+              "__guid": "cb80e454-060c-45d1-be91-a57b82b50587",
               "__enabled": true,
               "Flags": 0,
               "AnimationGraph": null,
@@ -23865,7 +23871,7 @@
           {
             "Id": {
               "Type": "GameObject",
-              "IdValue": "d85d561a-8c6f-4fa4-b31b-9528b3673343"
+              "IdValue": "8241b981-b883-40e3-8372-ff77c280ebd6"
             },
             "Parent": {
               "Type": "GameObject",
@@ -23873,12 +23879,12 @@
             },
             "PreviousElement": {
               "Type": "GameObject",
-              "IdValue": "86420ef0-6834-4a83-82bc-b3ee483e22d7"
+              "IdValue": "959181a9-fe44-400c-90cf-e506d0d5d5db"
             },
             "ContainerProperty": "Children",
             "IsContainerArray": true,
             "Data": {
-              "__guid": "d85d561a-8c6f-4fa4-b31b-9528b3673343",
+              "__guid": "8241b981-b883-40e3-8372-ff77c280ebd6",
               "__version": 2,
               "Flags": 0,
               "Name": "Clothing - boxing_shorts",
@@ -23899,18 +23905,18 @@
           {
             "Id": {
               "Type": "Component",
-              "IdValue": "c0fb5a77-3cde-4ccd-a7a7-6d37d4975206"
+              "IdValue": "e85b0696-8b00-4959-9e93-8cb50172f727"
             },
             "Parent": {
               "Type": "GameObject",
-              "IdValue": "d85d561a-8c6f-4fa4-b31b-9528b3673343"
+              "IdValue": "8241b981-b883-40e3-8372-ff77c280ebd6"
             },
             "PreviousElement": null,
             "ContainerProperty": "Components",
             "IsContainerArray": true,
             "Data": {
               "__type": "Sandbox.SkinnedModelRenderer",
-              "__guid": "c0fb5a77-3cde-4ccd-a7a7-6d37d4975206",
+              "__guid": "e85b0696-8b00-4959-9e93-8cb50172f727",
               "__enabled": true,
               "Flags": 0,
               "AnimationGraph": null,
@@ -23962,7 +23968,7 @@
           {
             "Id": {
               "Type": "GameObject",
-              "IdValue": "28a745a3-e903-4766-9544-5adaea0c331b"
+              "IdValue": "f404aa3b-d465-4409-98bc-cc03217eefa0"
             },
             "Parent": {
               "Type": "GameObject",
@@ -23970,12 +23976,12 @@
             },
             "PreviousElement": {
               "Type": "GameObject",
-              "IdValue": "d85d561a-8c6f-4fa4-b31b-9528b3673343"
+              "IdValue": "8241b981-b883-40e3-8372-ff77c280ebd6"
             },
             "ContainerProperty": "Children",
             "IsContainerArray": true,
             "Data": {
-              "__guid": "28a745a3-e903-4766-9544-5adaea0c331b",
+              "__guid": "f404aa3b-d465-4409-98bc-cc03217eefa0",
               "__version": 2,
               "Flags": 0,
               "Name": "Clothing - tshirt",
@@ -23996,18 +24002,18 @@
           {
             "Id": {
               "Type": "Component",
-              "IdValue": "692c6959-d852-40ac-a5af-06024474a371"
+              "IdValue": "10ea1a46-17e6-4582-b942-41678ed77449"
             },
             "Parent": {
               "Type": "GameObject",
-              "IdValue": "28a745a3-e903-4766-9544-5adaea0c331b"
+              "IdValue": "f404aa3b-d465-4409-98bc-cc03217eefa0"
             },
             "PreviousElement": null,
             "ContainerProperty": "Components",
             "IsContainerArray": true,
             "Data": {
               "__type": "Sandbox.SkinnedModelRenderer",
-              "__guid": "692c6959-d852-40ac-a5af-06024474a371",
+              "__guid": "10ea1a46-17e6-4582-b942-41678ed77449",
               "__enabled": true,
               "Flags": 0,
               "AnimationGraph": null,
@@ -24059,7 +24065,7 @@
           {
             "Id": {
               "Type": "GameObject",
-              "IdValue": "0305b112-23e0-4396-a99f-1dae5eed31a5"
+              "IdValue": "381a1da9-065a-4885-b8d1-57ff8921623d"
             },
             "Parent": {
               "Type": "GameObject",
@@ -24067,12 +24073,12 @@
             },
             "PreviousElement": {
               "Type": "GameObject",
-              "IdValue": "28a745a3-e903-4766-9544-5adaea0c331b"
+              "IdValue": "f404aa3b-d465-4409-98bc-cc03217eefa0"
             },
             "ContainerProperty": "Children",
             "IsContainerArray": true,
             "Data": {
-              "__guid": "0305b112-23e0-4396-a99f-1dae5eed31a5",
+              "__guid": "381a1da9-065a-4885-b8d1-57ff8921623d",
               "__version": 2,
               "Flags": 0,
               "Name": "Clothing - black_boots",
@@ -24093,18 +24099,18 @@
           {
             "Id": {
               "Type": "Component",
-              "IdValue": "4a49486f-efe3-4f3d-8a9a-a0683f27f7a6"
+              "IdValue": "5a2f392a-e5db-40c4-92f1-ad317ada8ff7"
             },
             "Parent": {
               "Type": "GameObject",
-              "IdValue": "0305b112-23e0-4396-a99f-1dae5eed31a5"
+              "IdValue": "381a1da9-065a-4885-b8d1-57ff8921623d"
             },
             "PreviousElement": null,
             "ContainerProperty": "Components",
             "IsContainerArray": true,
             "Data": {
               "__type": "Sandbox.SkinnedModelRenderer",
-              "__guid": "4a49486f-efe3-4f3d-8a9a-a0683f27f7a6",
+              "__guid": "5a2f392a-e5db-40c4-92f1-ad317ada8ff7",
               "__enabled": true,
               "Flags": 0,
               "AnimationGraph": null,
@@ -24156,7 +24162,7 @@
           {
             "Id": {
               "Type": "GameObject",
-              "IdValue": "5fa3b884-82b7-4e59-b714-06c4217cee58"
+              "IdValue": "e9275358-bf04-41d9-b8dc-d3e4be0c5174"
             },
             "Parent": {
               "Type": "GameObject",
@@ -24164,12 +24170,12 @@
             },
             "PreviousElement": {
               "Type": "GameObject",
-              "IdValue": "0305b112-23e0-4396-a99f-1dae5eed31a5"
+              "IdValue": "381a1da9-065a-4885-b8d1-57ff8921623d"
             },
             "ContainerProperty": "Children",
             "IsContainerArray": true,
             "Data": {
-              "__guid": "5fa3b884-82b7-4e59-b714-06c4217cee58",
+              "__guid": "e9275358-bf04-41d9-b8dc-d3e4be0c5174",
               "__version": 2,
               "Flags": 0,
               "Name": "Clothing - cardigan_colored",
@@ -24190,18 +24196,18 @@
           {
             "Id": {
               "Type": "Component",
-              "IdValue": "2a01ef90-1961-4675-ba3f-194f30529d1f"
+              "IdValue": "1853daa5-576e-47cd-b0a1-8f669d531bb2"
             },
             "Parent": {
               "Type": "GameObject",
-              "IdValue": "5fa3b884-82b7-4e59-b714-06c4217cee58"
+              "IdValue": "e9275358-bf04-41d9-b8dc-d3e4be0c5174"
             },
             "PreviousElement": null,
             "ContainerProperty": "Components",
             "IsContainerArray": true,
             "Data": {
               "__type": "Sandbox.SkinnedModelRenderer",
-              "__guid": "2a01ef90-1961-4675-ba3f-194f30529d1f",
+              "__guid": "1853daa5-576e-47cd-b0a1-8f669d531bb2",
               "__enabled": true,
               "Flags": 0,
               "AnimationGraph": null,
@@ -24253,7 +24259,7 @@
           {
             "Id": {
               "Type": "GameObject",
-              "IdValue": "b102840b-eebf-45d5-a62e-304037fa4fdd"
+              "IdValue": "cc50cfe8-7727-4d71-a425-5e7e16845d1b"
             },
             "Parent": {
               "Type": "GameObject",
@@ -24261,12 +24267,12 @@
             },
             "PreviousElement": {
               "Type": "GameObject",
-              "IdValue": "5fa3b884-82b7-4e59-b714-06c4217cee58"
+              "IdValue": "e9275358-bf04-41d9-b8dc-d3e4be0c5174"
             },
             "ContainerProperty": "Children",
             "IsContainerArray": true,
             "Data": {
-              "__guid": "b102840b-eebf-45d5-a62e-304037fa4fdd",
+              "__guid": "cc50cfe8-7727-4d71-a425-5e7e16845d1b",
               "__version": 2,
               "Flags": 0,
               "Name": "Clothing - mutton_chops",
@@ -24287,18 +24293,18 @@
           {
             "Id": {
               "Type": "Component",
-              "IdValue": "8624d494-a446-42c8-94ee-3ceceec2d382"
+              "IdValue": "f96cfcbb-af54-4536-b7b4-eab016fe039b"
             },
             "Parent": {
               "Type": "GameObject",
-              "IdValue": "b102840b-eebf-45d5-a62e-304037fa4fdd"
+              "IdValue": "cc50cfe8-7727-4d71-a425-5e7e16845d1b"
             },
             "PreviousElement": null,
             "ContainerProperty": "Components",
             "IsContainerArray": true,
             "Data": {
               "__type": "Sandbox.SkinnedModelRenderer",
-              "__guid": "8624d494-a446-42c8-94ee-3ceceec2d382",
+              "__guid": "f96cfcbb-af54-4536-b7b4-eab016fe039b",
               "__enabled": true,
               "Flags": 0,
               "AnimationGraph": null,
@@ -24380,7 +24386,7 @@
               "IdValue": "a158f964-10c8-4af8-804b-6cb1bfe2ebb4"
             },
             "Property": "BodyGroups",
-            "Value": 129
+            "Value": 1025
           },
           {
             "Target": {
@@ -24586,7 +24592,7 @@
       "OwnerTransfer": 1,
       "Components": [
         {
-          "__type": "Dxura.RP.Game.DebugDupe",
+          "__type": "Dxura.RP.Game.DebugDupeSpawner",
           "__guid": "6080b00e-5a2f-49c6-82fe-fdd4a16f65ca",
           "__enabled": true,
           "Flags": 0,
@@ -25165,6 +25171,22 @@
             },
             "Property": "Position",
             "Value": "-916.40979,-461.704712,0"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "JobIdentifier",
+            "Value": "391f2322-47d8-59fa-825f-5df8eefab2d6"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "Type",
+            "Value": "Job"
           }
         ],
         "MovedObjects": []
@@ -25197,6 +25219,22 @@
             },
             "Property": "Position",
             "Value": "-882.018616,-696.557617,0"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "JobIdentifier",
+            "Value": "33be9d80-92aa-586b-8ee6-1b1beaed3dc9"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "Type",
+            "Value": "Job"
           }
         ],
         "MovedObjects": []
@@ -25229,6 +25267,24 @@
             },
             "Property": "Position",
             "Value": "-860.065979,-696.557617,0"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "Tags",
+            "Value": [
+              "jail"
+            ]
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "Type",
+            "Value": "Tag"
           }
         ],
         "MovedObjects": []
@@ -25269,6 +25325,22 @@
             },
             "Property": "Rotation",
             "Value": "0,0,0.999859571,-0.0167536493"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "GroupIdentifier",
+            "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "Type",
+            "Value": "JobGroup"
           }
         ],
         "MovedObjects": []
@@ -25309,6 +25381,22 @@
             },
             "Property": "Rotation",
             "Value": "0,0,0.707106829,0.707106829"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "GroupIdentifier",
+            "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "Type",
+            "Value": "JobGroup"
           }
         ],
         "MovedObjects": []
@@ -25349,6 +25437,22 @@
             },
             "Property": "Rotation",
             "Value": "0,-0,-0.707106829,0.707106829"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "GroupIdentifier",
+            "Value": "01d6d82b-594e-5ad4-805e-4d33e79173ad"
+          },
+          {
+            "Target": {
+              "Type": "Component",
+              "IdValue": "c9dc349f-c586-43cd-84a2-d8b0d2724fd5"
+            },
+            "Property": "Type",
+            "Value": "JobGroup"
           }
         ],
         "MovedObjects": []
@@ -25806,6 +25910,7 @@
               "__enabled": true,
               "Flags": 0,
               "__version": 2,
+              "Billboard": "None",
               "BlendMode": "Normal",
               "FogStrength": 1,
               "HorizontalAlignment": "Center",
@@ -26376,31 +26481,44 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
-      "Sandbox.SelectionSetsSystem": {
-        "Data": {
-          "SelectionSets": []
+      "Dxura.RP.Game.Config": {
+        "GameMode": {
+          "Id": "00000000-0000-0000-0000-000000000000",
+          "Name": "Default",
+          "Description": null,
+          "Visibility": "Private",
+          "DefaultJobId": "00000000-0000-0000-0000-000000000000",
+          "StartingBalance": 0,
+          "DefaultEquipmentIds": [],
+          "Addons": [],
+          "Equipments": [],
+          "Entities": [],
+          "MarketItems": [],
+          "Jobs": [],
+          "JobGroups": [],
+          "Created": "0001-01-01T00:00:00+00:00",
+          "LastModified": "0001-01-01T00:00:00+00:00"
         }
+      },
+      "Dxura.RP.Game.Governance": {
+        "Prisoners": {}
+      },
+      "Dxura.RP.Game.ServerApiLink": {
+        "RulesetId": null,
+        "TenantId": ""
+      },
+      "Dxura.RP.Game.Wire.Wire": {
+        "Connections": []
       },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "64a7bcdf-b706-440e-98bb-b58ff65fa13f"
         }
       },
-      "Dxura.RP.Game.ServerApiLink": {
-        "TenantId": "",
-        "ServerId": "00000000-0000-0000-0000-000000000000"
-      },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
-      },
-      "Dxura.RP.Game.Wire.Wire": {
-        "Connections": []
-      },
-      "Dxura.RP.Game.Config": {
-        "IsReady": false
-      },
-      "Dxura.RP.Game.Governance": {
-        "Prisoners": {}
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
+        }
       }
     }
   },
