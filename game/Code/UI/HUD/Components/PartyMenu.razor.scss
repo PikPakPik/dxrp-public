@@ -294,16 +294,35 @@ PartyMenu {
     margin-top: 4px;
   }
 
-  // Roster row: the same PartyMemberCard the HUD shows, with the leader's inline kick button pinned
-  // to the right (per Dimmer — drop the Admin tab, conditionally show kick on the member list for the
-  // owner). Self never shows a button; you leave/disband instead of kicking yourself.
+  // Roster row: card + kick sit on one line; the card flexes within the pane and the icon button stays
+  // a fixed square to its right (never adds extra column width or floats outside the row).
   .member-row {
-    gap: 8px;
+    width: 100%;
+    gap: 0;
     padding: 1px 0;
+    align-items: stretch;
+
+    PartyMemberCard {
+      flex-grow: 1;
+      flex-shrink: 1;
+      min-width: 0;
+      width: 0;
+    }
   }
 
+  // Fixed-width action column reserved on EVERY row (filled with the kick button for other members,
+  // left empty for self). Holding the same width on all rows keeps each PartyMemberCard identical in
+  // width so the health/armor bars line up across the roster. Wider than the 28px button + center
+  // alignment so the kick button sits centered in the space to the right of the card, not jammed
+  // against the window edge.
   .member-actions {
+    width: 60px;
+    flex-grow: 0;
     flex-shrink: 0;
+    align-self: center;
+    // Shifted toward the right of the reserved column (not dead-center) per Dimmer's spacing.
+    justify-content: flex-end;
+    padding-right: 8px;
   }
 
   // Compact, icon-only kick button — square hit target, red-tinted on hover.

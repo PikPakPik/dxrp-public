@@ -193,17 +193,19 @@
 									var memberId = member.Id;
 									<div class="member-row flex flex-row items-center gap-2">
 										<PartyMemberCard Player=@memberPlayer IsLeader=@member.IsLeader AccentColor=@AccentColor/>
-										@if ( isLeader && !IsSelf( memberId ) )
-										{
-											<div class="flex-grow"></div>
-											<div class="member-actions flex flex-row gap-1">
+										@* Action column reserved on EVERY row (kick for other members, empty for self) so every
+										   card flexes to the same width and the health/armor bars line up across the roster. No
+										   extra flex-grow spacer — the card already grows to fill the space left of this column. *@
+										<div class="member-actions flex flex-row gap-1">
+											@if ( isLeader && !IsSelf( memberId ) )
+											{
 												<div class="action-btn kick flex flex-row items-center justify-center"
 												     tooltip="@Language.GetPhrase( "party.kick_tooltip" )"
 												     onclick="@(() => OnKick( memberId ))">
 													<i class="material-icons">person_remove</i>
 												</div>
-											</div>
-										}
+											}
+										</div>
 									</div>
 								}
 							</div>

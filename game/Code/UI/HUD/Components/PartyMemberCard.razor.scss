@@ -3,8 +3,11 @@
 PartyMemberCard {
   pointer-events: none;
   flex-direction: column;
-  // Floor width only — the card grows to fit the full player name and never truncates it. The PartyHud
-  // column uses align-items:stretch so the header + every card all match the WIDEST card's width.
+  // Stretch the rows to the full card width so the bottom job row lines up with the right edge of the
+  // health/armor bars in the top row, instead of collapsing to its own (shorter) content width.
+  align-items: stretch;
+  // Floor width only. In the /party menu the row override (width:0 + flex-grow + a fixed action column
+  // reserved on every row) sizes every card identically; in the HUD the column matches the widest card.
   min-width: 232px;
   background-color: rgba($color-primary, 0.92);
   border-radius: $rounding;

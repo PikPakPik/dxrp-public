@@ -2,33 +2,30 @@
 
 PartyHud {
   position: absolute;
-  // Dimmer's marked spot: under the Frame tool panel and to the RIGHT of the printer Waila panel. This
-  // is the STARTING position only — the panel is draggable, so the player can move it anywhere from here
-  // and the offset persists (DraggablePanel StorageKey="party-hud").
   top: 15%;
   left: 10%;
-  // Above the display-only panels (Waila / CurrentToolOverlay are z:auto) so the header reliably
-  // hit-tests to us (for dragging + the collapse chevron) instead of an overlapping panel.
-  z-index: 500;
+  // Sit just under AdminTickets (999000) so the always-on bar is above the canvas + HUD
+  // overlays and actually receives clicks/drag. At z 500 the canvas layer swallowed them.
+  z-index: 998000;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  // NOTE: do NOT set `pointer-events: none` on this root. The shared HUD root (HUD.razor) already gates
-  // the whole HUD — `none` until the cursor is unlocked (alt held / a cursor request), then `all`. A
-  // `pointer-events: none` ANCESTOR disables its entire subtree, which would kill both dragging and the
-  // chevron. AdminTickets (a clickable, draggable always-on HUD) sets none here either — we follow it.
+  // No pointer-events override: like AdminTickets, the bar is interactive only when the HUD root
+  // unlocks the cursor (hold Alt / "Mouse"). That gates BOTH the drag and the collapse toggle.
 
-  // The header bar is the DraggablePanel drag handle (it carries the .draggable-handle class too, which
-  // adds cursor:move). The handle + member list stack vertically and stretch to the widest card.
-  .party-header {
-    min-width: 232px; // floor; stretches to match the widest member card so names show in full
-    padding: 2px 8px 2px 7px; // slim vertical height for the drag/dropdown bar
-    margin-bottom: 3px;
+  .party-hud-panel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  // Retracted HUD — same accordion affordance as MarketTabMenuSection .category-bar (icon, label, chevron).
+  .party-header-bar {
+    padding: 0;
+    min-height: 32px;
     background-color: rgba($color-primary, 0.92);
     border-radius: $rounding;
-    pointer-events: all; // grab anywhere on the bar to drag
-    cursor: move; // 4-way drag affordance — matches the admin-ticket header. The DraggablePanel handle
-                  // also sets this, but declaring it here guarantees it across the component boundary.
+    cursor: move;
+    flex-shrink: 0;
     transition: background-color 0.1s ease;
 
     &:hover {
@@ -36,55 +33,47 @@ PartyHud {
     }
   }
 
-  // The header text/icon are left at default pointer-events (NOT none) so they inherit the bar's
-  // `cursor: move` and a mousedown on them still bubbles to the drag handle — exactly how the admin
-  // ticket header behaves. (Setting them to none broke the move-cursor hit-test on the bar.)
-  .header-icon {
-    font-size: 14px;
+  .party-header-content {
+    gap: $space-2;
+    padding: $space-2 $space-3;
+    width: 100%;
+    cursor: move;
   }
 
-  .header-title {
-    font-size: 11px;
-    font-weight: 700;
-    color: $color-white;
-    letter-spacing: 0.5px;
+  .party-header-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  .party-header-title {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: $color-tertiary;
     text-transform: uppercase;
+    pointer-events: none;
   }
 
-  .header-count {
-    font-size: 11px;
-    font-weight: 700;
-    color: $color-gray-400;
-  }
-
-  // Dedicated collapse toggle (stops its own mousedown so it doesn't drag — see PartyHud.razor).
-  .header-arrow-btn {
-    pointer-events: all;
-    border: 0;
-    background-color: transparent;
-    padding: 1px 4px;
-    margin-left: 6px;
-    border-radius: $rounding;
-    cursor: pointer;
-    transition: background-color 0.1s ease;
-
-    &:hover {
-      background-color: rgba($color-white, 0.12);
-
-      .header-arrow {
-        color: $color-white;
-      }
-    }
-  }
-
-  .header-arrow {
-    font-size: 15px;
+  .party-header-chevron {
+    font-size: 22px;
+    flex-shrink: 0;
     color: $color-gray-400;
     pointer-events: none;
-    transition: color 0.1s ease;
+  }
+
+  .party-header-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background-color: transparent;
+    cursor: pointer;
   }
 
   .party-members {
     gap: 3px;
+    margin-top: 3px;
   }
 }
