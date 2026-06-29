@@ -18,6 +18,11 @@ public static class GameModeEquipments
 			return null;
 		}
 
+		if ( Guid.TryParse( identifier, out var guid ) )
+		{
+			return FindById( guid ) ?? FindByContentId( guid );
+		}
+
 		return All.FirstOrDefault( x => string.Equals( x.Identifier(), identifier, StringComparison.OrdinalIgnoreCase ) );
 	}
 
