@@ -127,7 +127,6 @@ public class SpawnEntityCommand : ICommand
 			var baseEntityComponent = entityToSpawn.GetComponent<BaseEntity>();
 			if ( baseEntityComponent != null )
 			{
-				baseEntityComponent.Identifier = entity.Identifier();
 				baseEntityComponent.ConfigureGameModeEntityHost( entity );
 			}
 
@@ -173,7 +172,6 @@ public class SpawnEntityCommand : ICommand
 				return false;
 			}
 
-			shipmentBaseEntity.Identifier = equipment.Identifier();
 			shipmentEntity.MarketItemId = marketItemId;
 			shipmentEntity.ConfigureHost( equipment, quantity );
 

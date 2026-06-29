@@ -396,7 +396,6 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 				var baseEntityComponent = entityToSpawn.GetComponent<BaseEntity>();
 				if ( baseEntityComponent != null )
 				{
-					baseEntityComponent.Identifier = entity.Identifier();
 					baseEntityComponent.ConfigureGameModeEntityHost( entity );
 				}
 
@@ -431,7 +430,6 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 						return;
 					}
 
-					shipmentBaseEntity.Identifier = equipment.Identifier();
 					shipmentEntity.MarketItemId = marketItem.Id;
 					shipmentEntity.ConfigureHost( equipment, marketItem.Quantity );
 
