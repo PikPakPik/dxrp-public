@@ -322,7 +322,7 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 		var pressDepth = PressurePlateWireDefinition.GetPressDepthFromMass( _animatedMassOnPlate, _data.Depth );
 		var targetPosition = _plateRestPosition + new Vector3( 0, 0, -pressDepth );
 		var lerpSpeed = 14f * Time.Delta;
-
+	
 		PlateModel.LocalPosition = Vector3.Lerp( PlateModel.LocalPosition, targetPosition, lerpSpeed );
 
 		var pressFactor = maxPress > 0f ? pressDepth / maxPress : 0f;
@@ -399,7 +399,7 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 
 		var material = Material.Load( "materials/default.vmat" );
 		var mesh = new Mesh( material );
-		mesh.CreateVertexBuffer<Vertex>( vertices.Length, Vertex.Layout, vertices );
+		mesh.CreateVertexBuffer( vertices.Length, vertices );
 		mesh.CreateIndexBuffer( indices.Length, indices );
 		mesh.Bounds = new BBox(
 			new Vector3( -halfHeight, -halfWidth, -halfThickness ),
