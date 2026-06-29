@@ -36,6 +36,16 @@ public static class GameModeEquipments
 		return equipment?.GameModeAddonContentId == ToolGameModeContentId;
 	}
 
+	public static GameModeEquipmentDto? FindByContentId( Guid? contentId )
+	{
+		if ( !contentId.HasValue )
+		{
+			return null;
+		}
+
+		return All.FirstOrDefault( x => x.GameModeAddonContentId == contentId.Value );
+	}
+
 	public static GameModeEquipmentDto? FindByPrefabPath( string prefabPath )
 	{
 		if ( string.IsNullOrWhiteSpace( prefabPath ) )

@@ -28,6 +28,16 @@ public static class GameModeEntities
 		return All.FirstOrDefault( x => x.Id == id.Value );
 	}
 
+	public static GameModeEntityDto? FindByContentId( Guid? contentId )
+	{
+		if ( !contentId.HasValue )
+		{
+			return null;
+		}
+
+		return All.FirstOrDefault( x => x.GameModeAddonContentId == contentId.Value );
+	}
+
 	public static GameModeEntityDto? FindByPrefabPath( string prefabPath )
 	{
 		if ( string.IsNullOrWhiteSpace( prefabPath ) )
