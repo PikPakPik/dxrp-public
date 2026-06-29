@@ -107,8 +107,8 @@ public static class GameModeMarketItems
 		{
 			return 0;
 		}
-
-		return player.Scene.GetAllComponents<BaseEntity>()
+		
+		return player.Scene.Components.GetAll<BaseEntity>( FindMode.EverythingInChildren )
 			.Count( entity => entity.IsValid() &&
 			                 entity.Owner == player.SteamId &&
 			                 entity.GameModeEntityId == entityId.Value );
