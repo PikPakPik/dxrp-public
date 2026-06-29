@@ -53,6 +53,11 @@ EquipmentRow {
     align-items: center;
   }
 
+  .gunname {
+    word-break: normal;
+    text-align: center;
+  }
+
   &.is-active {
     opacity: 1;
     transform: scale(1);
