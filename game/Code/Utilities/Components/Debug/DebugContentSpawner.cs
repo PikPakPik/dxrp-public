@@ -30,7 +30,7 @@ public class DebugContentSpawner : Component, IGameEvents
 			return;
 		}
 
-		var entity = GameModeEntities.FindByContentId( ContentId );
+		var entity = GameModeEntities.FindById( ContentId );
 		if ( entity != null )
 		{
 			_spawned = true;
@@ -39,7 +39,7 @@ public class DebugContentSpawner : Component, IGameEvents
 			return;
 		}
 
-		var equipment = GameModeEquipments.FindByContentId( ContentId );
+		var equipment = GameModeEquipments.FindById( ContentId );
 		if ( equipment != null )
 		{
 			_spawned = true;
@@ -53,7 +53,6 @@ public class DebugContentSpawner : Component, IGameEvents
 				var shipmentBaseEntity = shipmentObject.GetComponent<BaseEntity>();
 				if ( shipmentEntity.IsValid() && shipmentBaseEntity.IsValid() )
 				{
-					shipmentBaseEntity.Identifier = equipment.Identifier();
 					shipmentEntity.ConfigureHost( equipment, 100 );
 					shipmentObject.NetworkSpawn();
 				}
@@ -90,7 +89,6 @@ public class DebugContentSpawner : Component, IGameEvents
 		var baseEntity = spawned.GetComponent<BaseEntity>();
 		if ( baseEntity != null )
 		{
-			baseEntity.Identifier = entity.Identifier();
 			baseEntity.ConfigureGameModeEntityHost( entity );
 		}
 

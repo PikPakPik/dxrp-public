@@ -88,7 +88,7 @@
 	{
 		var ownedWorldCount = Player.Local.IsValid()
 			? Scene.GetAllComponents<BaseEntity>().Count( entity => entity.IsValid() &&
-				entity.GameModeEntityId != Guid.Empty &&
+				entity.EntityId != Guid.Empty &&
 				entity.Owner == Player.Local.SteamId )
 			: 0;
 		var ownedEquipmentCount = Player.Local.IsValid()

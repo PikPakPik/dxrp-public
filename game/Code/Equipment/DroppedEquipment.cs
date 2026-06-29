@@ -8,7 +8,7 @@ public class DroppedEquipment : Component, Component.IPressable
 	[Property]
 	public GameModeEquipmentDto? Resource { get; private set; }
 	
-	public string Identifier { get; private set; } = "";
+	public Guid EquipmentId { get; private set; }
 	
 	public string PrefabPath { get; private set; } = "";
 	public Guid MarketItemId { get; private set; }
@@ -71,8 +71,7 @@ public class DroppedEquipment : Component, Component.IPressable
 			return;
 		}
 
-		var existingWeapon = player.Equipment.FirstOrDefault( w =>
-			string.Equals( w.Identifier, Identifier, StringComparison.OrdinalIgnoreCase ) );
+		var existingWeapon = player.Equipment.FirstOrDefault( w => w.EquipmentId == EquipmentId );
 
 		if ( existingWeapon != null )
 		{
@@ -146,7 +145,7 @@ public class DroppedEquipment : Component, Component.IPressable
 
 		var droppedWeapon = go.Components.Create<DroppedEquipment>();
 		droppedWeapon.Resource = dto;
-		droppedWeapon.Identifier = dto.Identifier();
+		droppedWeapon.EquipmentId = dto.GameModeAddonContentId;
 		droppedWeapon.PrefabPath = dto.PrefabPath();
 		droppedWeapon.MarketItemId = marketItemId != Guid.Empty ? marketItemId : heldWeapon?.MarketItemId ?? Guid.Empty;
 

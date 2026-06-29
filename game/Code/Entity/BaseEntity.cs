@@ -15,18 +15,11 @@ public class BaseEntity : Component, IDamageEvents, IDescription, IOwned, IGameO
 	public long Owner { get; set; }
 
 	[Property]
-	[Sync( SyncFlags.FromHost )]
-	public string Identifier { get; set; } = "";
-
-	[Property]
-	public GameModeEntityDto? Resource => GameModeEntities.GetByIdentifierOrFallback( Identifier );
-
-	[Property]
 	[ReadOnly]
 	[Sync( SyncFlags.FromHost )]
-	public Guid GameModeEntityId { get; private set; }
+	public Guid EntityId { get; private set; }
 
-	public GameModeEntityDto? GameModeEntity => GameModeEntities.FindById( GameModeEntityId ) ?? Resource;
+	public GameModeEntityDto? GameModeEntity => GameModeEntities.FindById( EntityId );
 	public GameModeAddonContentDto? Content => GameModeEntity.Content();
 	
 	public bool DestroyOnDisconnect => GameModeEntity?.DestroyOnDisconnect ?? true;
@@ -42,9 +35,9 @@ public class BaseEntity : Component, IDamageEvents, IDescription, IOwned, IGameO
 	[Property]
 	public Rigidbody? Rigidbody { get; set; }
 
-	public virtual string? DisplayName => string.IsNullOrWhiteSpace( Identifier )
-		? GameObject.Name
-		: GameModeEntity.DisplayName();
+	public virtual string? DisplayName => EntityId != Guid.Empty
+		? GameModeEntity.DisplayName()
+		: GameObject.Name;
 	
 	public virtual Color Color => Color.White;
 
@@ -52,11 +45,9 @@ public class BaseEntity : Component, IDamageEvents, IDescription, IOwned, IGameO
 	{
 		base.OnStart();
 
-		if ( Networking.IsHost )
+		if ( Networking.IsHost && EntityId != Guid.Empty )
 		{
-			var entityToApply = GameModeEntityId != Guid.Empty
-				? GameModeEntities.FindById( GameModeEntityId )
-				: GameModeEntities.FindByIdentifier( Identifier );
+			var entityToApply = GameModeEntities.FindById( EntityId );
 			if ( entityToApply != null )
 			{
 				ApplyGameModeEntityHostSettings( entityToApply );
@@ -127,7 +118,7 @@ public class BaseEntity : Component, IDamageEvents, IDescription, IOwned, IGameO
 	{
 		Assert.True( Networking.IsHost );
 
-		GameModeEntityId = entity.Id;
+		EntityId = entity.GameModeAddonContentId;
 		ApplyGameModeEntityHostSettings( entity );
 	}
 

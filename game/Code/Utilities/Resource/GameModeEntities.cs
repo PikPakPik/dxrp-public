@@ -18,17 +18,7 @@ public static class GameModeEntities
 		return All.FirstOrDefault( x => string.Equals( x.Identifier(), identifier, StringComparison.OrdinalIgnoreCase ) );
 	}
 
-	public static GameModeEntityDto? FindById( Guid? id )
-	{
-		if ( !id.HasValue )
-		{
-			return null;
-		}
-
-		return All.FirstOrDefault( x => x.Id == id.Value );
-	}
-
-	public static GameModeEntityDto? FindByContentId( Guid? contentId )
+	public static GameModeEntityDto? FindById( Guid? contentId )
 	{
 		if ( !contentId.HasValue )
 		{
@@ -36,6 +26,16 @@ public static class GameModeEntities
 		}
 
 		return All.FirstOrDefault( x => x.GameModeAddonContentId == contentId.Value );
+	}
+
+	public static GameModeEntityDto? FindByDtoId( Guid? dtoId )
+	{
+		if ( !dtoId.HasValue )
+		{
+			return null;
+		}
+
+		return All.FirstOrDefault( x => x.Id == dtoId.Value );
 	}
 
 	public static GameModeEntityDto? FindByPrefabPath( string prefabPath )

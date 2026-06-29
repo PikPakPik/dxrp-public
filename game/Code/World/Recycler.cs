@@ -202,10 +202,11 @@ public sealed class Recycler : Component, Component.ITriggerListener, IGameEvent
 
 		// Check for BaseEntity (entities like printers, etc.)
 		var baseEntity = gameObject.Components.Get<BaseEntity>();
-		if ( baseEntity is { GameModeEntityId: var entityId } && entityId != Guid.Empty )
+		if ( baseEntity is { EntityId: var entityId } && entityId != Guid.Empty )
 		{
+			var entityDtoId = GameModeEntities.FindById( entityId )?.Id;
 			var marketItem = GameModeMarketItems.All
-				.FirstOrDefault( x => x.Type == GameModeMarketItemType.Entity && x.ReferenceId == entityId );
+				.FirstOrDefault( x => x.Type == GameModeMarketItemType.Entity && x.ReferenceId == entityDtoId );
 			var entityPrice = GetRefundablePrice( marketItem );
 			return (uint)(entityPrice * Config.Current.Game.RecyclerEntityRefundPercent);
 		}

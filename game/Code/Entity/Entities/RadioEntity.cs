@@ -45,7 +45,7 @@ public sealed class RadioEntity : BaseEntity, IOcclusionEvents
 	public bool CanControl => Player.Local.IsValid() && GameUtils.HasPermission( Player.Local.SteamId, GameObject, false );
 	public bool ShouldShowWorldPanel => !_occluded && IsLocalPlayerWithinDistance();
 
-	public override string? DisplayName => Resource != null ? Resource.Name() : "Radio";
+	public override string? DisplayName => EntityId != Guid.Empty ? GameModeEntity.Name() : "Radio";
 
 	public string CurrentStationName => GetStation( StationIndex ).Name;
 	public string? CurrentStreamTitle => IsPlaying ? _currentStreamTitle : null;

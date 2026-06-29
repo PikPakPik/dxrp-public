@@ -104,7 +104,7 @@ public class CleanupSystem( Scene scene ) : GameObjectSystem<CleanupSystem>( sce
 				continue;
 			}
 
-			if ( !ignoreConditions && entity.Resource is { DestroyOnDisconnect: false } )
+			if ( !ignoreConditions && entity.GameModeEntity is { DestroyOnDisconnect: false } )
 			{
 				continue;
 			}

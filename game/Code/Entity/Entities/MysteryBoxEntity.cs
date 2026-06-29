@@ -303,8 +303,9 @@ public sealed class MysteryBoxEntity : BaseEntity, Component.IPressable
 
 	private int GetMarketItemCost()
 	{
+		var entityDtoId = GameModeEntities.FindById( EntityId )?.Id;
 		var marketItem = GameModeMarketItems.All.FirstOrDefault( x =>
-			x.Type == GameModeMarketItemType.Entity && x.ReferenceId == GameModeEntityId );
+			x.Type == GameModeMarketItemType.Entity && x.ReferenceId == entityDtoId );
 		return marketItem?.Cost ?? 0;
 	}
 

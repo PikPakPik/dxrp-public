@@ -81,7 +81,7 @@
 			return false;
 
 		var currentEquipment = Player.Local.CurrentEquipment;
-		return currentEquipment.IsValid() && currentEquipment.Identifier == "camera";
+		return currentEquipment.IsValid() && currentEquipment.EquipmentId == Constants.CameraEquipmentId;
 	}
 
 	private bool HasMedkitEquipped()
@@ -90,7 +90,8 @@
 			return false;
 
 		var currentEquipment = Player.Local.CurrentEquipment;
-		return currentEquipment.IsValid() && currentEquipment.Identifier == "848f8ecd-5c8b-4b4c-9191-900ec948fe14";
+		
+		return currentEquipment.IsValid() && currentEquipment.EquipmentId == Constants.MedkitEquipmentId;
 	}
 
 	private string GetHealthText()
@@ -129,7 +130,7 @@
 		
 		var isTalking = Player.Voice.LastPlayed < 0.25f;
 		var localPlayerJob = localIsValid ? Player.Local.Job.Id.ToString() : "";
-		var currentEquipment = localIsValid ? Player.Local.CurrentEquipment?.Identifier : "";
+		var currentEquipment = localIsValid ? Player.Local.CurrentEquipment?.EquipmentId.ToString() : "";
 		var health = Player.HealthComponent.IsValid() ? Player.HealthComponent.Health : 0;
 		
 		var hash = new HashCode();
