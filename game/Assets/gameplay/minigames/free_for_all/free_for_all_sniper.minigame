@@ -30,8 +30,8 @@
   "Weight": 50,
   "Duration": 120,
   "LobbyDuration": 15,
-  "StartingEquipment": [
-    "gameplay/equipment/weapons/m700/m700.equip"
+  "StartingEquipmentIdentifiers": [
+    "0d655512-704e-490b-8945-e97276aced6e"
   ],
   "GiveMaxAmmo": true,
   "SpawnRuleset": "OneLife",

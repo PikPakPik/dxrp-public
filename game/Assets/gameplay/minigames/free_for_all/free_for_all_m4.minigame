@@ -30,8 +30,8 @@
   "Weight": 50,
   "Duration": 120,
   "LobbyDuration": 15,
-  "StartingEquipment": [
-    "gameplay/equipment/weapons/m4a1/m4a1.equip"
+  "StartingEquipmentIdentifiers": [
+    "b2842f29-1db5-43d8-8ac7-886757f59380"
   ],
   "GiveMaxAmmo": true,
   "SpawnRuleset": "OneLife",
