@@ -99,7 +99,7 @@ static class Launcher
                 if (hasRepo)
                 {
                     RunGit(["-C", RepoDir, "fetch", "--depth", "1", "origin", config.Branch]);
-                    RunGit(["-C", RepoDir, "reset", "--hard", $"origin/{config.Branch}"]);
+                    RunGit(["-C", RepoDir, "reset", "--hard", "FETCH_HEAD"]);
                 }
                 else
                 {
