@@ -65,9 +65,7 @@
 									<div class="job-card @( isSelected ? "selected" : "" ) @( isCurrentJob ? "current" : "" )"
 									     onclick="@( () => SelectJobPreview( job ) )">
 										<div class="job-card-players">
-											<JobCardPlayerModel Player="@( isCurrentJob ? null : Player.Local )" IsCurrentJob="@isCurrentJob"
-											                      BorderColor="@job.ColorValue()"
-											                      Size="@(56)"/>
+											<JobCardPlayerModel Job="@job"/>
 										</div>
 										<div class="job-card-body">
 											<div class="job-card-info">
