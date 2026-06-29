@@ -6,12 +6,12 @@ public partial class Player : IContextualObject, Component.IPressable
 	public Vector3 ContextPosition => WorldPosition + Controller.BodyHeight * 0.60f * Vector3.Up;
 	public bool ShouldShow()
 	{
-		return !IsDead && !IsLocalPlayer && !HasStatus( Constants.CloakStatus ) && !string.IsNullOrWhiteSpace( Job.Interaction );
+		return !IsDead && !IsLocalPlayer && !HasStatus( Constants.CloakStatus ) && !string.IsNullOrWhiteSpace( Job?.Interaction );
 	}
 	public float ContextMaxDistance => Config.Current.Game.PlayerInteractDistance;
 	public bool LookOpacity => false;
 	public string InputHint => "use";
-	public string? DisplayText =>  Language.GetPhrase( Job.Interaction );
+	public string? DisplayText => Language.GetPhrase( Job?.Interaction ?? string.Empty );
 
 
 	private void OnStartInteract()
