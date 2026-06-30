@@ -37,7 +37,7 @@ public class NotifierWire() : BaseWireConstruct( ConstructType.NotifierWire )
 		get => false; // This is just a trigger, no need to store state
 	}
 
-	public override string Name => FormatWireName( $"Notifier ({_data.Message})" );
+	public override string Name => $"Notifier ({_data.Message})";
 
 	protected override void OnDataChanged( IConstructData oldData, IConstructData newData )
 	{

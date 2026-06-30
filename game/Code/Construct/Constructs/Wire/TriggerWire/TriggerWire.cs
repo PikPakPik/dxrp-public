@@ -40,7 +40,7 @@ public class TriggerWire() : BaseWireConstruct( ConstructType.TriggerWire ), IWi
 		get => false; // This is just a trigger, no need to store state
 	}
 
-	public override string Name => FormatWireName( "Trigger" );
+	public override string Name => "Trigger";
 
 	protected override void OnStart()
 	{

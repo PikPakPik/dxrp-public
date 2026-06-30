@@ -12,14 +12,11 @@ public abstract class BaseWireConstruct( ConstructType type ) : BaseConstruct( t
 	public string DisplayName => Name;
 
 	protected string? WireLabel => Data is IWireLabelData labelData ? labelData.Label : null;
-	protected string FormatWireName( string defaultName ) => WireLabelHelper.FormatDisplayName( WireLabel, defaultName );
 
 	public Vector3 ContextPosition => WorldPosition + Vector3.Up * 6f;
 	public bool LookOpacity => false;
 	public float ContextMaxDistance => 100f;
-	public string? DisplayText => WireLabelHelper.GetDisplayText( WireLabel );
-
-	public bool ShouldShow() => (WireTool.IsDeployed || WireLabelTool.IsDeployed) && DisplayText != null;
+	public bool ShouldShow() => false;
 
 	protected override void OnStart()
 	{

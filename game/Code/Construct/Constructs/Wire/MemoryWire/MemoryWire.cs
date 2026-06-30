@@ -25,7 +25,7 @@ public class MemoryWire() : BaseWireConstruct( ConstructType.MemoryWire ), IWire
 	[WireOutput( "has_value" )]
 	private bool HasValue { get; set; }
 
-	public override string Name => FormatWireName( "Memory" );
+	public override string Name => "Memory";
 
 	public void OnWireTick()
 	{

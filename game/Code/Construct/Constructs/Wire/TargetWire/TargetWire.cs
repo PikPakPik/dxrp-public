@@ -7,7 +7,7 @@ public class TargetWire() : BaseWireConstruct( ConstructType.TargetWire ), IWire
 {
 	private TargetWireData _data = new();
 
-	public override string Name => FormatWireName( "Target" );
+	public override string Name => "Target";
 
 	[WireInput( "reset_damage" )]
 	public bool ResetDamage

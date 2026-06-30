@@ -16,7 +16,7 @@ public class SynthesizerWire() : BaseWireConstruct( ConstructType.SynthesizerWir
 
 	private Mixer SoundMixer => Mixer.FindMixerByName( "Wire" ) ?? Mixer.Master;
 
-	public override string Name => FormatWireName( "Synthesizer" );
+	public override string Name => "Synthesizer";
 
 	[WireInput( "text" )]
 	public string Text

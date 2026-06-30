@@ -19,7 +19,7 @@ public class ScreenWire() : BaseWireConstruct( ConstructType.ScreenWire ), IWire
 	[Change( nameof( OnCurrentValueChanged ) )]
 	private string CurrentValue { get; set; } = "...";
 
-	public override string Name => FormatWireName( "Screen" );
+	public override string Name => "Screen";
 
 	private DisplayMode _mode = DisplayMode.Text;
 

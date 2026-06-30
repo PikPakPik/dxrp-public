@@ -17,7 +17,7 @@ public class ButtonWire() : BaseWireConstruct( ConstructType.ButtonWire ), Compo
 	[WireOutput( "out" )]
 	private float Out { get; set; }
 
-	public override string Name => FormatWireName( "Button" );
+	public override string Name => "Button";
 
 	[Property]
 	private float PressDepth { get; set; } = 2.0f;

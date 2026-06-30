@@ -16,7 +16,7 @@ public class ForcerWire() : BaseWireConstruct( ConstructType.ForcerWire ), IWire
 	[Property] public GameObject EndLaserTarget { get; set; } = null!;
 	[Property] public LineRenderer LineRenderer { get; set; } = null!;
 
-	public override string Name => FormatWireName( $"Forcer ({_data.ForceAmount})" );
+	public override string Name => $"Forcer ({_data.ForceAmount})";
 
 	private TimeSince _lastForceTime = 1000f;
 

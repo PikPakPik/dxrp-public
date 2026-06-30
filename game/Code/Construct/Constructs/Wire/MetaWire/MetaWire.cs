@@ -42,7 +42,7 @@ public class MetaWire() : BaseWireConstruct( ConstructType.MetaWire )
 	[WireOutput( "lockdown" )]
 	public bool Lockdown { get; private set; }
 
-	public override string Name => FormatWireName( "Meta" );
+	public override string Name => "Meta";
 
 	protected override void OnStart()
 	{

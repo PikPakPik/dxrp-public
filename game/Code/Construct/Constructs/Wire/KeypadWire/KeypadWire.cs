@@ -18,7 +18,7 @@ public class KeypadWire() : BaseWireConstruct( ConstructType.KeypadWire ), IWire
 	[WireOutput( "input" )]
 	private string Input { get; set; } = "";
 
-	public override string Name => FormatWireName( "Keypad" );
+	public override string Name => "Keypad";
 
 	[Property]
 	public bool Initialized { get; set; }

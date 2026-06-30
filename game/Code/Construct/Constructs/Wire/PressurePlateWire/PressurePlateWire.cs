@@ -45,7 +45,7 @@ public class PressurePlateWire() : BaseWireConstruct( ConstructType.PressurePlat
 		get => false;
 	}
 
-	public override string Name => FormatWireName( "Pressure Plate" );
+	public override string Name => "Pressure Plate";
 
 	public override Vector3 GetPortPosition()
 	{

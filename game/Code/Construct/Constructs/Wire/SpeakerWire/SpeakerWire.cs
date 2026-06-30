@@ -13,7 +13,7 @@ public class SpeakerWire() : BaseWireConstruct( ConstructType.SpeakerWire ), IWi
 
 	private Mixer SoundMixer => Mixer.FindMixerByName( "Wire" ) ?? Mixer.Master;
 
-	public override string Name => FormatWireName( $"Speaker ({_data.Sound})" );
+	public override string Name => $"Speaker ({_data.Sound})";
 
 	[WireInput( "emit" )]
 	public bool Emit
