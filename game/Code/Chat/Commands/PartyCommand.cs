@@ -36,6 +36,12 @@ public class PartyCommand : ICommand
 
 	public bool ExecuteHost( Player caller, string[] args, string raw )
 	{
+		if ( !RankSystem.HasPermission( caller.SteamId, Permission.CommandParty ) )
+		{
+			caller.Error( "#generic.no_permission" );
+			return true;
+		}
+
 		var system = PartySystem.Instance;
 		if ( system is null )
 		{
