@@ -63,7 +63,7 @@
 	public static bool Hidden { get; set; }
 
 	// Collapsed by default — retracted bar shows icon + PARTY + chevron until the player expands.
-	private static bool _collapsed = true;
+	private static bool _collapsed = false;
 
 	private static void StopMouseEvent( PanelEvent e ) => e.StopPropagation();
 
