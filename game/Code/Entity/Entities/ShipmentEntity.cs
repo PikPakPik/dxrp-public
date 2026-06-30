@@ -34,18 +34,7 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 	public override bool DestroyOnJobChange => false;
 	public override bool AllowOwnershipTransfer => true;
 
-	public override string DisplayName
-	{
-		get
-		{
-			var name = GameModeEntity.DisplayName();
-			if ( name.StartsWith( '#' ) )
-			{
-				name = Language.GetPhrase( name[1..] );
-			}
-			return $"{name} ({QuantityText.Text})";
-		}
-	}
+	public override string DisplayName => $"{TypeText.Text} ({QuantityText.Text})";
 
 	private bool _occluded;
 
