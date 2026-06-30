@@ -9,7 +9,7 @@
 			<div class="market-toolbar-actions">
 				@if ( CanUseAdminMode )
 				{
-					<button class="lock-toggle admin-toggle @( _adminMode ? "active" : "" )"
+					<button class="lock-toggle @( _adminMode ? "active admin-active" : "" )"
 					        onclick="@ToggleAdminMode">
 						<i class="material-icons">admin_panel_settings</i>
 						<span>@Language.GetPhrase( _adminMode ? "tabmenu.market.admin_mode.on" : "tabmenu.market.admin_mode.off" )</span>
@@ -104,7 +104,7 @@
 {
 	private bool _showLocked;
 	HashSet<string> _collapsedCategories = TabMenuSectionPreferences.LoadCollapsedMarketCategories();
-	private bool _adminMode;
+	private bool _adminMode = TabMenuSectionPreferences.LoadMarketAdminMode() && CanUseAdminMode;
 
 	private static bool CanUseAdminMode => RankSystem.HasLocalPermission( Permission.CommandSpawnEntity );
 
@@ -147,6 +147,7 @@
 			_showLocked = true;
 		}
 
+		TabMenuSectionPreferences.SaveMarketAdminMode( _adminMode );
 		Sound.Play( "pop" );
 	}
 	private static string GetCategoryText( string? category )
