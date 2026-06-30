@@ -1,4 +1,5 @@
 @namespace Dxura.RP.Game.UI
+@using Sandbox.UI
 @inherits Panel
 @attribute [StyleSheet]
 
@@ -11,12 +12,11 @@
 <root class="@(IsOpen ? "is-open" : "")">
 @if ( IsOpen )
 {
-	@{
-		var room = PartyRoom.Current;
-		var inParty = room is not null;
-		var isLeader = LocalIsLeader;
-		var activeTab = EffectiveTabLocal( inParty, isLeader );
-	}
+	var room = PartyRoom.Current;
+	var inParty = room is not null;
+	var isLeader = LocalIsLeader;
+	var activeTab = EffectiveTabLocal( inParty, isLeader );
+	
 	<div class="window flex flex-col">
 		<div class="title-bar flex flex-row items-center">
 			<label class="title">#party.window_title</label>
@@ -29,13 +29,13 @@
 
 		<div class="body flex flex-row">
 			<div class="sidebar flex flex-col">
-					<div class="navigation flex flex-col">
+				<div class="navigation flex flex-col">
 					@foreach ( var tab in VisibleTabsLocal( inParty, isLeader ) )
 					{
 						var section = tab.Section;
 						var active = activeTab == section;
 						<div class="menuButton flex flex-row items-center cursor-pointer @(active ? "active-btn" : "")"
-						        onclick="@(() => SelectTab( section ))">
+						     onclick="@(() => SelectTab( section ))">
 							<i class="material-icons tab-icon">@tab.Icon</i>
 							<label class="tab-label">@Language.GetPhrase( tab.LabelKey )</label>
 						</div>
