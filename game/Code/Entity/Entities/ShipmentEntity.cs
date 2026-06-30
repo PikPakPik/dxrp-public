@@ -31,6 +31,9 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 	private Vector3 _originalPreviewPosition;
 	private bool _previewPositionSaved;
 
+	public override bool DestroyOnJobChange => false;
+	public override bool AllowOwnershipTransfer => true;
+
 	public override string DisplayName
 	{
 		get
