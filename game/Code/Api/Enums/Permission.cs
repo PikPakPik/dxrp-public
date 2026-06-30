@@ -224,6 +224,9 @@ public enum Permission
 	[PermissionMeta( "command.spawnitem", "Spawn Inventory Item", "Spawn inventory items into the world via command", "Commands" )]
 	CommandSpawnItem,
 
+	[PermissionMeta( "command.spawnentity", "Spawn Entity", "Spawn market entities bypassing job and purchase restrictions", "Commands" )]
+	CommandSpawnEntity,
+
 	[PermissionMeta( "command.title", "Use Title", "Equip inventory titles", "Commands" )]
 	CommandTitle,
 
