@@ -1561,6 +1561,7 @@
   "settings.misc.civilian_clothing": "Одежда гражданских: ",
   "settings.misc.radio_distance": "Дистанция радио: ",
   "settings.misc.radio_autoplay": "Автовоспроизведение радио: ",
+  "settings.misc.tv_line_of_sight": "Прямая видимость TV: ",
   "settings.misc.clothing_note": "Настройка одежды применится после возрождения.",
   "inventory.titles": "Инвентарь",
   "inventory.items": "{0} предм.",

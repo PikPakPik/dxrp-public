@@ -1563,6 +1563,7 @@
   "settings.misc.civilian_clothing": "시민 직업 의상: ",
   "settings.misc.radio_distance": "라디오 거리: ",
   "settings.misc.radio_autoplay": "라디오 자동 재생: ",
+  "settings.misc.tv_line_of_sight": "TV 시야 확인: ",
   "settings.misc.clothing_note": "위 설정은 각 플레이어가 다음 리스폰 후 적용됩니다.",
   "inventory.title": "인벤토리",
   "inventory.items": "{0}개 아이템",

@@ -1561,6 +1561,7 @@
   "settings.misc.civilian_clothing": "Vêtements civils : ",
   "settings.misc.radio_distance": "Distance radio : ",
   "settings.misc.radio_autoplay": "Lecture auto des radios : ",
+  "settings.misc.tv_line_of_sight": "Visibilité TV : ",
   "settings.misc.clothing_note": "Le réglage prendra effet après réapparition.",
   "inventory.titles": "Inventaire",
   "inventory.items": "{0} objets",

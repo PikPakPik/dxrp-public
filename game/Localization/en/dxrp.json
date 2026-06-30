@@ -1564,6 +1564,7 @@
   "settings.misc.civilian_clothing": "Civilian Job Clothing: ",
   "settings.misc.radio_distance": "Radio Distance: ",
   "settings.misc.radio_autoplay": "Autoplay Radios: ",
+  "settings.misc.tv_line_of_sight": "TV Line of Sight: ",
   "settings.misc.clothing_note": "The above setting will take effect for each player after their next respawn.",
   "inventory.title": "Inventory",
   "inventory.items": "{0} items",
