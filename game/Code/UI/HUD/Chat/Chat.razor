@@ -516,12 +516,23 @@
 
 	private void EnsureValidChatMode()
 	{
-		var availableModes = GetAvailableChatModes();
-		if ( !availableModes.Contains( _chatMode ) )
+		if ( !IsValidChatMode( _chatMode ) )
 		{
-			_chatMode = availableModes[0];
+			_chatMode = MessageType.LocalChat;
 		}
 	}
+
+	// No allocation — only checks whether the current mode is still accessible.
+	private bool IsValidChatMode( MessageType mode ) => mode switch
+	{
+		MessageType.LocalChat => true,
+		MessageType.GlobalChat => Config.Current.Game.OocChatEnabled,
+		MessageType.GovernmentChat => IsGovernment,
+		MessageType.StaffChat => CanStaffChat,
+		MessageType.FactionChat => IsInFaction,
+		MessageType.PartyChat => IsInParty,
+		_ => false
+	};
 
 	private List<MessageType> GetAvailableChatModes()
 	{
