@@ -1,3 +1,4 @@
+using System.Text;
 namespace Dxura.RP.Game.Wire;
 
 [Title( "Gate" )]
@@ -259,7 +260,7 @@ public class GateWire() : BaseWireConstruct( ConstructType.GateWire ), IWireEven
 	private static string ConcatSafe( string a, string b, string c, string d, string e )
 	{
 		var limit = Wire.MaxWireStringLength;
-		var sb = new System.Text.StringBuilder( limit );
+		var sb = new StringBuilder( limit );
 		foreach ( var part in new[] { a, b, c, d, e } )
 		{
 			var remaining = limit - sb.Length;
