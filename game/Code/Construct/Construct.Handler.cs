@@ -293,7 +293,7 @@ public partial class Construct
 		var distance = Vector3.DistanceBetween( player.GameObject.WorldPosition, target.WorldPosition );
 		if ( distance > Config.Current.Game.ReachDistance * 1.25f )
 		{
-			Log.Warning( $"Player ({player.SteamId}) tried to update wire label outside reach distance ({distance} > {Config.Current.Game.ReachDistance})" );
+			Log.Warning( $"Player ({player.SteamId}) tried to update wire label outside reach distance ({distance} > {Config.Current.Game.ReachDistance * 1.25f})" );
 			player.Error( "#generic.error" );
 			return;
 		}

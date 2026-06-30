@@ -1,6 +1,6 @@
 namespace Dxura.RP.Game.Wire;
 
-public class PressurePlateWireDefinition : ConstructDefinition<PressurePlateWire, PressurePlateWireData>
+public class PressurePlateWireDefinition : WireConstructDefinition<PressurePlateWire, PressurePlateWireData>
 {
 	public override ConstructType Type => ConstructType.PressurePlateWire;
 	public override uint Limit => Config.Current.Game.PressurePlateWireLimit;
@@ -44,7 +44,7 @@ public class PressurePlateWireDefinition : ConstructDefinition<PressurePlateWire
 		return Math.Max( MinPressDepth, maxPress * factor );
 	}
 
-	protected override ConstructDataValidationResult ValidateTyped( PressurePlateWireData data )
+	protected override ConstructDataValidationResult ValidateWireTyped( PressurePlateWireData data )
 	{
 		if ( data.Width is < MinSize or > MaxSize )
 		{

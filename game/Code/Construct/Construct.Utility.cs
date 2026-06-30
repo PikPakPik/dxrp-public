@@ -76,6 +76,7 @@ public partial class Construct
 			return false;
 		}
 
+		label = label?.Trim() ?? string.Empty;
 		var labelValidation = WireLabelHelper.ValidateLabel( label );
 		if ( !labelValidation.IsValid )
 		{

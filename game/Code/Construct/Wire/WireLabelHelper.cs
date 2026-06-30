@@ -6,12 +6,12 @@ public static class WireLabelHelper
 
 	public static ConstructDataValidationResult ValidateLabel( string? label )
 	{
-		if ( string.IsNullOrEmpty( label ) )
+		if ( string.IsNullOrWhiteSpace( label ) )
 		{
 			return ConstructDataValidationResult.Success();
 		}
 
-		if ( label.Length > MaxWireLabelLength )
+		if ( label.Trim().Length > MaxWireLabelLength )
 		{
 			return ConstructDataValidationResult.Failure( $"Label cannot exceed {MaxWireLabelLength} characters" );
 		}
