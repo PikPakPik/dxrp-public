@@ -67,25 +67,37 @@ public partial class Player
 	public HighlightOutline Outline { get; set; } = null!;
 
 
-	private bool IsOutlineVisible()
-	{
-		var localPlayer = Local;
-		if ( !localPlayer.IsValid() ||
-		     localPlayer.HealthComponent.State != LifeState.Dead )
-		{
-			return false;
-		}
+	// ── Generic outline source discovery ────────────────────────────────────────────────────────
+	// Any system (party, job team, admin ESP, …) implements IPlayerOutlineSource; TypeLibrary
+	// discovers all concrete types automatically. The first source that returns a non-null request
+	// wins; sources are queried in discovery order.
 
-		return localPlayer.GetLastKiller() == this;
+	private static List<IPlayerOutlineSource>? _outlineSources;
+
+	private static List<IPlayerOutlineSource> OutlineSources
+	{
+		get
+		{
+			if ( _outlineSources is not null )
+			{
+				return _outlineSources;
+			}
+
+			_outlineSources = new List<IPlayerOutlineSource>();
+			foreach ( var type in TypeLibrary.GetTypes<IPlayerOutlineSource>()
+				         .Where( t => !t.IsAbstract && t.TargetType != null ) )
+			{
+				if ( TypeLibrary.Create<IPlayerOutlineSource>( type.TargetType ) is { } source )
+				{
+					_outlineSources.Add( source );
+				}
+			}
+
+			return _outlineSources;
+		}
 	}
 
-	/// <summary>
-	/// Party silhouettes through geometry for the local viewer. Uses the existing player
-	/// <see cref="HighlightOutline"/> plus the camera's <see cref="Highlight"/> post-process.
-	/// Returns the party color if the outline should be shown, null otherwise.
-	/// Scans <see cref="PartySystem.Parties"/> once and reads all required flags from the same entry.
-	/// </summary>
-	private Color? GetPartyOutlineColor()
+	private PlayerOutlineRequest? GetSourceOutlineRequest()
 	{
 		var localPlayer = Local;
 		if ( !localPlayer.IsValid() || localPlayer == this || localPlayer.IsDead )
@@ -93,69 +105,68 @@ public partial class Player
 			return null;
 		}
 
-		var party = PartySystem.Instance;
-		if ( party is null || !party.Settings.AllowMemberOutline )
+		foreach ( var source in OutlineSources )
 		{
-			return null;
-		}
-
-		foreach ( var kv in party.Parties )
-		{
-			var members = kv.Value.Members;
-			if ( members is null || !members.Contains( localPlayer.SteamId ) )
+			var request = source.GetOutlineRequest( localPlayer, this );
+			if ( request.HasValue )
 			{
-				continue;
+				return request;
 			}
-
-			if ( !members.Contains( SteamId ) || !kv.Value.MemberOutlineEnabled )
-			{
-				return null;
-			}
-
-			return kv.Value.Color.ToColor();
 		}
 
 		return null;
 	}
 
+	private bool _sourceOutlineActive;
+	private PlayerOutlineRequest _lastRequest;
+	private List<Renderer>? _cachedOutlineTargets;
+
 	private void OnUpdateEffects()
 	{
-		var partyColor = GetPartyOutlineColor();
-		if ( partyColor.HasValue )
+		var request = GetSourceOutlineRequest();
+		if ( request.HasValue )
 		{
-			var c = partyColor.Value;
-			Outline.Enabled = true;
-			Outline.OverrideTargets = true;
-			Outline.Targets = GetPartyOutlineTargets();
-			Outline.Width = 0.12f;
-			Outline.Color = c.WithAlpha( 0.12f );
-			Outline.InsideColor = Color.Transparent;
-			Outline.InsideObscuredColor = Color.Transparent;
-			Outline.ObscuredColor = c.WithAlpha( 0.85f );
+			var r = request.Value;
+			if ( !_sourceOutlineActive )
+			{
+				_sourceOutlineActive = true;
+				Outline.Enabled = true;
+				Outline.OverrideTargets = r.OverrideTargets;
+				if ( r.OverrideTargets )
+				{
+					_cachedOutlineTargets = GetOutlineTargets();
+					Outline.Targets = _cachedOutlineTargets;
+				}
+			}
+
+			if ( !r.Equals( _lastRequest ) )
+			{
+				_lastRequest = r;
+				Outline.Width = r.Width;
+				Outline.Color = r.Color;
+				Outline.ObscuredColor = r.ObscuredColor;
+				Outline.InsideColor = r.InsideColor;
+				Outline.InsideObscuredColor = r.InsideObscuredColor;
+			}
+
 			return;
 		}
 
-		Outline.OverrideTargets = false;
-		Outline.Targets = null;
-
-		if ( !IsOutlineVisible() )
+		if ( _sourceOutlineActive )
 		{
+			_sourceOutlineActive = false;
+			_cachedOutlineTargets = null;
 			Outline.Enabled = false;
-			return;
+			Outline.OverrideTargets = false;
+			Outline.Targets = null;
 		}
-
-		Outline.Enabled = true;
-		Outline.Width = 0.1f;
-		Outline.Color = Color.Transparent;
-		Outline.InsideColor = HealthComponent.IsGodMode ? Color.White.WithAlpha( 0.1f ) : Color.Transparent;
-		Outline.ObscuredColor = Color.Red;
 	}
 
 	/// <summary>
 	/// Outline the dressed citizen body only — never equipment under hold bones, emotes, or nameplates.
 	/// Targets must be <see cref="Renderer"/> instances, not <see cref="GameObject"/>.
 	/// </summary>
-	private List<Renderer> GetPartyOutlineTargets()
+	private List<Renderer> GetOutlineTargets()
 	{
 		var targets = new List<Renderer>();
 
