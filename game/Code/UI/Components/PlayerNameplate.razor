@@ -8,11 +8,11 @@
 }
 
 <root>
-	@if ( IsPartyMember )
+	@if ( ShowPartyNameplateTag )
 	{
 		<div class="party-tag">
 			<i class="material-icons text-accent">group</i>
-			<span style="color: @PartyColorHex">#party.nameplate_tag</span>
+			<label style="color: @PartyColorHex">#party.nameplate_tag</label>
 		</div>
 	}
 
@@ -76,7 +76,7 @@
 	
 	[Property] Player Player { get; set; } = null!;
 
-	private bool ShowNameplate => Player.IsValid() && !Player.IsLocalPlayer && Config.Current.Game.ShowNamePlate && !Player.GameObject.Tags.Has( Constants.OccludeTag ) && !HasCameraEquipped();
+	private bool ShowNameplate => Player.IsValid() && !Player.IsLocalPlayer && Config.Current.Game.ShowNamePlate && !Player.GameObject.Tags.Has( Constants.OccludeTag ) && !HasCameraEquipped() && !HideNameplateForPartyOutline;
 	private bool ShowHealthInfo => ShowNameplate &&
 	                               Player.Local.IsValid() &&
 	                               Player.Local.Job.IsMedicRole() &&
@@ -106,6 +106,48 @@
 		: PartySystem.DefaultPartyColor;
 
 	private string PartyColorHex => PartyColorValue.Hex();
+
+	// When outlines are on, the silhouette is the marker — hide the floating nameplate entirely.
+	private bool HideNameplateForPartyOutline
+	{
+		get
+		{
+			if ( !IsPartyMember )
+			{
+				return false;
+			}
+
+			var party = PartySystem.Instance;
+			if ( party is null || !Player.Local.IsValid() )
+			{
+				return false;
+			}
+
+			var partyId = party.GetPartyId( Player.Local.SteamId );
+			return partyId.HasValue && party.IsMemberOutlineEnabled( partyId.Value );
+		}
+	}
+
+	// When member outlines are on, the silhouette is the marker — skip the redundant PARTY nameplate tag.
+	private bool ShowPartyNameplateTag
+	{
+		get
+		{
+			if ( !IsPartyMember )
+			{
+				return false;
+			}
+
+			var party = PartySystem.Instance;
+			if ( party is null || !Player.Local.IsValid() )
+			{
+				return true;
+			}
+
+			var partyId = party.GetPartyId( Player.Local.SteamId );
+			return !partyId.HasValue || !party.IsMemberOutlineEnabled( partyId.Value );
+		}
+	}
 	
 	private bool HasCameraEquipped()
 	{
@@ -182,6 +224,8 @@
 		var isPartyMember = IsPartyMember;
 		hash.Add( isPartyMember );
 		hash.Add( isPartyMember ? PartyColorValue : 0u );
+		hash.Add( ShowPartyNameplateTag );
+		hash.Add( HideNameplateForPartyOutline );
 		return hash.ToHashCode();
 	}
 }

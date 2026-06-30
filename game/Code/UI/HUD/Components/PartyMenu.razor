@@ -122,6 +122,17 @@
 
 					case PartyTab.Settings:
 						<div class="pane flex flex-col">
+							@if ( SystemAllowsMemberOutline )
+							{
+								<label class="section-label">#party.outline_label</label>
+								<div class="toggle-row flex flex-row items-center gap-2 cursor-pointer"
+								     onclick="@OnToggleMemberOutline">
+									<i class="material-icons toggle-icon">@(MemberOutlineEnabled ? "check_box" : "check_box_outline_blank")</i>
+									<label class="toggle-label">@(MemberOutlineEnabled ? "ON" : "OFF")</label>
+								</div>
+								<label class="pane-hint">#party.outline_hint</label>
+							}
+
 							<label class="section-label">#party.color_label</label>
 							<div class="color-row flex flex-row items-center gap-2">
 								<div class="color-preview" style="background-color: @PendingHex"></div>
@@ -336,6 +347,17 @@
 		Sound.Play( "pop" );
 	}
 
+	private void OnToggleMemberOutline()
+	{
+		if ( !LocalIsLeader || !SystemAllowsMemberOutline )
+		{
+			return;
+		}
+
+		PartySystem.Instance?.RequestSetMemberOutline( !MemberOutlineEnabled );
+		Sound.Play( "pop" );
+	}
+
 	private void OnInviteSubmit()
 	{
 		var name = _inviteName?.Trim();
@@ -385,6 +407,25 @@
 	// Leader-only actions (kick/promote/disband/color) are gated on this; non-leaders see read-only notes.
 	private bool LocalIsLeader => PartySystem.Instance is { } system && Player.Local.IsValid()
 		&& system.IsLeader( Player.Local.SteamId );
+
+	private bool SystemAllowsMemberOutline =>
+		PartySystem.Instance?.Settings.AllowMemberOutline == true;
+
+	private bool MemberOutlineEnabled
+	{
+		get
+		{
+			if ( PartySystem.Instance is not { } system || !Player.Local.IsValid() )
+			{
+				return false;
+			}
+
+			var partyId = system.GetPartyId( Player.Local.SteamId );
+			return partyId.HasValue
+			       && system.Parties.TryGetValue( partyId.Value, out var data )
+			       && data.MemberOutlineEnabled;
+		}
+	}
 
 	private static bool IsSelf( long steamId ) => Player.Local.IsValid() && Player.Local.SteamId == steamId;
 
@@ -449,6 +490,8 @@
 		// Settings preview swatch + Apply button follow the picker before it's committed.
 		if ( activeTabForHash == PartyTab.Settings )
 		{
+			hash.Add( SystemAllowsMemberOutline );
+			hash.Add( MemberOutlineEnabled );
 			hash.Add( _colorDirty );
 			hash.Add( _colorHolder.Color.ToPacked() );
 		}

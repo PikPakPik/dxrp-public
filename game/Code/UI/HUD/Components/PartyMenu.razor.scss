@@ -274,7 +274,34 @@ PartyMenu {
     text-align: center;
   }
 
-  // ── Settings (color) ─────────────────────────────────────────────────────────────────────────
+  // ── Settings (outline + color) ───────────────────────────────────────────────────────────────
+  .toggle-row {
+    margin-top: 4px;
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    border-radius: $rounding;
+    background-color: rgba(black, 0.2);
+    pointer-events: all;
+
+    &:hover {
+      background-color: rgba(black, 0.28);
+    }
+  }
+
+  .toggle-icon {
+    font-size: 20px;
+    color: $color-accent;
+    pointer-events: none;
+  }
+
+  .toggle-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: $color-white;
+    letter-spacing: 0.4px;
+    pointer-events: none;
+  }
+
   .color-row {
     margin-top: 4px;
   }

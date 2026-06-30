@@ -112,6 +112,22 @@ public class PartyCommand : ICommand
 				system.HostSetColor( caller, color );
 				return true;
 
+			case "outline":
+				if ( args.Length < 2 )
+				{
+					caller.SendMessage( Language.GetPhrase( "party.outline_usage" ) );
+					return true;
+				}
+
+				if ( !TryParseOnOff( args[1], out var outlineEnabled ) )
+				{
+					caller.Error( Language.GetPhrase( "party.outline_invalid" ) );
+					return true;
+				}
+
+				system.HostSetMemberOutline( caller, outlineEnabled );
+				return true;
+
 			default:
 				// Shorthand: anything that isn't a known subcommand is treated as a party-chat message
 				// (e.g. "/party lets push north", "/p on my way"). Routes through the same shared,
@@ -154,5 +170,32 @@ public class PartyCommand : ICommand
 		}
 
 		return uint.TryParse( hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out packed );
+	}
+
+	private static bool TryParseOnOff( string input, out bool enabled )
+	{
+		enabled = false;
+		if ( string.IsNullOrWhiteSpace( input ) )
+		{
+			return false;
+		}
+
+		switch ( input.Trim().ToLowerInvariant() )
+		{
+			case "on":
+			case "true":
+			case "1":
+			case "yes":
+				enabled = true;
+				return true;
+			case "off":
+			case "false":
+			case "0":
+			case "no":
+				enabled = false;
+				return true;
+			default:
+				return false;
+		}
 	}
 }
