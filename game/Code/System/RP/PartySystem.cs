@@ -231,6 +231,12 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		SendPartyChat( caller, string.Format( Language.GetPhrase( "party.invite_sent" ), target.DisplayName ) );
 		SendPartyChat( target, string.Format( Language.GetPhrase( "party.invite_received" ), caller.DisplayName ) );
 
+		if ( target.IsDebugPlayer )
+		{
+			HostAccept( target, partyId.Value );
+			return;
+		}
+
 		ScheduleInviteExpiry( partyId.Value, target.SteamId );
 	}
 
