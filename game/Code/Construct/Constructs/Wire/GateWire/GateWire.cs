@@ -28,7 +28,7 @@ public class GateWire() : BaseWireConstruct( ConstructType.GateWire ), IWireEven
 	[WireOutput( "out" )]
 	private object? Out { get; set; }
 
-	public override string Name => $"Gate ({_data.Type})";
+	public override string Name => FormatWireName( $"Gate ({_data.Type})" );
 
 	private bool _inputALinked = false;
 	private bool _inputBLinked = false;

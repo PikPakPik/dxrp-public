@@ -6,7 +6,7 @@ namespace Dxura.RP.Game.Wire;
 public class CameraWire() : BaseWireConstruct( ConstructType.CameraWire ), IWireEvents
 {
 	private CameraWireData _data = new();
-	public override string Name => "Camera";
+	public override string Name => FormatWireName( "Camera" );
 
 	[Property]
 	public required CameraComponent Camera { get; set; }

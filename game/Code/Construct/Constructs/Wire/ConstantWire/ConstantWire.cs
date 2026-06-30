@@ -7,7 +7,7 @@ public class ConstantWire() : BaseWireConstruct( ConstructType.ConstantWire )
 {
 	private ConstantWireData _data = new();
 
-	public override string Name => $"Constant ({_data.Type}: {GetValueString()})";
+	public override string Name => FormatWireName( $"Constant ({_data.Type}: {GetValueString()})" );
 
 	protected override void OnStart()
 	{

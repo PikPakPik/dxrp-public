@@ -26,7 +26,7 @@ public class UserWire() : BaseWireConstruct( ConstructType.UserWire )
 		get => false; // This is just a trigger, no need to store state
 	}
 
-	public override string Name => "User";
+	public override string Name => FormatWireName( "User" );
 
 	protected override void OnStart()
 	{
