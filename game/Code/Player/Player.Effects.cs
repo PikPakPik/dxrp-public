@@ -82,38 +82,56 @@ public partial class Player
 	/// <summary>
 	/// Party silhouettes through geometry for the local viewer. Uses the existing player
 	/// <see cref="HighlightOutline"/> plus the camera's <see cref="Highlight"/> post-process.
+	/// Returns the party color if the outline should be shown, null otherwise.
+	/// Scans <see cref="PartySystem.Parties"/> once and reads all required flags from the same entry.
 	/// </summary>
-	private bool IsPartyOutlineVisible()
+	private Color? GetPartyOutlineColor()
 	{
 		var localPlayer = Local;
 		if ( !localPlayer.IsValid() || localPlayer == this || localPlayer.IsDead )
 		{
-			return false;
+			return null;
 		}
 
 		var party = PartySystem.Instance;
-		if ( party is null || !party.AreInSameParty( localPlayer.SteamId, SteamId ) )
+		if ( party is null || !party.Settings.AllowMemberOutline )
 		{
-			return false;
+			return null;
 		}
 
-		var partyId = party.GetPartyId( localPlayer.SteamId );
-		return partyId.HasValue && party.IsMemberOutlineEnabled( partyId.Value );
+		foreach ( var kv in party.Parties )
+		{
+			var members = kv.Value.Members;
+			if ( members is null || !members.Contains( localPlayer.SteamId ) )
+			{
+				continue;
+			}
+
+			if ( !members.Contains( SteamId ) || !kv.Value.MemberOutlineEnabled )
+			{
+				return null;
+			}
+
+			return kv.Value.Color.ToColor();
+		}
+
+		return null;
 	}
 
 	private void OnUpdateEffects()
 	{
-		if ( IsPartyOutlineVisible() )
+		var partyColor = GetPartyOutlineColor();
+		if ( partyColor.HasValue )
 		{
-			var partyColor = PartySystem.Instance!.GetPartyColorForMember( SteamId ).ToColor();
+			var c = partyColor.Value;
 			Outline.Enabled = true;
 			Outline.OverrideTargets = true;
 			Outline.Targets = GetPartyOutlineTargets();
 			Outline.Width = 0.12f;
-			Outline.Color = partyColor.WithAlpha( 0.12f );
+			Outline.Color = c.WithAlpha( 0.12f );
 			Outline.InsideColor = Color.Transparent;
 			Outline.InsideObscuredColor = Color.Transparent;
-			Outline.ObscuredColor = partyColor.WithAlpha( 0.85f );
+			Outline.ObscuredColor = c.WithAlpha( 0.85f );
 			return;
 		}
 
