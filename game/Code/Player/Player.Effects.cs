@@ -79,8 +79,47 @@ public partial class Player
 		return localPlayer.GetLastKiller() == this;
 	}
 
+	/// <summary>
+	/// Party silhouettes through geometry for the local viewer. Uses the existing player
+	/// <see cref="HighlightOutline"/> plus the camera's <see cref="Highlight"/> post-process.
+	/// </summary>
+	private bool IsPartyOutlineVisible()
+	{
+		var localPlayer = Local;
+		if ( !localPlayer.IsValid() || localPlayer == this || localPlayer.IsDead )
+		{
+			return false;
+		}
+
+		var party = PartySystem.Instance;
+		if ( party is null || !party.AreInSameParty( localPlayer.SteamId, SteamId ) )
+		{
+			return false;
+		}
+
+		var partyId = party.GetPartyId( localPlayer.SteamId );
+		return partyId.HasValue && party.IsMemberOutlineEnabled( partyId.Value );
+	}
+
 	private void OnUpdateEffects()
 	{
+		if ( IsPartyOutlineVisible() )
+		{
+			var partyColor = PartySystem.Instance!.GetPartyColorForMember( SteamId ).ToColor();
+			Outline.Enabled = true;
+			Outline.OverrideTargets = true;
+			Outline.Targets = GetPartyOutlineTargets();
+			Outline.Width = 0.12f;
+			Outline.Color = partyColor.WithAlpha( 0.12f );
+			Outline.InsideColor = Color.Transparent;
+			Outline.InsideObscuredColor = Color.Transparent;
+			Outline.ObscuredColor = partyColor.WithAlpha( 0.85f );
+			return;
+		}
+
+		Outline.OverrideTargets = false;
+		Outline.Targets = null;
+
 		if ( !IsOutlineVisible() )
 		{
 			Outline.Enabled = false;
@@ -92,6 +131,48 @@ public partial class Player
 		Outline.Color = Color.Transparent;
 		Outline.InsideColor = HealthComponent.IsGodMode ? Color.White.WithAlpha( 0.1f ) : Color.Transparent;
 		Outline.ObscuredColor = Color.Red;
+	}
+
+	/// <summary>
+	/// Outline the dressed citizen body only — never equipment under hold bones, emotes, or nameplates.
+	/// Targets must be <see cref="Renderer"/> instances, not <see cref="GameObject"/>.
+	/// </summary>
+	private List<Renderer> GetPartyOutlineTargets()
+	{
+		var targets = new List<Renderer>();
+
+		if ( Renderer.IsValid() && Renderer.Enabled && Renderer.Model is { IsError: false } )
+		{
+			targets.Add( Renderer );
+		}
+
+		if ( !BodyRoot.IsValid() )
+		{
+			return targets;
+		}
+
+		foreach ( var skinnedRenderer in BodyRoot.GetComponentsInChildren<SkinnedModelRenderer>( true ) )
+		{
+			if ( skinnedRenderer == Renderer || skinnedRenderer == EmoteRenderer )
+			{
+				continue;
+			}
+
+			// Dresser clothing only — equipment rigs live under hold_* and must not be outlined.
+			if ( !skinnedRenderer.GameObject.Name.StartsWith( "Clothing - ", StringComparison.Ordinal ) )
+			{
+				continue;
+			}
+
+			if ( !skinnedRenderer.Enabled || skinnedRenderer.Model is null || skinnedRenderer.Model.IsError )
+			{
+				continue;
+			}
+
+			targets.Add( skinnedRenderer );
+		}
+
+		return targets;
 	}
 
 	[Rpc.Broadcast( NetFlags.HostOnly | NetFlags.Unreliable )]

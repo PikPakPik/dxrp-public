@@ -17,6 +17,12 @@ public class PartySystemConfig
 
 	/// <summary>Seconds a pending /party invite stays valid before it auto-expires. Mirrors CoinFlipDuration (30s).</summary>
 	public int InviteExpireSeconds { get; init; } = 30;
+
+	/// <summary>
+	/// When true, party members can see each other through geometry via <see cref="HighlightOutline"/>
+	/// (requires the camera's <see cref="Highlight"/> post-process). Operators can disable server-wide.
+	/// </summary>
+	public bool AllowMemberOutline { get; init; } = true;
 }
 
 /// <summary>
@@ -41,6 +47,12 @@ public class PartyData
 
 	/// <summary>Packed 0xRRGGBB highlight color (leader-customizable; drives nameplate + future party HUD).</summary>
 	public uint Color { get; set; }
+
+	/// <summary>
+	/// When true, members of this party see each other's silhouettes through geometry using the party color.
+	/// Leader-controlled party option; still gated by <see cref="PartySystemConfig.AllowMemberOutline"/>.
+	/// </summary>
+	public bool MemberOutlineEnabled { get; set; } = true;
 }
 
 /// <summary>
@@ -126,6 +138,14 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		var partyId = GetPartyId( steamId );
 		return partyId.HasValue ? GetPartyColor( partyId.Value ) : DefaultPartyColor;
 	}
+
+	/// <summary>
+	/// Whether <paramref name="partyId"/> should render member outlines for its roster (system + party option).
+	/// </summary>
+	public bool IsMemberOutlineEnabled( Guid partyId ) =>
+		Settings.AllowMemberOutline
+		&& Parties.TryGetValue( partyId, out var data )
+		&& data.MemberOutlineEnabled;
 
 	/// <summary>
 	/// Builds a client-readable view of a party for UI/HUD. This is display state only —
@@ -426,6 +446,49 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 	}
 
 	/// <summary>
+	/// Leader toggles whether this party draws member silhouettes through geometry
+	/// (<see cref="HighlightOutline.ObscuredColor"/> + camera <see cref="Highlight"/>).
+	/// </summary>
+	public void HostSetMemberOutline( Player caller, bool enabled )
+	{
+		if ( !Networking.IsHost || caller is null )
+		{
+			return;
+		}
+
+		var partyId = GetPartyId( caller.SteamId );
+		if ( !partyId.HasValue )
+		{
+			caller.Error( Language.GetPhrase( "party.no_party" ) );
+			return;
+		}
+
+		if ( !IsLeader( caller.SteamId ) )
+		{
+			caller.Error( Language.GetPhrase( "party.not_leader" ) );
+			return;
+		}
+
+		if ( !Settings.AllowMemberOutline )
+		{
+			caller.Error( Language.GetPhrase( "party.outline_disabled_server" ) );
+			return;
+		}
+
+		var data = Clone( Parties[partyId.Value] );
+		if ( data.MemberOutlineEnabled == enabled )
+		{
+			return;
+		}
+
+		data.MemberOutlineEnabled = enabled;
+		Parties[partyId.Value] = data;
+
+		var phrase = enabled ? "party.outline_enabled" : "party.outline_disabled";
+		NotifyParty( partyId.Value, Language.GetPhrase( phrase ) );
+	}
+
+	/// <summary>
 	/// Leader hands leadership to <paramref name="target"/>, a fellow party member. This is the manual
 	/// counterpart to the automatic oldest-member transfer in <see cref="RemovePlayerInternal"/> when a
 	/// leader leaves; both just reassign <see cref="PartyData.Leader"/> and replicate.
@@ -600,6 +663,16 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		}
 	}
 
+	[Rpc.Host]
+	public void RequestSetMemberOutline( bool enabled )
+	{
+		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
+		if ( caller.IsValid() )
+		{
+			HostSetMemberOutline( caller, enabled );
+		}
+	}
+
 	// ── Internal helpers (host-side) ────────────────────────────────────────────────────────
 
 	/// <summary>
@@ -614,7 +687,8 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		Leader = src.Leader,
 		Members = new List<long>( src.Members ),
 		Invites = new List<long>( src.Invites ),
-		Color = src.Color
+		Color = src.Color,
+		MemberOutlineEnabled = src.MemberOutlineEnabled
 	};
 
 	private Guid CreatePartyForLeader( Player leader )
@@ -625,7 +699,8 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 			Leader = leader.SteamId,
 			Members = new List<long> { leader.SteamId },
 			Invites = new List<long>(),
-			Color = DefaultPartyColor
+			Color = DefaultPartyColor,
+			MemberOutlineEnabled = Settings.AllowMemberOutline
 		};
 		SendPartyChat( leader, Language.GetPhrase( "party.created" ) );
 		return partyId;
