@@ -525,7 +525,7 @@
   "tool.wire.attack1": "Use",
   "tool.wire.attack2": "Anchor",
   "tool.wire.reload": "Reset",
-  "tool.wire.labeler.name": "Wire Labeler",
+  "tool.wire.labeler.name": "Labeler",
   "tool.wire.labeler.description": "Tag and identify wire constructs in-world",
   "tool.wire.labeler.attack1": "Apply Label",
   "tool.wire.labeler.attack2": "Copy Label",

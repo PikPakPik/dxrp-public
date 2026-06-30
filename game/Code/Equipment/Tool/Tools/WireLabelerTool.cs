@@ -4,7 +4,7 @@ using Dxura.RP.Shared;
 namespace Dxura.RP.Game.Tools;
 
 [Tool( "#tool.wire.labeler.name", "#tool.wire.labeler.description", "#tool.group.core", Category = ToolCategory.Wire )]
-public class WireLabelTool : BaseTool
+public class WireLabelerTool : BaseTool
 {
 	public static bool IsDeployed { get; private set; }
 
