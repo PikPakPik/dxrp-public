@@ -221,13 +221,14 @@ public sealed partial class Chat
 				}
 			case MessageType.PartyChat:
 				{
-					var partyId = PartySystem.Instance?.GetPartyId( player.SteamId );
+					var partySystem = PartySystem.Instance;
+					var partyId = partySystem?.GetPartyId( player.SteamId );
 					if ( !partyId.HasValue )
 					{
 						return;
 					}
 
-					var partyMembers = PartySystem.Instance.GetMembers( partyId.Value ).ToHashSet();
+					var partyMembers = partySystem.GetMembers( partyId.Value ).ToHashSet();
 					var partyConnections = GameUtils.Players
 						.Where( x => x.IsValid() && partyMembers.Contains( x.SteamId ) )
 						.Select( x => x.Connection )

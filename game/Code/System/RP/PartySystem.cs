@@ -194,18 +194,29 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		var partyId = GetPartyId( caller.SteamId );
 		if ( !partyId.HasValue )
 		{
+			// A new party starts with 1 member; if MaxPartySize is already at capacity, bail before creating
+			// so the caller isn't orphaned as the leader of a party they can never invite anyone into.
+			if ( Settings.MaxPartySize <= 1 )
+			{
+				caller.Error( Language.GetPhrase( "party.party_full" ) );
+				return;
+			}
+
 			partyId = CreatePartyForLeader( caller );
 		}
-		else if ( !IsLeader( caller.SteamId ) )
+		else
 		{
-			caller.Error( Language.GetPhrase( "party.not_leader" ) );
-			return;
-		}
+			if ( !IsLeader( caller.SteamId ) )
+			{
+				caller.Error( Language.GetPhrase( "party.not_leader" ) );
+				return;
+			}
 
-		if ( GetPartySize( partyId.Value ) >= Settings.MaxPartySize )
-		{
-			caller.Error( Language.GetPhrase( "party.party_full" ) );
-			return;
+			if ( GetPartySize( partyId.Value ) >= Settings.MaxPartySize )
+			{
+				caller.Error( Language.GetPhrase( "party.party_full" ) );
+				return;
+			}
 		}
 
 		// One pending invite per player: clear any prior invite before recording this one.
@@ -223,8 +234,9 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		ScheduleInviteExpiry( partyId.Value, target.SteamId );
 	}
 
-	/// <summary>Accept the single pending invite for the caller.</summary>
-	public void HostAccept( Player caller )
+	/// <summary>Accept a pending invite for the caller. When <paramref name="specificPartyId"/> is provided
+	/// (UI path), only accept that party's invite; otherwise search all parties (command path).</summary>
+	public void HostAccept( Player caller, Guid? specificPartyId = null )
 	{
 		if ( !Networking.IsHost || caller is null )
 		{
@@ -237,7 +249,14 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 			return;
 		}
 
-		var partyId = FindInviteParty( caller.SteamId );
+		// If a specific party was requested, honour it only when the invite actually exists there;
+		// otherwise fall back to searching all parties (single-invite command path).
+		var partyId = specificPartyId.HasValue &&
+		              Parties.TryGetValue( specificPartyId.Value, out var pCheck ) &&
+		              pCheck.Invites?.Contains( caller.SteamId ) == true
+			? specificPartyId
+			: FindInviteParty( caller.SteamId );
+
 		if ( !partyId.HasValue )
 		{
 			caller.Error( Language.GetPhrase( "party.invite_none" ) );
@@ -539,12 +558,12 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 	}
 
 	[Rpc.Host]
-	public void RequestAccept()
+	public void RequestAccept( Guid partyId )
 	{
 		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
 		if ( caller.IsValid() )
 		{
-			HostAccept( caller );
+			HostAccept( caller, partyId );
 		}
 	}
 

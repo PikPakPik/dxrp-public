@@ -12,33 +12,9 @@
 	var inParty = room is not null;
 	var isLeader = LocalIsLeader;
 
-	// Local functions so they are visible to the top-level Razor C# block during generation.
-	// Mirrors the static/instance helpers below for BuildHash.
-	IEnumerable<(PartyTab Section, string LabelKey, string Icon)> VisibleTabsLocal( bool ip, bool il )
-	{
-		foreach ( var t in AllTabs )
-		{
-			var show = t.Section switch
-			{
-				PartyTab.Start => !ip,
-				PartyTab.Join => !ip,
-				PartyTab.Party => ip,
-				PartyTab.Settings => ip && il,
-				PartyTab.Leave => ip,
-				_ => false
-			};
-			if ( show ) yield return t;
-		}
-	}
-
-	PartyTab EffectiveTabLocal( bool ip, bool il )
-	{
-		foreach ( var t in VisibleTabsLocal( ip, il ) )
-		{
-			if ( t.Section == _tab ) return _tab;
-		}
-		return ip ? PartyTab.Party : PartyTab.Start;
-	}
+	// Local function aliases so the top-level Razor C# block can see them during code generation.
+	IEnumerable<(PartyTab Section, string LabelKey, string Icon)> VisibleTabsLocal( bool ip, bool il ) => VisibleTabs( ip, il );
+	PartyTab EffectiveTabLocal( bool ip, bool il ) => EffectiveTab( ip, il );
 
 	var activeTab = EffectiveTabLocal( inParty, isLeader );
 }
@@ -111,7 +87,7 @@
 											<i class="material-icons" style="color: @AccentHex">group</i>
 											<label class="invite-name">@LeaderName( invite )</label>
 											<div class="flex-grow"></div>
-											<div class="primary-btn flex flex-row items-center gap-1" onclick="@OnAccept">
+											<div class="primary-btn flex flex-row items-center gap-1" onclick="@(() => OnAccept( invite.Id ))">
 												<i class="material-icons">check</i>
 												<label>#party.join_accept</label>
 											</div>
@@ -378,7 +354,7 @@
 		}
 	}
 
-	private static void OnAccept() => PartySystem.Instance?.RequestAccept();
+	private static void OnAccept( Guid partyId ) => PartySystem.Instance?.RequestAccept( partyId );
 	private static void OnKick( long steamId ) => PartySystem.Instance?.RequestKick( steamId );
 	private static void OnToggleHud() => PartyHud.Hidden = !PartyHud.Hidden;
 

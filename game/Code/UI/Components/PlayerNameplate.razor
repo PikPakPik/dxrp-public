@@ -179,8 +179,9 @@
 		hash.Add(health.CeilToInt());
 		hash.Add( DxNameplates );
 		hash.Add( RankSystem.Instance.GetPlayerRank( Player.SteamId )?.Name );
-		hash.Add( IsPartyMember );
-		hash.Add( IsPartyMember ? PartyColorValue : 0u );
+		var isPartyMember = IsPartyMember;
+		hash.Add( isPartyMember );
+		hash.Add( isPartyMember ? PartyColorValue : 0u );
 		return hash.ToHashCode();
 	}
 }

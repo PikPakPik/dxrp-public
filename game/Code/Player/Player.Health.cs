@@ -46,6 +46,8 @@ public partial class Player
 
 	void IDamageEvents.OnModifyDamageTaken( Component victim, ref DamageInfo damageInfo )
 	{
+		// Party protection runs first: friendly-fire between party members is blocked entirely regardless
+		// of governance role (e.g. two police in the same party still can't hurt each other).
 		if ( ApplyPartyDamageProtection( ref damageInfo ) )
 		{
 			return;
