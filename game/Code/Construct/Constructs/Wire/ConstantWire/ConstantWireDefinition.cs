@@ -13,6 +13,11 @@ public class ConstantWireDefinition : WireConstructDefinition<ConstantWire, Cons
 
 	protected override ConstructDataValidationResult ValidateWireTyped( ConstantWireData data )
 	{
+		if ( data.Type == ConstantWireType.String && data.StringValue.Length > Wire.MaxWireStringLength )
+		{
+			return ConstructDataValidationResult.Failure( $"String value exceeds maximum length of {Wire.MaxWireStringLength} characters." );
+		}
+
 		return ConstructDataValidationResult.Success();
 	}
 
