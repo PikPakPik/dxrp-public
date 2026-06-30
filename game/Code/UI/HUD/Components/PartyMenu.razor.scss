@@ -1,17 +1,21 @@
 @import "../../styles.scss";
 
 PartyMenu {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  align-items: center;
-  justify-content: center;
-  // Above the always-on HUD, but below AdminTickets (z 999000, staff-only) so staff tickets still win.
-  z-index: 100000;
-  pointer-events: all;
-  background-color: rgba(black, 0.55);
+  // Only stretch to cover the screen and block input when the menu is actually open.
+  // Without this guard the panel root would sit full-screen at all times and eat every click.
+  &.is-open {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    // Above the always-on HUD, but below AdminTickets (z 999000, staff-only) so staff tickets still win.
+    z-index: 100000;
+    pointer-events: all;
+    background-color: rgba(black, 0.55);
+  }
 
   .window {
     width: 680px;

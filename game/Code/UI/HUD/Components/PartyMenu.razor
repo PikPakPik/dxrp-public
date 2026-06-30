@@ -2,24 +2,21 @@
 @inherits Panel
 @attribute [StyleSheet]
 
-@if ( !IsOpen )
-{
-	return;
-}
-
 @{
-	var room = PartyRoom.Current;
-	var inParty = room is not null;
-	var isLeader = LocalIsLeader;
-
-	// Local function aliases so the top-level Razor C# block can see them during code generation.
+	// Local function aliases — defined before <root> so the markup below can call them.
 	IEnumerable<(PartyTab Section, string LabelKey, string Icon)> VisibleTabsLocal( bool ip, bool il ) => VisibleTabs( ip, il );
 	PartyTab EffectiveTabLocal( bool ip, bool il ) => EffectiveTab( ip, il );
-
-	var activeTab = EffectiveTabLocal( inParty, isLeader );
 }
 
-<root>
+<root class="@(IsOpen ? "is-open" : "")">
+@if ( IsOpen )
+{
+	@{
+		var room = PartyRoom.Current;
+		var inParty = room is not null;
+		var isLeader = LocalIsLeader;
+		var activeTab = EffectiveTabLocal( inParty, isLeader );
+	}
 	<div class="window flex flex-col">
 		<div class="title-bar flex flex-row items-center">
 			<label class="title">#party.window_title</label>
@@ -191,6 +188,7 @@
 			</div>
 		</div>
 	</div>
+}
 </root>
 
 @code
