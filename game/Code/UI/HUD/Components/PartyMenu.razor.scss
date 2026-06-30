@@ -23,7 +23,6 @@ PartyMenu {
     max-width: 92vw;
     max-height: 84vh;
     background-color: $color-primary;
-    border: 1px solid rgba(white, 0.06);
     border-radius: $rounding;
     overflow: hidden;
   }
@@ -32,7 +31,7 @@ PartyMenu {
   .title-bar {
     padding: 10px 14px;
     background-color: rgba(black, 0.35);
-    border-bottom: 1px solid rgba(white, 0.06);
+    border-bottom: 0.5px solid rgba(white, 0.04);
     gap: 4px;
   }
 
@@ -173,7 +172,7 @@ PartyMenu {
   .invite-input {
     flex-grow: 1;
     background-color: rgba(black, 0.4);
-    border: 1px solid rgba(white, 0.08);
+    border: 0.5px solid rgba(white, 0.04);
     border-radius: $rounding;
     padding: 7px 10px;
     color: $color-white;
