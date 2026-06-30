@@ -227,7 +227,7 @@
   "command.spawnentity.list_empty": "No spawnable equipment. Use the market for entities like printers.",
   "command.spawnentity.list_empty_filter": "No spawnable equipment matching '{0}'.",
   "command.spawnentity.list": "Equipment ({0}): {1}",
-  "command.spawnentity.suggest": "Did you mean: {0}",
+  "command.spawnentity.suggest": "Did you mean: {0}?", 
   "command.gag.help": "Gag a player for a specified duration (Staff only)",
   "command.gag.usage": "Usage: /gag <username/steamid> <duration> <reason>",
   "command.gag.duration_examples": "Duration examples: 10m, 1h, 1d",
