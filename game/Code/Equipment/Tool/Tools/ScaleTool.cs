@@ -46,10 +46,10 @@ public class ScaleTool : BaseTool
 			return false;
 		}
 
-		// Validate scale limits
-		if ( x < PropDefinition.MinPropScale || x > PropDefinition.MaxPropScale ||
-		     y < PropDefinition.MinPropScale || y > PropDefinition.MaxPropScale ||
-		     z < PropDefinition.MinPropScale || z > PropDefinition.MaxPropScale )
+		// Validate scale limits (epsilon-tolerant, see PropDefinition.ScaleEpsilon)
+		if ( x < PropDefinition.MinPropScale - PropDefinition.ScaleEpsilon || x > PropDefinition.MaxPropScale + PropDefinition.ScaleEpsilon ||
+		     y < PropDefinition.MinPropScale - PropDefinition.ScaleEpsilon || y > PropDefinition.MaxPropScale + PropDefinition.ScaleEpsilon ||
+		     z < PropDefinition.MinPropScale - PropDefinition.ScaleEpsilon || z > PropDefinition.MaxPropScale + PropDefinition.ScaleEpsilon )
 		{
 			Notify.Error( $"Scale must be between {PropDefinition.MinPropScale} and {PropDefinition.MaxPropScale}" );
 			return false;
@@ -92,8 +92,9 @@ public class ScaleTool : BaseTool
 		}
 		else
 		{
-			// Validate factor scaling limits
-			if ( ScaleFactor is < PropDefinition.MinPropScale or > PropDefinition.MaxPropScale )
+			// Validate factor scaling limits (epsilon-tolerant, see PropDefinition.ScaleEpsilon)
+			if ( ScaleFactor < PropDefinition.MinPropScale - PropDefinition.ScaleEpsilon ||
+			     ScaleFactor > PropDefinition.MaxPropScale + PropDefinition.ScaleEpsilon )
 			{
 				Notify.Error( $"Scale must be between {PropDefinition.MinPropScale} and {PropDefinition.MaxPropScale}" );
 				return;
