@@ -43,6 +43,10 @@
 								OnTextEdited=@( ( string value ) => {
 									if ( float.TryParse( value, out var floatValue ) )
 									{
+										if ( range != null )
+										{
+											floatValue = Math.Clamp( floatValue, range.Min, range.Max );
+										}
 										property.SetValue( floatValue );
 									}
 								} )/>

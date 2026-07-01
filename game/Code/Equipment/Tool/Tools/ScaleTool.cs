@@ -55,6 +55,11 @@ public class ScaleTool : BaseTool
 			return false;
 		}
 
+		// Snap values within epsilon of the boundary back onto it, so nothing slightly out-of-range is stored
+		x = Math.Clamp( x, PropDefinition.MinPropScale, PropDefinition.MaxPropScale );
+		y = Math.Clamp( y, PropDefinition.MinPropScale, PropDefinition.MaxPropScale );
+		z = Math.Clamp( z, PropDefinition.MinPropScale, PropDefinition.MaxPropScale );
+
 		scaleValues = new Vector3( x, y, z );
 		return true;
 	}
@@ -100,8 +105,11 @@ public class ScaleTool : BaseTool
 				return;
 			}
 
+			// Snap values within epsilon of the boundary back onto it, so nothing slightly out-of-range is stored
+			var clampedFactor = Math.Clamp( ScaleFactor, PropDefinition.MinPropScale, PropDefinition.MaxPropScale );
+
 			// Apply factor scaling
-			scaleValues = Vector3.One * ScaleFactor;
+			scaleValues = Vector3.One * clampedFactor;
 		}
 
 		if ( !Scale( targetObject, scaleValues ) )

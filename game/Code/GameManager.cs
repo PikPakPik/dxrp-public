@@ -870,6 +870,13 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 			return;
 		}
 
+		// Snap values within epsilon of the boundary back onto it, so nothing slightly out-of-range is stored
+		scaleValues = new Vector3(
+			Math.Clamp( scaleValues.x, PropDefinition.MinPropScale, PropDefinition.MaxPropScale ),
+			Math.Clamp( scaleValues.y, PropDefinition.MinPropScale, PropDefinition.MaxPropScale ),
+			Math.Clamp( scaleValues.z, PropDefinition.MinPropScale, PropDefinition.MaxPropScale )
+		);
+
 		// Apply the scaling directly - unified approach for all
 		entity.ApplyScaleOwner( scaleValues );
 	}
