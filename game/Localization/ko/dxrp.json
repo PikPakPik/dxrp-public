@@ -660,7 +660,7 @@
   "wire.input.reset_hits.name": "명중 초기화",
   "wire.input.reset_hits.description": "명중 횟수를 초기화합니다",
   "wire.output.value.name": "값",
-  "wire.output.value.description": "상수 출력값",
+  "wire.output.value.description": "출력 값",
   "constantwiretype.number": "숫자",
   "constantwiretype.bool": "불리언",
   "constantwiretype.string": "문자열",

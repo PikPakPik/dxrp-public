@@ -46,6 +46,7 @@ public class ArrayWire() : BaseWireConstruct( ConstructType.ArrayWire ), IWireEv
 	{
 		if ( !IsPreview )
 		{
+			SetData( DataJson );
 			RegisterOutputPort( "value", GetValueWireType() );
 		}
 
@@ -134,15 +135,8 @@ public class ArrayWire() : BaseWireConstruct( ConstructType.ArrayWire ), IWireEv
 
 	private void ClearAllValues()
 	{
-		switch ( _data.ValueType )
-		{
-			case ArrayWireValueType.Number:
-				_numberValues.Clear();
-				break;
-			case ArrayWireValueType.String:
-				_stringValues.Clear();
-				break;
-		}
+		_numberValues.Clear();
+ 		_stringValues.Clear();
 
 		PersistData();
 	}
