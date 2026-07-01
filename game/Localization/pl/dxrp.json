@@ -769,6 +769,7 @@
   "tool.inspector.material_selected": "Materiał wybrany",
   "tool.inspector.reset_settings": "Resetuj ustawienia",
   "tool.inspector.text_placeholder": "Wpisz tekst...",
+  "tool.inspector.line": "Linia {0}",
   "roleplay.job.citizen.name": "Obywatel",
   "roleplay.job.citizen.description": "Zwykły członek społeczeństwa bez wyspecjalizowanej roli.",
   "roleplay.job.cook.name": "Kucharz",

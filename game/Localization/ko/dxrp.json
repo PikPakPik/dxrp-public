@@ -769,6 +769,7 @@
   "tool.inspector.material_selected": "재질 선택 완료",
   "tool.inspector.reset_settings": "설정 초기화",
   "tool.inspector.text_placeholder": "텍스트를 입력하세요...",
+  "tool.inspector.line": "{0}번째 줄",
   "roleplay.job.citizen.name": "시민",
   "roleplay.job.citizen.description": "특별한 역할 없이 사회를 살아가는 일반 시민입니다.",
   "roleplay.job.cook.name": "요리사",

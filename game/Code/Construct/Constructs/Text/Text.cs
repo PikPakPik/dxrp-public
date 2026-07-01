@@ -18,7 +18,7 @@ public sealed class Text() : BaseConstruct( ConstructType.Text )
 	{
 		var textData = newData is TextData data ? data : new TextData();
 		var oldTextData = oldData is TextData old ? old : new TextData();
-		var lines = textData.Lines ?? new List<TextLineData> { new() };
+		var lines = textData.Lines is { Count: > 0 } l ? l : new List<TextLineData> { new() };
 
 		GameObject.Name = $"Text ({lines[0].Text})";
 
@@ -44,7 +44,7 @@ public sealed class Text() : BaseConstruct( ConstructType.Text )
 
 			const float fallbackFontSize = 32f;
 			const string fallbackText = "Hello! ❤";
-			( Collider as BoxCollider )!.Scale = new Vector3( 2f, fallbackText.Length * fallbackFontSize * 0.06f, fallbackFontSize * 0.1f );
+			( Collider as BoxCollider )?.Scale = new Vector3( 2f, fallbackText.Length * fallbackFontSize * 0.06f, fallbackFontSize * 0.1f );
 			return;
 		}
 
@@ -56,7 +56,7 @@ public sealed class Text() : BaseConstruct( ConstructType.Text )
 		float totalHeight = lineHeights.Sum() + ( visibleLines.Count - 1 ) * lineGap;
 		float maxWidth = visibleLines.Max( l => MathF.Max( 1f, l.Text.Length * l.FontSize * 0.06f ) );
 
-		( Collider as BoxCollider )!.Scale = new Vector3( 2f, maxWidth, totalHeight );
+		( Collider as BoxCollider )?.Scale = new Vector3( 2f, maxWidth, totalHeight );
 
 		float zOffset = totalHeight / 2f;
 

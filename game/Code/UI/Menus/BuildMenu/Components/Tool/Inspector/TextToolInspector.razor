@@ -14,22 +14,25 @@
 	<label class="header">@textTool.GetName()</label>
 
 	<div class="tabs">
-		@foreach ( var idx in Enumerable.Range( 0, textTool.LineCount ) )
-		{
-			var i = idx;
-			<div class="tab-btn @( textTool.SelectedLine == i ? "active" : "" )"
-			     @onclick="@(() => SelectLine( textTool, i ))">
-				Line @( i + 1 )
-			</div>
-		}
-		<div style="flex: 1;"></div>
-		<div class="tab-action @( textTool.LineCount >= TextDefinition.MaxLines ? "disabled" : "" )"
-		     @onclick="@(() => AddLine( textTool ))">
-			+
+		<div class="line-tabs">
+			@foreach ( var idx in Enumerable.Range( 0, textTool.LineCount ) )
+			{
+				var i = idx;
+				<div class="tab-btn @( textTool.SelectedLine == i ? "active" : "" )"
+				     @onclick="@(() => SelectLine( textTool, i ))">
+					@string.Format( Language.GetPhrase( "tool.inspector.line" ), i + 1 )
+				</div>
+			}
 		</div>
-		<div class="tab-action danger @( textTool.LineCount <= 1 ? "disabled" : "" )"
-		     @onclick="@(() => RemoveSelectedLine( textTool ))">
-			−
+		<div class="tab-actions">
+			<div class="tab-action @( textTool.LineCount >= TextDefinition.MaxLines ? "disabled" : "" )"
+			     @onclick="@(() => AddLine( textTool ))">
+				+
+			</div>
+			<div class="tab-action danger @( textTool.LineCount <= 1 ? "disabled" : "" )"
+			     @onclick="@(() => RemoveSelectedLine( textTool ))">
+				−
+			</div>
 		</div>
 	</div>
 

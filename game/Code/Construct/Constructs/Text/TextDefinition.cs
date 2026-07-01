@@ -61,6 +61,9 @@ public class TextDefinition : ConstructDefinition<Text, TextData>
 
 		if ( lines.Count > MaxLines )
 			return ConstructDataValidationResult.Failure( $"Maximum {MaxLines} text lines allowed" );
+		
+		if ( lines.TrueForAll( l => string.IsNullOrEmpty( l.Text ) ) )
+ 			return ConstructDataValidationResult.Failure( "At least one line must have text" );
 
 		// Empty lines are allowed — they are skipped at render time and show the "Hello! ❤" fallback.
 		foreach ( var line in lines )

@@ -769,6 +769,7 @@
   "tool.inspector.material_selected": "Материал выбран",
   "tool.inspector.reset_settings": "Сбросить настройки",
   "tool.inspector.text_placeholder": "Введите текст...",
+  "tool.inspector.line": "Строка {0}",
   "roleplay.job.citizen.name": "Гражданин",
   "roleplay.job.citizen.description": "Обычный член общества без специализации.",
   "roleplay.job.cook.name": "Повар",
