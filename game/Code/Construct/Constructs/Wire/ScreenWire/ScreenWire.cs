@@ -639,11 +639,10 @@ public class ScreenWire() : BaseWireConstruct( ConstructType.ScreenWire ), IWire
 		var lines = text.Split( '\n' );
 		if ( lines.Length > 1 )
 		{
-			return string.Join( "\n", lines.Select( line => WrapLine( line, maxWidth, fontFamily, fontSize ) ) );
+			return string.Join( "\n", lines.Select( line => WrapLine( line, maxWidth, fontFamily, fontSize ).TrimEnd( '\n' ) ) );
 		}
 
-		return WrapLine( text, maxWidth, fontFamily, fontSize );
-	}
+		return WrapLine( text, maxWidth, fontFamily, fontSize ).TrimEnd( '\n' );
 
 	private string WrapLine( string text, float maxWidth, string fontFamily, float fontSize )
 	{
