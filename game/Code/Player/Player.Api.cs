@@ -1,3 +1,10 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// PROPRIETARY & CONFIDENTIAL — © 2026 lifepunch.co. All rights reserved.
+//
+// LifePunch DXRP editor overlay — gates player pulse until lp_authorize applies tenant ID.
+// Sync: lifepunch/scripts/Sync-DxrpEditorOverlays.ps1
+// ─────────────────────────────────────────────────────────────────────────────
+
 using Sandbox.Engine;
 using System.Threading.Tasks;
 
@@ -10,7 +17,13 @@ public partial class Player
 
 	private void OnSecondlyUpdateApi()
 	{
-		if ( string.IsNullOrEmpty( ServerApiLink.Current?.TenantId ) )
+		if ( !ServerApiLink.HasAuthorizationKey )
+		{
+			return;
+		}
+
+		// lp_authorize sets Token before InitializeServer returns TenantId — one stray pulse 403s without this gate.
+		if ( !ServerApiLink.IsPortalTenantReady )
 		{
 			return;
 		}

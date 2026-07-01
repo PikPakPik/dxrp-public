@@ -147,6 +147,13 @@ PartyMenu {
     text-align: center;
   }
 
+  .settings-pane {
+    .pane-hint {
+      font-size: 11px;
+      text-align: center;
+    }
+  }
+
   .pane-note {
     font-size: 12px;
     color: $color-gray-400;
@@ -306,6 +313,29 @@ PartyMenu {
     margin-top: 4px;
   }
 
+  .settings-apply-row {
+    width: 100%;
+
+    .primary-btn {
+      margin-left: auto;
+    }
+  }
+
+  .size-control-block {
+    flex-grow: 1;
+    min-width: 0;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    border-radius: $rounding;
+    background-color: rgba(black, 0.2);
+    pointer-events: all;
+
+    &:hover {
+      background-color: rgba(black, 0.28);
+    }
+  }
+
   .color-preview {
     width: 28px;
     height: 28px;
@@ -377,6 +407,18 @@ PartyMenu {
 
       &:hover {
         background-color: rgba($color-bad, 0.18);
+      }
+    }
+
+    &.size-step {
+      background-color: rgba($color-accent, 0.14);
+
+      i {
+        color: $color-accent;
+      }
+
+      &:hover {
+        background-color: rgba($color-accent, 0.24);
       }
     }
   }
