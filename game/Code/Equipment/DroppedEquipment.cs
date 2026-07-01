@@ -149,12 +149,13 @@ public class DroppedEquipment : Component, Component.IPressable
 		droppedWeapon.PrefabPath = dto.PrefabPath();
 		droppedWeapon.MarketItemId = marketItemId != Guid.Empty ? marketItemId : heldWeapon?.MarketItemId ?? Guid.Empty;
 
+		var model = dto.GetWorldModel();
 		var renderer = go.Components.Create<ModelRenderer>();
-		renderer.Model = dto.GetWorldModel();
+		renderer.Model = model;
 
 		var collider = go.Components.Create<BoxCollider>();
-		collider.Scale = heldWeapon?.DroppedSize ?? new Vector3( 8, 2, 8 );
-		collider.Center = heldWeapon?.DroppedCenter ?? default;
+		collider.Scale = model?.Bounds.Size ?? new Vector3( 8, 2, 8 );
+		collider.Center = model?.Bounds.Center ?? default;
 
 		droppedWeapon.Rigidbody = go.Components.Create<Rigidbody>();
 
