@@ -150,7 +150,9 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 	}
 
 	public string GetPartyName( Guid partyId ) =>
-		Parties.TryGetValue( partyId, out var data ) ? NormalizePartyName( data.Name ) : DefaultPartyName;
+		Parties.TryGetValue( partyId, out var data ) && !string.IsNullOrWhiteSpace( data.Name )
+			? data.Name
+			: DefaultPartyName;
 
 	public string GetPartyNameForMember( long steamId )
 	{

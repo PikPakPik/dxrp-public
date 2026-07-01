@@ -126,7 +126,8 @@
 				return true;
 			}
 
-			return !PartyPreferences.MemberOutlineEnabled;
+			var systemAllowsOutline = PartySystem.Instance?.Settings.AllowMemberOutline == true;
+			return !( systemAllowsOutline && PartyPreferences.MemberOutlineEnabled );
 		}
 	}
 	
