@@ -154,8 +154,16 @@ public class DroppedEquipment : Component, Component.IPressable
 		renderer.Model = model;
 
 		var collider = go.Components.Create<BoxCollider>();
-		collider.Scale = model?.Bounds.Size ?? new Vector3( 8, 2, 8 );
-		collider.Center = model?.Bounds.Center ?? default;
+		if ( model.IsValid() && model.Bounds.Size.Length > 0.1f )
+		{
+			collider.Scale = model.Bounds.Size;
+			collider.Center = model.Bounds.Center;
+		}
+		else
+		{
+			collider.Scale = heldWeapon?.DroppedSize ?? new Vector3( 8, 2, 8 );
+			collider.Center = heldWeapon?.DroppedCenter ?? default;
+		}
 
 		droppedWeapon.Rigidbody = go.Components.Create<Rigidbody>();
 
