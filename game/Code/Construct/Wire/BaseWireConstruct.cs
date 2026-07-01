@@ -16,7 +16,7 @@ public abstract class BaseWireConstruct( ConstructType type ) : BaseConstruct( t
 	public Vector3 ContextPosition => WorldPosition + Vector3.Up * 6f;
 	public bool LookOpacity => false;
 	public float ContextMaxDistance => 100f;
-	public bool ShouldShow() => DisplayText != null;
+	public virtual bool ShouldShow() => !string.IsNullOrWhiteSpace( DisplayText );
 
 	protected override void OnStart()
 	{
