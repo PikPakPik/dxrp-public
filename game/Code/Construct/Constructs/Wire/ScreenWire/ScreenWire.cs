@@ -643,6 +643,7 @@ public class ScreenWire() : BaseWireConstruct( ConstructType.ScreenWire ), IWire
 		}
 
 		return WrapLine( text, maxWidth, fontFamily, fontSize ).TrimEnd( '\n' );
+	}
 
 	private string WrapLine( string text, float maxWidth, string fontFamily, float fontSize )
 	{
