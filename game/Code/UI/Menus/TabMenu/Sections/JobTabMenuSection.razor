@@ -173,13 +173,6 @@
 	{
 		return GameModeJobs.All
 			.Where( x => x.Selectable || x.IsSameJob( Player.Local.Job ) )
-			.Where( job =>
-			{
-				var prerequisiteJobs = GameModeJobs.GetPrerequisiteJobs( job );
-				return prerequisiteJobs.Length == 0 ||
-				       prerequisiteJobs.Any( p => p.Id == Player.Local.Job?.Id ) ||
-				       job.IsSameJob( Player.Local.Job );
-			} )
 			.OrderBy( x => x.GetGroup()?.Name ?? "zzzz" )
 			.ThenBy( x => x.DisplayName() );
 	}

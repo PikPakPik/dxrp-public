@@ -16,7 +16,12 @@
 	var needsMorePlayTime = requiredPlayTime > currentPlayTime && !IgnoreJobRequirements;
 	var remainingPlayTime = requiredPlayTime - currentPlayTime;
 	var isCurrentJob = Player.Local.Job.IsSameJob( Job );
-	var canChange = !isCurrentJob && Job.Selectable && !needsMorePlayTime && !isFull;
+	var prerequisiteJobs = GameModeJobs.GetPrerequisiteJobs( Job );
+	var missingPrerequisite = !IgnoreJobRequirements
+	                          && prerequisiteJobs.Length > 0
+	                          && !prerequisiteJobs.Any( p => p.Id == Player.Local.Job?.Id )
+	                          && !isCurrentJob;
+	var canChange = !isCurrentJob && Job.Selectable && !needsMorePlayTime && !missingPrerequisite && !isFull;
 	var loadout = GetDisplayLoadout( Job ).ToList();
 	var visibleLoadout = loadout.Take( MaxVisibleLoadoutIcons ).ToList();
 	var hiddenLoadoutCount = loadout.Count - visibleLoadout.Count;
@@ -64,6 +69,12 @@
 				{
 					<div class="unlock-notice">
 						@( $"{Language.GetPhrase( "generic.unlocks" )} {TimeSpan.FromMinutes( remainingPlayTime ).Humanize( 1 )}" )
+					</div>
+				}
+				else if ( missingPrerequisite )
+				{
+					<div class="unlock-notice">
+						#notify.job.prerequisite
 					</div>
 				}
 
