@@ -49,7 +49,7 @@ public static partial class GameObjectExtensions
 		if ( go.Tags.Contains( Constants.EntityTag ) )
 		{
 			var baseEntity = go.GetComponent<BaseEntity>();
-			if ( baseEntity.IsValid() && baseEntity.AllowOwnershipTransfer )
+			if ( baseEntity.IsValid() && ( baseEntity.AllowOwnershipTransfer || baseEntity.Owner == 0 ) )
 			{
 				baseEntity.Owner = player.SteamId;
 			}
