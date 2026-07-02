@@ -63,7 +63,7 @@
 				@if ( needsMorePlayTime )
 				{
 					<div class="unlock-notice">
-						<span>#generic.unlocks</span> @TimeSpan.FromMinutes( remainingPlayTime ).Humanize( 1 )
+						@( $"{Language.GetPhrase( "generic.unlocks" )} {TimeSpan.FromMinutes( remainingPlayTime ).Humanize( 1 )}" )
 					</div>
 				}
 
