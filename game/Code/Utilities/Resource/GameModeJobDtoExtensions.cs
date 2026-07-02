@@ -143,6 +143,11 @@ public static class GameModeJobDtoExtensions
 		return job != null && job.Id != Guid.Empty && !string.IsNullOrWhiteSpace( job.Name );
 	}
 
+	public static bool IsSameJob( this GameModeJobDto? job, GameModeJobDto? other )
+	{
+		return job.IsValid() && other.IsValid() && job!.Id == other!.Id;
+	}
+
 	public static bool IsGovernmentRole( this GameModeJobDto? job )
 	{
 		return job.HasTag( JobTag.Government );
@@ -185,7 +190,7 @@ public static class GameModeJobDtoExtensions
 
 	public static bool AssignableTo( this GameModeJobDto job, Player player )
 	{
-		if ( player.Job == job )
+		if ( player.Job.IsSameJob( job ) )
 		{
 			return false;
 		}

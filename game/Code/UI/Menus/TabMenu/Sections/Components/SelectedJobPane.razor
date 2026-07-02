@@ -15,7 +15,7 @@
 	var currentPlayTime = (int)(Player.Local.PlayTime / 60f);
 	var needsMorePlayTime = requiredPlayTime > currentPlayTime && !IgnoreJobRequirements;
 	var remainingPlayTime = requiredPlayTime - currentPlayTime;
-	var isCurrentJob = Player.Local.Job == Job;
+	var isCurrentJob = Player.Local.Job.IsSameJob( Job );
 	var canChange = !isCurrentJob && Job.Selectable && !needsMorePlayTime && !isFull;
 	var loadout = GetDisplayLoadout( Job ).ToList();
 	var visibleLoadout = loadout.Take( MaxVisibleLoadoutIcons ).ToList();
