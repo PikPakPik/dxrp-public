@@ -217,10 +217,6 @@ PartyMenu {
     background-color: rgba(white, 0.05);
     border-radius: $rounding;
     padding: 6px 10px;
-
-    &.self {
-      background-color: rgba($color-accent, 0.08);
-    }
   }
 
   .party-color-dot {

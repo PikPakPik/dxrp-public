@@ -132,7 +132,7 @@
 								<div class="browse-list flex flex-col">
 									@foreach ( var browsePlayer in browsePlayers )
 									{
-										<div class="browse-row flex flex-row items-center gap-2 @(IsSelf( browsePlayer.SteamId ) ? "self" : "")">
+										<div class="browse-row flex flex-row items-center gap-2">
 											<div class="browse-avatar" style="background-image: url(avatar:@browsePlayer.SteamId)"></div>
 											<label class="browse-name">@browsePlayer.DisplayName</label>
 											<div class="flex-grow"></div>
@@ -634,9 +634,12 @@
 	private static IEnumerable<PartyRoom> BrowseParties() =>
 		PartySystem.Instance?.GetActiveParties() ?? Enumerable.Empty<PartyRoom>();
 
+	// Other online players only — self is intentionally excluded (you're always here viewing the menu),
+	// which matches the "party.browse_no_players" copy ("No other players online.") and keeps that empty
+	// state reachable when you're the only one connected.
 	private static IEnumerable<Player> BrowsePlayers() =>
 		GameUtils.Players
-			.Where( p => p.IsValid() && p.IsConnected )
+			.Where( p => p.IsValid() && p.IsConnected && !IsSelf( p.SteamId ) )
 			.OrderBy( p => p.DisplayName, StringComparer.OrdinalIgnoreCase );
 
 	private static string BrowsePartyTag( Player player )
@@ -712,20 +715,31 @@
 			hash.Add( _colorHolder.Color.ToPacked() );
 		}
 
-		// Browse is read-only, but still needs to react live to parties forming/disbanding and
-		// players connecting/disconnecting while the tab is open.
+		// Browse is read-only, but must react live while open: parties forming/disbanding, players
+		// connecting/disconnecting, and leader edits to any rendered field. Name, color, and desired
+		// size are leader-editable and drawn per row, so they must be hashed too — otherwise a
+		// rename/recolor/resize won't refresh, and a party with no connected members would never
+		// refresh its name/color at all (that's only caught indirectly via members' player tags).
 		if ( activeTabForHash == PartyTab.Browse )
 		{
+			var browseSystem = PartySystem.Instance;
 			foreach ( var browseRoom in BrowseParties() )
 			{
 				hash.Add( browseRoom.Id );
 				hash.Add( browseRoom.Count );
+				if ( browseSystem is not null )
+				{
+					hash.Add( browseSystem.GetPartyName( browseRoom.Id ) );
+					hash.Add( browseSystem.GetPartyColor( browseRoom.Id ) );
+					hash.Add( browseSystem.GetDesiredPartySize( browseRoom.Id ) );
+				}
 			}
 
 			foreach ( var browsePlayer in BrowsePlayers() )
 			{
 				hash.Add( browsePlayer.SteamId );
 				hash.Add( BrowsePartyTag( browsePlayer ) );
+				hash.Add( BrowsePartyTagColorHex( browsePlayer ) );
 			}
 		}
 
