@@ -18,7 +18,7 @@ public static class GameUtils
 	/// </summary>
 	public static IEnumerable<Player> GetPlayersByJob( GameModeJobDto job )
 	{
-		return Players.Where( x => x.Job == job );
+		return Players.Where( x => x.Job.IsSameJob( job ) );
 	}
 
 	public static IEnumerable<Player> GetPlayersByJobTag( JobTag tag )

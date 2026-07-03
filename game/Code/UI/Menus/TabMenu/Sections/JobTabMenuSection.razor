@@ -59,7 +59,7 @@
 									var jobPlayers = playersByJobId.GetValueOrDefault( job.Id ) ?? EmptyJobPlayers;
 									var currentPlayers = jobPlayers.Count;
 									var isFull = job.MaxCount > 0 && currentPlayers >= job.MaxCount;
-									var isCurrentJob = Player.Local.Job == job;
+									var isCurrentJob = Player.Local.Job.IsSameJob( job );
 									var isSelected = effectiveSelected == job;
 
 									<div class="job-card @( isSelected ? "selected" : "" ) @( isCurrentJob ? "current" : "" )"
@@ -172,14 +172,7 @@
 	private IEnumerable<GameModeJobDto> GetVisibleJobs()
 	{
 		return GameModeJobs.All
-			.Where( x => x.Selectable || x == Player.Local.Job )
-			.Where( job =>
-			{
-				var prerequisiteJobs = GameModeJobs.GetPrerequisiteJobs( job );
-				return prerequisiteJobs.Length == 0 ||
-				       prerequisiteJobs.Any( p => p.Id == Player.Local.Job?.Id ) ||
-				       job == Player.Local.Job;
-			} )
+			.Where( x => x.Selectable || x.IsSameJob( Player.Local.Job ) )
 			.OrderBy( x => x.GetGroup()?.Name ?? "zzzz" )
 			.ThenBy( x => x.DisplayName() );
 	}
@@ -189,7 +182,7 @@
 		if ( _selectedJob != null && visibleJobs.Contains( _selectedJob ) )
 			return _selectedJob;
 
-		return visibleJobs.FirstOrDefault( x => x == Player.Local.Job ) ?? visibleJobs.FirstOrDefault();
+		return visibleJobs.FirstOrDefault( x => x.IsSameJob( Player.Local.Job ) ) ?? visibleJobs.FirstOrDefault();
 	}
 
 	private static Guid GetGroupKey( Guid? groupId ) => groupId ?? Guid.Empty;

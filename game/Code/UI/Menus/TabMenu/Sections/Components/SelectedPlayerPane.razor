@@ -15,7 +15,7 @@
 		var canTargetRank = RankSystem.CanLocalTarget( SelectedPlayer.SteamId );
 		var canDemote = Config.Current.Game.DemoteEnabled &&
 		                Player.Local.PlayTime >= Config.Current.Game.DemoteMinPlaytime &&
-		                SelectedPlayer.Job != GameModeJobs.Default &&
+		                !SelectedPlayer.Job.IsSameJob( GameModeJobs.Default ) &&
 		                SelectedPlayer.Job.Demotable;
 		var canJail = canTargetRank && RankSystem.HasLocalPermission( Permission.PlayerJail );
 		var canBan = canTargetRank && RankSystem.HasLocalPermission( Permission.PlayerBan );
