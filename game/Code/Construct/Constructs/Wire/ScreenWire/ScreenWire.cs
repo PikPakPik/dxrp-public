@@ -21,6 +21,9 @@ public class ScreenWire() : BaseWireConstruct( ConstructType.ScreenWire ), IWire
 
 	public override string Name => "Screen";
 
+	// The label is already drawn as the header text on the screen itself, so skip the floating context bubble.
+	public override string? DisplayText => null;
+
 	private DisplayMode _mode = DisplayMode.Text;
 
 	private bool _playerWithinRaycast;
