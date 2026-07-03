@@ -121,7 +121,7 @@
 						break;
 
 					case PartyTab.Settings:
-						<div class="pane flex flex-col">
+						<div class="pane settings-pane flex flex-col">
 							@if ( SystemAllowsMemberOutline )
 							{
 								<label class="section-label">#party.outline_label</label>
@@ -130,24 +130,73 @@
 									<i class="material-icons toggle-icon">@(MemberOutlineEnabled ? "check_box" : "check_box_outline_blank")</i>
 									<label class="toggle-label">@(MemberOutlineEnabled ? "ON" : "OFF")</label>
 								</div>
-								<label class="pane-hint">#party.outline_hint</label>
 							}
 
-							<label class="section-label">#party.color_label</label>
-							<div class="color-row flex flex-row items-center gap-2">
-								<div class="color-preview" style="background-color: @PendingHex"></div>
-								@if ( ColorProperty is not null )
-								{
-									<ColorControl Property=@ColorProperty/>
-								}
-							</div>
-							<label class="pane-hint">#party.color_hint</label>
-							<div class="apply-row flex flex-row justify-center">
-								<div class="primary-btn @(_colorDirty ? "" : "is-disabled") flex flex-row items-center gap-1" onclick="@OnApplyColor">
-									<i class="material-icons">check</i>
-									<label>#party.color_apply</label>
+							<label class="section-label">Party name</label>
+							@if ( isLeader )
+							{
+								<div class="name-row settings-apply-row flex flex-row items-center gap-2">
+									<TextEntry class="invite-input"
+									           MaxLength="@( PartySystem.PartyNameMaxLength )"
+									           Value:bind="@DraftPartyName"
+									           onsubmit="@OnApplyPartyName"/>
+									<div class="primary-btn @(PartyNameDirty ? "" : "is-disabled") flex flex-row items-center gap-1" onclick="@OnApplyPartyName">
+										<i class="material-icons">check</i>
+										<label>#party.color_apply</label>
+									</div>
 								</div>
-							</div>
+								<label class="pane-hint">Up to @PartySystem.PartyNameMaxLength letters/numbers. Icon remains fixed.</label>
+							}
+							else
+							{
+								<label class="pane-hint">Party name: @CurrentPartyName</label>
+							}
+
+							<label class="section-label">Max size</label>
+							@if ( isLeader )
+							{
+								<div class="size-row settings-apply-row flex flex-row items-center gap-2">
+									<div class="size-control-block flex flex-row items-center gap-2">
+										<div class="action-btn size-step flex flex-row items-center justify-center" onclick="@(() => OnAdjustDesiredPartySize( -1 ))">
+											<i class="material-icons">remove</i>
+										</div>
+										<label class="toggle-label">@DraftDesiredPartySize / @OperatorPartySizeCap</label>
+										<div class="action-btn size-step flex flex-row items-center justify-center" onclick="@(() => OnAdjustDesiredPartySize( 1 ))">
+											<i class="material-icons">add</i>
+										</div>
+									</div>
+									<div class="primary-btn @(_desiredSizeDirty ? "" : "is-disabled") flex flex-row items-center gap-1" onclick="@OnApplyDesiredPartySize">
+										<i class="material-icons">check</i>
+										<label>#party.color_apply</label>
+									</div>
+								</div>
+								<label class="pane-hint">Party cap includes leader. Current operator cap is @OperatorPartySizeCap.</label>
+							}
+							else
+							{
+								<label class="pane-hint">Leader-set cap: @DesiredPartySize / @OperatorPartySizeCap</label>
+							}
+
+							@if ( isLeader )
+							{
+								<label class="section-label">#party.color_label</label>
+								<div class="color-row settings-apply-row flex flex-row items-center gap-2">
+									<div class="color-preview" style="background-color: @PendingHex"></div>
+									@if ( ColorProperty is not null )
+									{
+										<ColorControl Property=@ColorProperty/>
+									}
+									<div class="primary-btn @(_colorDirty ? "" : "is-disabled") flex flex-row items-center gap-1" onclick="@OnApplyColor">
+										<i class="material-icons">check</i>
+										<label>#party.color_apply</label>
+									</div>
+								</div>
+								<label class="pane-hint">#party.color_hint</label>
+							}
+							else
+							{
+								<label class="pane-hint">#party.not_leader</label>
+							}
 						</div>
 						break;
 
@@ -229,8 +278,8 @@
 	};
 
 	// Tabs shown depend on party state: partyless players see only Start/Join (create or accept), party
-	// members see the roster (Party) + Leave, and the leader additionally gets Settings (color). The old
-	// Admin tab is gone — the leader's kick control renders inline on each other member's roster row.
+	// members see the roster (Party) + Settings + Leave. The old Admin tab is gone — the leader's kick
+	// control renders inline on each other member's roster row.
 	private static IEnumerable<(PartyTab Section, string LabelKey, string Icon)> VisibleTabs( bool inParty, bool isLeader )
 	{
 		foreach ( var tab in AllTabs )
@@ -240,7 +289,7 @@
 				PartyTab.Start => !inParty,
 				PartyTab.Join => !inParty,
 				PartyTab.Party => inParty,
-				PartyTab.Settings => inParty && isLeader,
+				PartyTab.Settings => inParty,
 				PartyTab.Leave => inParty,
 				_ => false
 			};
@@ -285,6 +334,9 @@
 	private SerializedObject? _colorObject;
 	private SerializedProperty? _colorProperty;
 	private bool _colorDirty;
+	private int _pendingDesiredPartySize;
+	private bool _desiredSizeDirty;
+	private string _draftPartyName = string.Empty;
 
 	private SerializedProperty? ColorProperty
 	{
@@ -336,7 +388,7 @@
 	// Commit the picked color to the host once, on confirmation. No-op if nothing changed.
 	private void OnApplyColor()
 	{
-		if ( !_colorDirty )
+		if ( !_colorDirty || !LocalIsLeader )
 		{
 			return;
 		}
@@ -349,12 +401,51 @@
 
 	private void OnToggleMemberOutline()
 	{
-		if ( !LocalIsLeader || !SystemAllowsMemberOutline )
+		if ( !SystemAllowsMemberOutline )
 		{
 			return;
 		}
 
-		PartySystem.Instance?.RequestSetMemberOutline( !MemberOutlineEnabled );
+		PartyPreferences.SetMemberOutlineEnabled( !MemberOutlineEnabled );
+		Sound.Play( "pop" );
+	}
+
+	private void OnAdjustDesiredPartySize( int delta )
+	{
+		if ( !LocalIsLeader || PartySystem.Instance is not { } system || !Player.Local.IsValid() )
+		{
+			return;
+		}
+
+		var minAllowed = Math.Min( CurrentPartySize, OperatorPartySizeCap );
+		var next = Math.Clamp( DraftDesiredPartySize + delta, minAllowed, OperatorPartySizeCap );
+		_pendingDesiredPartySize = next;
+		_desiredSizeDirty = _pendingDesiredPartySize != DesiredPartySize;
+		Sound.Play( "pop" );
+	}
+
+	private void OnApplyDesiredPartySize()
+	{
+		if ( !_desiredSizeDirty || !LocalIsLeader || PartySystem.Instance is not { } system || !Player.Local.IsValid() )
+		{
+			return;
+		}
+
+		system.RequestSetDesiredPartySize( _pendingDesiredPartySize );
+		_desiredSizeDirty = false;
+		Sound.Play( "pop" );
+	}
+
+	private void OnApplyPartyName()
+	{
+		if ( !LocalIsLeader || !PartyNameDirty || PartySystem.Instance is not { } system )
+		{
+			return;
+		}
+
+		var normalized = PartySystem.NormalizePartyName( _draftPartyName );
+		system.RequestSetPartyName( normalized );
+		_draftPartyName = normalized;
 		Sound.Play( "pop" );
 	}
 
@@ -415,15 +506,53 @@
 	{
 		get
 		{
-			if ( PartySystem.Instance is not { } system || !Player.Local.IsValid() )
+			return PartyPreferences.MemberOutlineEnabled;
+		}
+	}
+
+	private int CurrentPartySize => PartyRoom.Current?.Count ?? 1;
+
+	private int OperatorPartySizeCap =>
+		PartySystem.Instance?.GetOperatorPartySizeCap() ?? PartySystem.HardPartySizeCap;
+
+	private int DesiredPartySize =>
+		Player.Local.IsValid() && PartySystem.Instance is { } system
+			? system.GetDesiredPartySizeForMember( Player.Local.SteamId )
+			: OperatorPartySizeCap;
+
+	private string CurrentPartyName =>
+		Player.Local.IsValid() && PartySystem.Instance is { } system
+			? system.GetPartyNameForMember( Player.Local.SteamId )
+			: PartySystem.DefaultPartyName;
+
+	private string DraftPartyName
+	{
+		get
+		{
+			if ( string.IsNullOrWhiteSpace( _draftPartyName ) )
 			{
-				return false;
+				_draftPartyName = CurrentPartyName;
 			}
 
-			var partyId = system.GetPartyId( Player.Local.SteamId );
-			return partyId.HasValue
-			       && system.Parties.TryGetValue( partyId.Value, out var data )
-			       && data.MemberOutlineEnabled;
+			return _draftPartyName;
+		}
+		set => _draftPartyName = value;
+	}
+
+	private bool PartyNameDirty =>
+		!string.Equals( PartySystem.NormalizePartyName( _draftPartyName ), CurrentPartyName, StringComparison.Ordinal );
+
+	private int DraftDesiredPartySize
+	{
+		get
+		{
+			var desired = DesiredPartySize;
+			if ( !_desiredSizeDirty || _pendingDesiredPartySize <= 0 )
+			{
+				_pendingDesiredPartySize = desired;
+			}
+
+			return _pendingDesiredPartySize;
 		}
 	}
 
@@ -465,7 +594,7 @@
 		if ( inParty )
 		{
 			// Prefer current if still valid for this state; else fall back.
-			if ( _tab == PartyTab.Party || _tab == PartyTab.Leave || (isLeader && _tab == PartyTab.Settings) )
+			if ( _tab == PartyTab.Party || _tab == PartyTab.Leave || _tab == PartyTab.Settings )
 			{
 				activeTabForHash = _tab;
 			}
@@ -492,6 +621,14 @@
 		{
 			hash.Add( SystemAllowsMemberOutline );
 			hash.Add( MemberOutlineEnabled );
+			hash.Add( CurrentPartyName );
+			hash.Add( _draftPartyName );
+			hash.Add( PartyNameDirty );
+			hash.Add( DesiredPartySize );
+			hash.Add( DraftDesiredPartySize );
+			hash.Add( _desiredSizeDirty );
+			hash.Add( OperatorPartySizeCap );
+			hash.Add( CurrentPartySize );
 			hash.Add( _colorDirty );
 			hash.Add( _colorHolder.Color.ToPacked() );
 		}
