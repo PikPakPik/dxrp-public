@@ -229,7 +229,7 @@
 							}
 
 							<label class="section-label">Max size</label>
-							<label class="pane-hint">@CurrentPartySize / @OperatorPartySizeCap — party cap includes leader. Operator cap is @OperatorPartySizeCap.</label>
+							<label class="size-count">@CurrentPartySize / @OperatorPartySizeCap</label>
 
 							@if ( isLeader )
 							{
@@ -343,6 +343,13 @@
 	private SerializedProperty? _colorProperty;
 	private bool _colorDirty;
 	private string _draftPartyName = string.Empty;
+
+	// Tracks which party (or partyless = null) the Settings draft name/color were last synced to. When the
+	// party identity changes (disband → recreate, leave, join) we reset the drafts to that party's real
+	// values. Without this, the leader's previous name/color linger in the inputs and look "applied" to a
+	// freshly created party that is actually still on defaults — requiring a needless re-Apply.
+	private Guid? _syncedPartyId;
+	private bool _draftsSynced;
 
 	private SerializedProperty? ColorProperty
 	{
@@ -561,6 +568,31 @@
 		room.Members
 			.OrderByDescending( m => m.IsLeader )
 			.ThenBy( m => m.Name );
+
+	public override void Tick()
+	{
+		base.Tick();
+		SyncDraftsToPartyIdentity();
+	}
+
+	// Resets the Settings draft name/color to the current party's real values whenever party identity
+	// changes (partyless <-> a specific party id). Guarded so it only fires on change — an in-progress
+	// edit inside the same party is never clobbered.
+	private void SyncDraftsToPartyIdentity()
+	{
+		var currentId = PartyRoom.Current?.Id;
+		if ( _draftsSynced && currentId == _syncedPartyId )
+		{
+			return;
+		}
+
+		_syncedPartyId = currentId;
+		_draftsSynced = true;
+
+		_draftPartyName = CurrentPartyName;
+		_colorHolder.Color = AccentColor.ToColor();
+		_colorDirty = false;
+	}
 
 	protected override int BuildHash()
 	{

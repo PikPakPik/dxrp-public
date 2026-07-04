@@ -152,6 +152,15 @@ PartyMenu {
       font-size: 11px;
       text-align: center;
     }
+
+    .size-count {
+      font-size: $text-xl;
+      font-weight: 700;
+      color: $color-white;
+      text-align: center;
+      letter-spacing: 1px;
+      margin: 4px 0;
+    }
   }
 
   .pane-note {
