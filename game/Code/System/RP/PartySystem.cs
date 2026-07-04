@@ -398,6 +398,7 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 
 		RemovePlayerInternal( target.SteamId );
 		target.Warn( Language.GetPhrase( "party.kicked" ) );
+		target.SendMessage( Language.GetPhrase( "party.kicked" ) );
 		NotifyParty( partyId.Value, string.Format( Language.GetPhrase( "party.member_kicked" ), target.DisplayName ) );
 	}
 
