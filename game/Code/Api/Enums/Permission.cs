@@ -107,6 +107,12 @@ public enum Permission
 	[PermissionMeta( "portal.apikeys.manage", "Manage API Keys", "Create, list, and revoke API keys", "Portal" )]
 	ManageApiKeys,
 
+	[PermissionMeta( "portal.billing.manage", "Manage Billing", "Manage payment onboarding and view billing status", "Portal" )]
+	ManageBilling,
+
+	[PermissionMeta( "portal.addon.purchase", "Purchase Addons", "Purchase marketplace addons on behalf of this network", "Portal" )]
+	PurchaseAddon,
+
 	// Moderation
 	[PermissionMeta( "player.kick", "Kick Player", "Kick players from the server", "Moderation" )]
 	PlayerKick,
