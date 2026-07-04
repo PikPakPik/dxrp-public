@@ -1189,7 +1189,7 @@
   "construct.no_permission": "Vous n'avez pas la permission de modifier cette construction.",
   "construct.update_failed": "Échec de la mise à jour des données",
   "chat.system.host": "Vous êtes l'hôte, tout abus peut entraîner un bannissement global.",
-  "chat.gagged.restrict": "Vous êtes bâillonné et ne pouvez pas envoyer de messages. Faites appel sur Discord",
+  "chat.gagged.restrict": "Vous êtes bâillonné et ne pouvez pas envoyer de messages",
   "chat.label.ooc": "OOC",
   "chat.label.gov": "GOUV",
   "chat.label.staff": "STAFF",

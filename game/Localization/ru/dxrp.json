@@ -1189,7 +1189,7 @@
   "construct.no_permission": "У вас нет прав на обновление этой постройки.",
   "construct.update_failed": "Не удалось обновить данные постройки",
   "chat.system.host": "Вы хост, злоупотребление правами может привести к глобальному бану.",
-  "chat.gagged.restrict": "У вас кляп, и вы не можете отправлять сообщения. Подайте апелляцию в Discord",
+  "chat.gagged.restrict": "У вас кляп, и вы не можете отправлять сообщения",
   "chat.label.ooc": "OOC",
   "chat.label.gov": "ГОС",
   "chat.label.staff": "АДМИН",

@@ -1190,7 +1190,7 @@
   "construct.no_permission": "Nie masz uprawnień do aktualizacji tej konstrukcji.",
   "construct.update_failed": "Nie udało się zaktualizować danych konstrukcji",
   "chat.system.host": "Jesteś hostem, nadużywanie tego może skutkować globalnym banem.",
-  "chat.gagged.restrict": "Jesteś zakneblowany i nie możesz wysyłać wiadomości. Odwołaj się na Discordzie",
+  "chat.gagged.restrict": "Jesteś zakneblowany i nie możesz wysyłać wiadomości",
   "chat.label.ooc": "OOC",
   "chat.label.gov": "RZĄD",
   "chat.label.staff": "PERSONEL",

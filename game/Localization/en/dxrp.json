@@ -1291,7 +1291,7 @@
   "construct.no_permission": "You do not have permission to update this construct.",
   "construct.update_failed": "Failed to update construct data",
   "chat.system.host": "You are the host, abuse of this may result in a global ban.",
-  "chat.gagged.restrict": "You are gagged and can't send messages. Appeal on Discord",
+  "chat.gagged.restrict": "You are gagged and can't send messages",
   "chat.label.ooc": "OOC",
   "chat.label.gov": "GOV",
   "chat.label.staff": "STAFF",
