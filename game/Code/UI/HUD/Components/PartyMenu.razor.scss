@@ -213,10 +213,35 @@ PartyMenu {
     margin-bottom: 6px;
   }
 
+  .browse-party-block {
+    gap: 0;
+  }
+
   .browse-row {
     background-color: rgba(white, 0.05);
     border-radius: $rounding;
     padding: 6px 10px;
+    pointer-events: all;
+  }
+
+  .browse-expand {
+    gap: 4px;
+    margin: 0 4px 4px 4px;
+    padding: 6px 8px 8px 8px;
+    border-radius: $rounding;
+    background-color: rgba(black, 0.22);
+  }
+
+  .browse-member-row {
+    padding: 4px 6px;
+    border-radius: $rounding;
+    background-color: rgba(white, 0.04);
+  }
+
+  .browse-chevron {
+    font-size: 18px;
+    color: $color-gray-400;
+    pointer-events: none;
   }
 
   .party-color-dot {
