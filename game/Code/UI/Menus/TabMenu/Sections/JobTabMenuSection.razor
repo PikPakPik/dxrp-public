@@ -173,8 +173,15 @@
 	{
 		return GameModeJobs.All
 			.Where( x => x.Selectable || x.IsSameJob( Player.Local.Job ) )
+			.Where( x => x.IsSameJob( Player.Local.Job ) || IgnoreJobRequirements || !HasUnmetPrerequisite( x ) )
 			.OrderBy( x => x.GetGroup()?.Name ?? "zzzz" )
 			.ThenBy( x => x.DisplayName() );
+	}
+
+	private static bool HasUnmetPrerequisite( GameModeJobDto job )
+	{
+		var prerequisiteJobs = GameModeJobs.GetPrerequisiteJobs( job );
+		return prerequisiteJobs.Length > 0 && !prerequisiteJobs.Any( p => p.Id == Player.Local.Job?.Id );
 	}
 
 	private GameModeJobDto? GetEffectiveSelected( List<GameModeJobDto> visibleJobs )

@@ -71,12 +71,6 @@
 						@( $"{Language.GetPhrase( "generic.unlocks" )} {TimeSpan.FromMinutes( remainingPlayTime ).Humanize( 1 )}" )
 					</div>
 				}
-				else if ( missingPrerequisite )
-				{
-					<div class="unlock-notice">
-						#notify.job.prerequisite
-					</div>
-				}
 
 				<div class="job-detail-sections">
 					@if ( !string.IsNullOrWhiteSpace( Job.DisplayDescription() ) )
