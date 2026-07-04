@@ -1,5 +1,6 @@
 @namespace Dxura.RP.Game.UI
 @using Sandbox.Services
+@using Sandbox.UI
 @using Dxura.RP.Shared
 @inherits Panel
 
@@ -25,6 +26,20 @@
 
 	<div class="job-menu">
 		<div class="job-list-panel">
+			<div class="job-search-bar">
+				<i class="material-icons text-gray-400 text-sm">search</i>
+				<TabMenuTextEntry
+					@ref="_searchTextEntry"
+					class="job-search-input"
+					placeholder="#tabmenu.jobs.search_placeholder"
+					Value:bind="@_searchQuery"/>
+				@if ( !string.IsNullOrEmpty( _searchQuery ) )
+				{
+					<div class="job-search-clear cursor-pointer" onclick="@( () => ClearSearch() )">
+						<i class="material-icons text-gray-400 text-sm">close</i>
+					</div>
+				}
+			</div>
 			<div class="job-list-scroll">
 				@foreach ( var groupEntry in groupedJobs )
 				{
@@ -110,6 +125,9 @@
 	GameModeJobDto? _selectedJob;
 	HashSet<Guid> _collapsedGroupIds = TabMenuSectionPreferences.LoadCollapsedJobGroups();
 
+	TextEntry? _searchTextEntry;
+	string _searchQuery = string.Empty;
+
 	bool IgnoreJobRequirements => GameManager.Instance.IsValid() && GameManager.Instance.IgnoreJobRequirements;
 
 	public override void Tick()
@@ -126,7 +144,7 @@
 			collapsedHash = HashCode.Combine( collapsedHash, groupId );
 		}
 
-		return HashCode.Combine( GameModeJobs.All, (int)(Player.Local.PlayTime / 60f), Player.Local.Job, IgnoreJobRequirements, _selectedJob?.Id, collapsedHash, BuildJobOccupancyHash() );
+		return HashCode.Combine( GameModeJobs.All, (int)(Player.Local.PlayTime / 60f), Player.Local.Job, IgnoreJobRequirements, _selectedJob?.Id, collapsedHash, BuildJobOccupancyHash(), _searchQuery );
 	}
 
 	private static int BuildJobOccupancyHash()
@@ -174,6 +192,7 @@
 		return GameModeJobs.All
 			.Where( x => x.Selectable || x.IsSameJob( Player.Local.Job ) )
 			.Where( x => x.IsSameJob( Player.Local.Job ) || IgnoreJobRequirements || !HasUnmetPrerequisite( x ) )
+			.Where( x => string.IsNullOrEmpty( _searchQuery ) || x.DisplayName().Contains( _searchQuery, StringComparison.OrdinalIgnoreCase ) )
 			.OrderBy( x => x.GetGroup()?.Name ?? "zzzz" )
 			.ThenBy( x => x.DisplayName() );
 	}
@@ -194,7 +213,7 @@
 
 	private static Guid GetGroupKey( Guid? groupId ) => groupId ?? Guid.Empty;
 
-	private bool IsGroupCollapsed( Guid? groupId ) => _collapsedGroupIds.Contains( GetGroupKey( groupId ) );
+	private bool IsGroupCollapsed( Guid? groupId ) => string.IsNullOrEmpty( _searchQuery ) && _collapsedGroupIds.Contains( GetGroupKey( groupId ) );
 
 	private void ToggleGroup( Guid? groupId )
 	{
@@ -207,6 +226,13 @@
 		}
 
 		TabMenuSectionPreferences.SaveCollapsedJobGroups( _collapsedGroupIds );
+	}
+
+	private void ClearSearch()
+	{
+		_searchQuery = string.Empty;
+		if ( _searchTextEntry != null )
+			_searchTextEntry.Text = string.Empty;
 	}
 
 	private void SelectJobPreview( GameModeJobDto job )
