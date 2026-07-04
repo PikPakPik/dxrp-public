@@ -68,6 +68,9 @@ public enum Permission
 	[PermissionMeta( "portal.addon.edit", "Edit Addons", "Manage addons and revisions", "Portal" )]
 	EditAddon,
 
+	[PermissionMeta( "portal.addon.entitlements.manage", "Manage Addon Owners", "Grant addon access entitlements to other networks", "Portal" )]
+	ManageAddonEntitlements,
+
 	[PermissionMeta( "portal.gamemode.view", "View Game Modes", "View game mode list and details", "Portal" )]
 	ViewGameMode,
 
