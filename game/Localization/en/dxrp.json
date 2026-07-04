@@ -93,6 +93,8 @@
   "tabmenu.jobs": "Jobs",
   "tabmenu.jobs.select": "Select a job to view details",
   "tabmenu.jobs.search_placeholder": "Search jobs...",
+  "tabmenu.jobs.show_locked": "Show Locked",
+  "tabmenu.jobs.locked": "Locked",
   "tabmenu.jobs.description": "Description",
   "tabmenu.jobs.loadout": "Loadout",
   "tabmenu.jobs.change": "Change Job",

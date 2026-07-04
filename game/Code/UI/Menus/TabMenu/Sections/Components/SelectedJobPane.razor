@@ -130,6 +130,10 @@
 					{
 						<button class="btn btn-disabled action-btn" disabled>#tabmenu.jobs.full</button>
 					}
+					else if ( missingPrerequisite )
+					{
+						<button class="btn btn-bad action-btn" disabled>#tabmenu.jobs.locked</button>
+					}
 					else
 					{
 						<button class="btn btn-disabled action-btn" disabled>#tabmenu.jobs.unavailable</button>

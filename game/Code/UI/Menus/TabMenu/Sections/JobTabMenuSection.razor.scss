@@ -29,50 +29,36 @@ JobTabMenuSection {
     flex-shrink: 1;
     min-height: 0;
     border-right: 1px solid rgba(white, 0.06);
-    background-color: rgba($color-secondary, 0.5);
   }
 
-  .job-search-bar {
+  .job-search-row {
     display: flex;
     align-items: center;
-    gap: $space-1;
-    padding: 0 $space-2;
-    margin: $space-4 $space-4 0;
-    background-color: $color-secondary;
-    border-radius: $space-1;
+    justify-content: space-between;
+    gap: $space-2;
+    margin: $space-4 $space-5 $space-3;
+    flex-shrink: 0;
+  }
+
+  .job-lock-toggle {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: 0 $space-4;
     height: 30px;
     flex-shrink: 0;
+    background-color: $color-primary;
+    border-radius: $space-3;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: $text-sm;
+    color: $color-gray-400;
+    transition: all 0.15s ease;
 
-    .job-search-input {
-      flex: 1;
-      background-color: transparent;
-      color: white;
-      font-size: $text-sm;
-      border: none;
-      outline: none;
-      border-radius: 0;
-      box-shadow: none;
-      transition: none;
+    i { font-size: $text-lg; }
 
-      &:hover,
-      &:focus,
-      &.is-focused {
-        box-shadow: none;
-      }
-
-      .inner {
-        padding: 0;
-      }
-    }
-
-    .job-search-clear {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      &:hover {
-        color: white;
-      }
+    &:hover {
+      color: $color-tertiary;
     }
   }
 
@@ -85,7 +71,7 @@ JobTabMenuSection {
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: $space-4;
+    padding: 0 $space-5 $space-4;
   }
 
   .job-group {
@@ -183,6 +169,17 @@ JobTabMenuSection {
       border-color: rgba($color-accent, 0.35);
     }
 
+    &.locked {
+      opacity: 0.55;
+
+      .job-card-name {
+        color: $color-gray-400;
+      }
+
+      &.selected {
+        border-color: rgba(#e04c4c, 0.4);
+      }
+    }
 
     JobSlotRing .ring-center {
       background-color: $color-primary;
@@ -258,6 +255,18 @@ JobTabMenuSection {
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
+  }
+
+  .job-card-lock {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    i {
+      font-size: $text-lg;
+      color: rgba(#e04c4c, 0.8);
+    }
   }
 
   .job-card-slots {

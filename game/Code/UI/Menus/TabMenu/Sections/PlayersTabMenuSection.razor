@@ -46,16 +46,16 @@
 
 
 		<div class="player-toolbar">
-			<div class="search-bar">
+			<div class="tabmenu-search-bar">
 				<i class="material-icons text-gray-400 text-sm">search</i>
 				<TabMenuTextEntry
 					@ref="_searchTextEntry"
-					class="search-input"
+					class="tabmenu-search-input"
 					placeholder="#tabmenu.players.search_placeholder"
 					Value:bind="@_searchQuery"/>
 				@if ( !string.IsNullOrEmpty( _searchQuery ) )
 				{
-					<div class="search-clear cursor-pointer" onclick="@( () => ClearSearch() )">
+					<div class="tabmenu-search-clear cursor-pointer" onclick="@( () => ClearSearch() )">
 						<i class="material-icons text-gray-400 text-sm">close</i>
 					</div>
 				}

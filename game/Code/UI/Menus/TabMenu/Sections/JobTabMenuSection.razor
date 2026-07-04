@@ -26,19 +26,26 @@
 
 	<div class="job-menu">
 		<div class="job-list-panel">
-			<div class="job-search-bar">
-				<i class="material-icons text-gray-400 text-sm">search</i>
-				<TabMenuTextEntry
-					@ref="_searchTextEntry"
-					class="job-search-input"
-					placeholder="#tabmenu.jobs.search_placeholder"
-					Value:bind="@_searchQuery"/>
-				@if ( !string.IsNullOrEmpty( _searchQuery ) )
-				{
-					<div class="job-search-clear cursor-pointer" onclick="@( () => ClearSearch() )">
-						<i class="material-icons text-gray-400 text-sm">close</i>
-					</div>
-				}
+			<div class="job-search-row">
+				<div class="tabmenu-search-bar">
+					<i class="material-icons text-gray-400 text-sm">search</i>
+					<TabMenuTextEntry
+						@ref="_searchTextEntry"
+						class="tabmenu-search-input"
+						placeholder="#tabmenu.jobs.search_placeholder"
+						Value:bind="@_searchQuery"/>
+					@if ( !string.IsNullOrEmpty( _searchQuery ) )
+					{
+						<div class="tabmenu-search-clear cursor-pointer" onclick="@( () => ClearSearch() )">
+							<i class="material-icons text-gray-400 text-sm">close</i>
+						</div>
+					}
+				</div>
+				<div class="job-lock-toggle @( _showLockedJobs ? "active" : "" )"
+				     onclick="@ToggleShowLockedJobs">
+					<i class="material-icons">@( _showLockedJobs ? "lock_open" : "lock" )</i>
+					<span>#tabmenu.jobs.show_locked</span>
+				</div>
 			</div>
 			<div class="job-list-scroll">
 				@foreach ( var groupEntry in groupedJobs )
@@ -76,8 +83,9 @@
 									var isFull = job.MaxCount > 0 && currentPlayers >= job.MaxCount;
 									var isCurrentJob = Player.Local.Job.IsSameJob( job );
 									var isSelected = effectiveSelected == job;
+									var isLocked = !isCurrentJob && !IgnoreJobRequirements && HasUnmetPrerequisite( job );
 
-									<div class="job-card @( isSelected ? "selected" : "" ) @( isCurrentJob ? "current" : "" )"
+									<div class="job-card @( isSelected ? "selected" : "" ) @( isCurrentJob ? "current" : "" ) @( isLocked ? "locked" : "" )"
 									     onclick="@( () => SelectJobPreview( job ) )">
 										<div class="job-card-players">
 											<JobCardPlayerModel Job="@job"/>
@@ -86,6 +94,12 @@
 											<div class="job-card-info">
 												<span class="job-card-name">@job.DisplayName()</span>
 											</div>
+											@if ( isLocked )
+											{
+												<div class="job-card-lock">
+													<i class="material-icons">lock</i>
+												</div>
+											}
 											<div class="job-card-slots">
 												<JobSlotRing CurrentPlayers="@currentPlayers"
 												             MaxCount="@job.MaxCount"
@@ -127,6 +141,7 @@
 
 	TextEntry? _searchTextEntry;
 	string _searchQuery = string.Empty;
+	bool _showLockedJobs = TabMenuSectionPreferences.LoadShowLockedJobs();
 
 	bool IgnoreJobRequirements => GameManager.Instance.IsValid() && GameManager.Instance.IgnoreJobRequirements;
 
@@ -144,7 +159,10 @@
 			collapsedHash = HashCode.Combine( collapsedHash, groupId );
 		}
 
-		return HashCode.Combine( GameModeJobs.All, (int)(Player.Local.PlayTime / 60f), Player.Local.Job, IgnoreJobRequirements, _selectedJob?.Id, collapsedHash, BuildJobOccupancyHash(), _searchQuery );
+		return HashCode.Combine(
+			HashCode.Combine( GameModeJobs.All, (int)(Player.Local.PlayTime / 60f), Player.Local.Job, IgnoreJobRequirements, _selectedJob?.Id, collapsedHash, BuildJobOccupancyHash() ),
+			_searchQuery,
+			_showLockedJobs );
 	}
 
 	private static int BuildJobOccupancyHash()
@@ -191,7 +209,7 @@
 	{
 		return GameModeJobs.All
 			.Where( x => x.Selectable || x.IsSameJob( Player.Local.Job ) )
-			.Where( x => x.IsSameJob( Player.Local.Job ) || IgnoreJobRequirements || !HasUnmetPrerequisite( x ) )
+			.Where( x => x.IsSameJob( Player.Local.Job ) || IgnoreJobRequirements || _showLockedJobs || !HasUnmetPrerequisite( x ) )
 			.Where( x => string.IsNullOrEmpty( _searchQuery ) || x.DisplayName().Contains( _searchQuery, StringComparison.OrdinalIgnoreCase ) )
 			.OrderBy( x => x.GetGroup()?.Name ?? "zzzz" )
 			.ThenBy( x => x.DisplayName() );
@@ -226,6 +244,13 @@
 		}
 
 		TabMenuSectionPreferences.SaveCollapsedJobGroups( _collapsedGroupIds );
+	}
+
+	private void ToggleShowLockedJobs()
+	{
+		Sound.Play( "pop" );
+		_showLockedJobs = !_showLockedJobs;
+		TabMenuSectionPreferences.SaveShowLockedJobs( _showLockedJobs );
 	}
 
 	private void ClearSearch()

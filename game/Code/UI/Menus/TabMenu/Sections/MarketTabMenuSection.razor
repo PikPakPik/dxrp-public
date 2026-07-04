@@ -6,36 +6,33 @@
 <root>
 	<div class="market">
 		<div class="section-header market-toolbar">
-			<h1>@Language.GetPhrase( "tabmenu.market" )</h1>
-			<div class="market-search-bar">
+			<div class="tabmenu-search-bar">
 				<i class="material-icons text-gray-400 text-sm">search</i>
 				<TabMenuTextEntry
 					@ref="_searchTextEntry"
-					class="market-search-input"
+					class="tabmenu-search-input"
 					placeholder="#tabmenu.market.search_placeholder"
 					Value:bind="@_searchQuery"/>
 				@if ( !string.IsNullOrEmpty( _searchQuery ) )
 				{
-					<div class="market-search-clear cursor-pointer" onclick="@( () => ClearSearch() )">
+					<div class="tabmenu-search-clear cursor-pointer" onclick="@( () => ClearSearch() )">
 						<i class="material-icons text-gray-400 text-sm">close</i>
 					</div>
 				}
 			</div>
-			<div class="market-toolbar-actions">
-				@if ( CanUseAdminMode )
-				{
-					<button class="lock-toggle @( _adminMode ? "active admin-active" : "" )"
-					        onclick="@ToggleAdminMode">
-						<i class="material-icons">admin_panel_settings</i>
-						<span>@Language.GetPhrase( _adminMode ? "tabmenu.market.admin_mode.on" : "tabmenu.market.admin_mode.off" )</span>
-					</button>
-				}
-				<button class="lock-toggle @( _showLocked ? "active" : "" )"
-				        onclick="@( () => { _showLocked = !_showLocked; Sound.Play( "pop" ); } )">
-					<i class="material-icons">@( _showLocked ? "visibility" : "visibility_off" )</i>
-					<span>@Language.GetPhrase( _showLocked ? "tabmenu.market.hide_locked" : "tabmenu.market.show_locked" )</span>
+			@if ( CanUseAdminMode )
+			{
+				<button class="lock-toggle @( _adminMode ? "active admin-active" : "" )"
+				        onclick="@ToggleAdminMode">
+					<i class="material-icons">admin_panel_settings</i>
+					<span>@Language.GetPhrase( _adminMode ? "tabmenu.market.admin_mode.on" : "tabmenu.market.admin_mode.off" )</span>
 				</button>
-			</div>
+			}
+			<button class="lock-toggle @( _showLocked ? "active" : "" )"
+			        onclick="@( () => { _showLocked = !_showLocked; Sound.Play( "pop" ); } )">
+				<i class="material-icons">@( _showLocked ? "visibility" : "visibility_off" )</i>
+				<span>@Language.GetPhrase( _showLocked ? "tabmenu.market.hide_locked" : "tabmenu.market.show_locked" )</span>
+			</button>
 		</div>
 
 		<div class="market-scroll">
