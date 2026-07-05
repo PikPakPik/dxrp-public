@@ -15,4 +15,5 @@ namespace Dxura.RP.Shared;
 [JsonDerivedType( typeof( SetBalanceActionDto ), "set_balance" )]
 [JsonDerivedType( typeof( SetLevelActionDto ), "set_level" )]
 [JsonDerivedType( typeof( BackupRestoredActionDto ), "backup_restored" )]
+[JsonDerivedType( typeof( ManualActionActionDto ), "manual_action" )]
 public class BaseServerActionDto;
