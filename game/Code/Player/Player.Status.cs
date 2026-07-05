@@ -39,6 +39,26 @@ public partial class Player
 		return Statuses.TryGetValue( statusName, out var info ) ? info.Stacks : 0;
 	}
 
+	public bool IsBlockedByStatus( StatusAction action )
+	{
+		return Status.Current.IsActionBlocked( this, action );
+	}
+
+	public string? GetStatusBlockMessage( StatusAction action )
+	{
+		return Status.Current.GetActionBlockMessage( this, action );
+	}
+
+	public bool IsCommandBlockedByStatus( ICommand command )
+	{
+		return Status.Current.IsCommandBlocked( this, command );
+	}
+
+	public string? GetCommandBlockMessage( ICommand command )
+	{
+		return Status.Current.GetCommandBlockMessage( this, command );
+	}
+
 	//
 	// Callbacks
 	//

@@ -63,6 +63,64 @@ public partial class Status : GameObjectSystem<Status>
 		return _activeStatuses.TryGetValue( steamId, out var statuses ) && statuses.Any( x => x.Id == statusId );
 	}
 
+	public IStatus? GetActionBlocker( Player player, StatusAction action )
+	{
+		if ( !player.IsValid() )
+		{
+			return null;
+		}
+
+		foreach ( var statusId in player.Statuses.Keys )
+		{
+			var status = GetCachedInstance( statusId );
+			if ( status?.BlocksAction( player, action ) == true )
+			{
+				return status;
+			}
+		}
+
+		return null;
+	}
+
+	public string? GetActionBlockMessage( Player player, StatusAction action )
+	{
+		return GetActionBlocker( player, action )?.GetActionBlockMessage( player, action );
+	}
+
+	public bool IsActionBlocked( Player player, StatusAction action )
+	{
+		return GetActionBlocker( player, action ) != null;
+	}
+
+	public IStatus? GetCommandBlocker( Player player, ICommand command )
+	{
+		if ( !player.IsValid() )
+		{
+			return null;
+		}
+
+		foreach ( var statusId in player.Statuses.Keys )
+		{
+			var status = GetCachedInstance( statusId );
+			if ( status?.BlocksCommand( player, command ) == true )
+			{
+				return status;
+			}
+		}
+
+		return null;
+	}
+
+	public string? GetCommandBlockMessage( Player player, ICommand command )
+	{
+		return GetCommandBlocker( player, command )?.GetCommandBlockMessage( player, command );
+	}
+
+	public bool IsCommandBlocked( Player player, ICommand command )
+	{
+		return GetCommandBlocker( player, command ) != null;
+	}
+
 	public string ModifyChat( Player player, string message, MessageType messageType )
 	{
 		if ( !_activeStatuses.TryGetValue( player.SteamId, out var statuses ) )

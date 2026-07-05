@@ -39,8 +39,6 @@ public partial class Player
 	[Group( "State" )]
 	public bool Restricted { get; set; }
 
-	public bool IsStunned => HasStatus( Constants.StunStatus );
-
 	[Sync( SyncFlags.FromHost )]
 	[Property]
 	[Group( "State" )]
@@ -327,12 +325,7 @@ public partial class Player
 
 	private bool CanSit()
 	{
-		if ( Restricted || IsStunned )
-		{
-			return false;
-		}
-
-		if ( HasStatus( Constants.SurrenderStatus ) )
+		if ( Restricted || IsBlockedByStatus( StatusAction.Sit ) )
 		{
 			return false;
 		}

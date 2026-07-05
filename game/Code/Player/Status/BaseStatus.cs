@@ -32,6 +32,10 @@ public abstract class BaseStatus : IStatus
 
 	// Modifiers
 	public virtual bool PreventFallDamage => false;
+	public virtual bool BlocksAction( Player player, StatusAction action ) => false;
+	public virtual string? GetActionBlockMessage( Player player, StatusAction action ) => null;
+	public virtual bool BlocksCommand( Player player, ICommand command ) => BlocksAction( player, StatusAction.Command );
+	public virtual string? GetCommandBlockMessage( Player player, ICommand command ) => GetActionBlockMessage( player, StatusAction.Command );
 
 	// Lifecycle
 

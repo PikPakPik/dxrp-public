@@ -146,7 +146,7 @@ public static class GameModeMarketItems
 
 	public static bool CanPurchase( Player player, GameModeMarketItemDto? item )
 	{
-		if ( !player.IsValid() || item == null || player.Restricted || player.IsStunned )
+		if ( !player.IsValid() || item == null || player.Restricted || player.IsBlockedByStatus( StatusAction.MarketPurchase ) )
 		{
 			return false;
 		}

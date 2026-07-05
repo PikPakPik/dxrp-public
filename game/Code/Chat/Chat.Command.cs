@@ -95,15 +95,9 @@ public sealed partial class Chat
 			return false;
 		}
 
-		if ( player.HasStatus( Constants.FreezeStatus ) && !command.IsUsableWhileFrozen )
+		if ( player.IsCommandBlockedByStatus( command ) )
 		{
-			player.SendMessage( "#command.frozen" );
-			return false;
-		}
-
-		if ( player.IsStunned && !command.IsUsableWhileStunned )
-		{
-			player.SendMessage( "#command.stunned" );
+			player.SendMessage( player.GetCommandBlockMessage( command ) ?? "#generic.forbidden" );
 			return false;
 		}
 
@@ -122,12 +116,7 @@ public sealed partial class Chat
 			return false;
 		}
 
-		if ( player.HasStatus( Constants.FreezeStatus ) && !command.IsUsableWhileFrozen )
-		{
-			return false;
-		}
-
-		if ( player.IsStunned && !command.IsUsableWhileStunned )
+		if ( player.IsCommandBlockedByStatus( command ) )
 		{
 			return false;
 		}

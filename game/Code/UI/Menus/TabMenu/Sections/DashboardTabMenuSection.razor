@@ -248,9 +248,9 @@
 			return;
 		}
 
-		if ( Player.Local.Restricted || Player.Local.IsStunned )
+		if ( Player.Local.Restricted || Player.Local.IsBlockedByStatus( StatusAction.Suicide ) )
 		{
-			Notify.Error( "#generic.forbidden" );
+			Notify.Error( Player.Local.GetStatusBlockMessage( StatusAction.Suicide ) ?? "#generic.forbidden" );
 			TabMenu.RequestCloseMenu();
 			return;
 		}

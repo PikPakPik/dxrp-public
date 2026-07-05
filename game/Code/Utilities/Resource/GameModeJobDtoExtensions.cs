@@ -220,9 +220,9 @@ public static class GameModeJobDtoExtensions
 			return false;
 		}
 
-		if ( player.IsStunned )
+		if ( player.IsBlockedByStatus( StatusAction.JobSwitch ) )
 		{
-			player.Error( "#notify.job.stunned" );
+			player.Error( player.GetStatusBlockMessage( StatusAction.JobSwitch ) ?? "#generic.forbidden" );
 			return false;
 		}
 

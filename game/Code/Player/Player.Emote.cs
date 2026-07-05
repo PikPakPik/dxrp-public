@@ -17,7 +17,7 @@ public partial class Player
 	{
 		Assert.True( Networking.IsHost );
 
-		if ( !emote.IsValid() || IsDead || HasStatus( Constants.FreezeStatus ) || IsStunned )
+		if ( !emote.IsValid() || IsDead || IsBlockedByStatus( StatusAction.Emote ) )
 		{
 			return;
 		}

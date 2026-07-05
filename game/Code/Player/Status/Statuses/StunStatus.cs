@@ -15,6 +15,40 @@ public class StunStatus : BaseStatus
 	public override bool RemoveOnJobChange => true;
 	public override bool ShowOnNameplate => true;
 
+	public override bool BlocksAction( Player player, StatusAction action )
+	{
+		return action switch
+		{
+			StatusAction.BuildMenu => true,
+			StatusAction.MarketPurchase => true,
+			StatusAction.JobSwitch => true,
+			StatusAction.Emote => true,
+			StatusAction.Sit => true,
+			StatusAction.Suicide => true,
+			_ => false
+		};
+	}
+
+	public override string? GetActionBlockMessage( Player player, StatusAction action )
+	{
+		return action switch
+		{
+			StatusAction.JobSwitch => "#notify.job.stunned",
+			StatusAction.Suicide => "#generic.forbidden",
+			_ => null
+		};
+	}
+
+	public override bool BlocksCommand( Player player, ICommand command )
+	{
+		return !command.IsUsableWhileStunned;
+	}
+
+	public override string? GetCommandBlockMessage( Player player, ICommand command )
+	{
+		return "#command.stunned";
+	}
+
 	public override void OnAddedServer( Player player )
 	{
 		player.BeginStunRagdollHost();
