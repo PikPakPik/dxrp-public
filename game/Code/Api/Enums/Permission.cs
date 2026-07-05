@@ -231,8 +231,8 @@ public enum Permission
 	CommandDropItem,
 
 	[PermissionMeta( "command.spawnitem", "Spawn Inventory Item", "Spawn inventory items into the world via command", "Commands" )]
-	CommandSpawnItem,
-
+	CommandSpawnItem,	
+	
 	[PermissionMeta( "command.spawnentity", "Spawn Entity ", "Spawn entity into the world via command", "Commands" )]
 	CommandSpawnEntity,
 
@@ -304,16 +304,7 @@ public enum Permission
 	ManageInventory,
 
 	[PermissionMeta( "inventory.manage.bulk", "Manage Inventory Bulk", "Run bulk inventory operations across multiple players", "Server Management" )]
-	ManageInventoryBulk,
-
-	[PermissionMeta( "portal.monetization.products.manage", "Manage Products", "Create, edit, and delete monetization products", "Portal" )]
-	ManageEntitlementProducts,
-
-	[PermissionMeta( "portal.monetization.coupons.manage", "Manage Coupons", "Create, edit, and delete discount coupons", "Portal" )]
-	ManageCoupons,
-
-	[PermissionMeta( "portal.monetization.view", "View Monetization", "View the monetization breakdown and sales history", "Portal" )]
-	ViewMonetization
+	ManageInventoryBulk
 
 }
 
