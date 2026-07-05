@@ -49,8 +49,6 @@ public partial class Player
 	private Vector3 _sitReturnPosition = Vector3.Zero;
 
 	private readonly SemaphoreSlim _transactionLock = new( 1, 1 );
-	private readonly SemaphoreSlim _purchaseLock = new( 1, 1 );
-	internal SemaphoreSlim PurchaseLock => _purchaseLock;
 
 	private void OnUpdateRoleplay()
 	{
