@@ -398,6 +398,7 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 
 		RemovePlayerInternal( target.SteamId );
 		target.Warn( Language.GetPhrase( "party.kicked" ) );
+		target.SendMessage( Language.GetPhrase( "party.kicked" ) );
 		NotifyParty( partyId.Value, string.Format( Language.GetPhrase( "party.member_kicked" ), target.DisplayName ) );
 	}
 
@@ -501,42 +502,6 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		Parties[partyId.Value] = data;
 
 		NotifyParty( partyId.Value, Language.GetPhrase( "party.color_changed" ) );
-	}
-
-	/// <summary>
-	/// Leader sets the desired party size (inclusive of leader). Value is clamped to the current roster
-	/// count and the operator/hard caps.
-	/// </summary>
-	public void HostSetDesiredPartySize( Player caller, int desiredSize )
-	{
-		if ( !Networking.IsHost || caller is null )
-		{
-			return;
-		}
-
-		var partyId = GetPartyId( caller.SteamId );
-		if ( !partyId.HasValue )
-		{
-			caller.Error( Language.GetPhrase( "party.no_party" ) );
-			return;
-		}
-
-		if ( !IsLeader( caller.SteamId ) )
-		{
-			caller.Error( Language.GetPhrase( "party.not_leader" ) );
-			return;
-		}
-
-		var data = Clone( Parties[partyId.Value] );
-		var memberCount = data.Members?.Count ?? 1;
-		var clamped = ClampDesiredPartySize( desiredSize, memberCount );
-		if ( data.DesiredPartySize == clamped )
-		{
-			return;
-		}
-
-		data.DesiredPartySize = clamped;
-		Parties[partyId.Value] = data;
 	}
 
 	/// <summary>
@@ -749,16 +714,6 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 	}
 
 	[Rpc.Host]
-	public void RequestSetDesiredPartySize( int desiredSize )
-	{
-		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
-		if ( caller.IsValid() )
-		{
-			HostSetDesiredPartySize( caller, desiredSize );
-		}
-	}
-
-	[Rpc.Host]
 	public void RequestSetPartyName( string name )
 	{
 		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
@@ -801,13 +756,6 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		}
 
 		return cleaned.Length > PartyNameMaxLength ? cleaned[..PartyNameMaxLength] : cleaned;
-	}
-
-	private int ClampDesiredPartySize( int desiredSize, int currentMemberCount )
-	{
-		var operatorCap = GetOperatorPartySizeCap();
-		var minAllowed = Math.Clamp( currentMemberCount, 1, operatorCap );
-		return Math.Clamp( desiredSize, minAllowed, operatorCap );
 	}
 
 	private Guid CreatePartyForLeader( Player leader )
