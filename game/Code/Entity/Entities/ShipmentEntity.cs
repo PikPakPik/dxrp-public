@@ -5,6 +5,8 @@ namespace Dxura.RP.Game.Entities;
 
 public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 {
+	private const float DepositRadius = 32f;
+
 	[Property]
 	[ReadOnly]
 	[Sync( SyncFlags.FromHost )]
@@ -16,9 +18,11 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 	public int Quantity { get; private set; }
 
 	[Property]
+	[Sync( SyncFlags.FromHost )]
 	public Guid EquipmentId { get; set; }
 
 	[Property]
+	[Sync( SyncFlags.FromHost )]
 	public int MaxQuantity { get; set; } = 10;
 
 	[Property] public required GameObject EquipmentPreview { get; set; }
@@ -79,6 +83,11 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 		}
 
 		var equipment = GameModeEquipments.FindById( EquipmentId );
+		if ( equipment == null )
+		{
+			return;
+		}
+
 		EquipmentRenderer.Model = equipment.GetWorldModel();
 		EquipmentRenderer.WorldScale = 1.1f;
 		TypeText.Text = equipment.DisplayName();
@@ -87,12 +96,129 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 
 	public void ConfigureHost( GameModeEquipmentDto equipment, int quantity )
 	{
+		ConfigureHost( equipment, quantity, quantity );
+	}
+
+	public void ConfigureHost( GameModeEquipmentDto equipment, int maxQuantity, int quantity )
+	{
 		Assert.True( Networking.IsHost );
 
 		EquipmentId = equipment.GameModeAddonContentId;
-		MaxQuantity = Math.Max( 1, quantity );
-		Quantity = MaxQuantity;
+		MaxQuantity = Math.Max( 1, maxQuantity );
+		Quantity = Math.Clamp( quantity, 1, MaxQuantity );
 		UpdateState();
+	}
+
+	public bool CanDeposit( DroppedEquipment droppedEquipment )
+	{
+		return droppedEquipment.IsValid() &&
+		       Quantity < MaxQuantity &&
+		       droppedEquipment.EquipmentId == EquipmentId;
+	}
+
+	public bool TryDepositHost( DroppedEquipment droppedEquipment )
+	{
+		Assert.True( Networking.IsHost );
+
+		if ( !CanDeposit( droppedEquipment ) )
+		{
+			return false;
+		}
+
+		Quantity++;
+		droppedEquipment.GameObject.Destroy();
+		return true;
+	}
+
+	[Rpc.Host]
+	public void DepositNearbyDropsHost()
+	{
+		var callerId = Rpc.CallerId;
+		if ( Cooldown.Current.CheckAndStartCooldown( $"{callerId}:shipment:deposit", Config.Current.Game.ShipmentUseCooldown ) )
+		{
+			return;
+		}
+
+		var player = GameUtils.GetPlayerByConnectionId( callerId );
+		if ( !player.IsValid() || !HasDepositLineOfSight( player ) )
+		{
+			return;
+		}
+
+		foreach ( var droppedEquipment in FindNearbyDepositDrops() )
+		{
+			if ( !TryDepositHost( droppedEquipment ) )
+			{
+				continue;
+			}
+
+			if ( Quantity >= MaxQuantity )
+			{
+				return;
+			}
+		}
+	}
+
+	public static int CreateFromDropsHost( IReadOnlyList<DroppedEquipment> drops, Player? owner )
+	{
+		Assert.True( Networking.IsHost );
+
+		var validDrops = drops
+			.Where( drop => drop.IsValid() && drop.EquipmentId != Guid.Empty )
+			.ToList();
+
+		if ( validDrops.Count < 2 )
+		{
+			return 0;
+		}
+
+		var equipmentId = validDrops[0].EquipmentId;
+		if ( validDrops.Any( drop => drop.EquipmentId != equipmentId ) )
+		{
+			return 0;
+		}
+
+		var equipment = validDrops[0].Resource ?? GameModeEquipments.FindById( equipmentId );
+		if ( equipment == null )
+		{
+			return 0;
+		}
+
+		var marketItem = GameModeMarketItems.FindShipmentMarketItem( equipment );
+		var maxQuantity = Math.Max( 1, marketItem?.Quantity ?? 10 );
+		var marketItemId = validDrops.Select( drop => drop.MarketItemId ).FirstOrDefault( id => id != Guid.Empty );
+		if ( marketItemId == Guid.Empty && marketItem != null )
+		{
+			marketItemId = marketItem.Id;
+		}
+
+		var createdQuantity = 0;
+		while ( validDrops.Count > 0 )
+		{
+			var quantity = Math.Min( maxQuantity, validDrops.Count );
+			if ( createdQuantity == 0 && quantity < 2 )
+			{
+				break;
+			}
+
+			var shipmentDrops = validDrops.Take( quantity ).ToList();
+			var position = shipmentDrops.Aggregate( Vector3.Zero, ( sum, drop ) => sum + drop.WorldPosition ) / shipmentDrops.Count;
+
+			if ( !TryCreateShipmentHost( equipment, marketItemId, maxQuantity, quantity, position, owner ) )
+			{
+				break;
+			}
+
+			foreach ( var drop in shipmentDrops )
+			{
+				drop.GameObject.Destroy();
+			}
+
+			createdQuantity += shipmentDrops.Count;
+			validDrops.RemoveRange( 0, shipmentDrops.Count );
+		}
+
+		return createdQuantity;
 	}
 
 	public bool Press( IPressable.Event e )
@@ -186,7 +312,79 @@ public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 
 	private void OnQuantityChange( int oldValue, int newValue )
 	{
-		QuantityText.Text = $"{Quantity}/{MaxQuantity}";
+		if ( QuantityText.IsValid() )
+		{
+			QuantityText.Text = $"{Quantity}/{MaxQuantity}";
+		}
+	}
+
+	private bool HasDepositLineOfSight( Player player )
+	{
+		var tr = Scene.Trace.Ray( player.AimRay, Config.Current.Game.ReachDistance )
+			.IgnoreGameObjectHierarchy( player.GameObject )
+			.WithoutTags( Constants.TraceIgnoreTags )
+			.UseHitboxes()
+			.Run();
+
+		return tr.Hit && tr.GameObject.Root == GameObject.Root;
+	}
+
+	private List<DroppedEquipment> FindNearbyDepositDrops()
+	{
+		if ( Quantity >= MaxQuantity || EquipmentId == Guid.Empty )
+		{
+			return [];
+		}
+
+		var bounds = new BBox(
+			WorldPosition - Vector3.One * DepositRadius,
+			WorldPosition + Vector3.One * DepositRadius );
+
+		return Scene.FindInPhysics( bounds )
+			.Select( gameObject => gameObject.Root.GetComponent<DroppedEquipment>() )
+			.Where( CanDeposit )
+			.GroupBy( drop => drop.GameObject )
+			.Select( group => group.First() )
+			.OrderBy( drop => drop.WorldPosition.DistanceSquared( WorldPosition ) )
+			.Take( MaxQuantity - Quantity )
+			.ToList();
+	}
+
+	private static bool TryCreateShipmentHost( GameModeEquipmentDto equipment, Guid marketItemId, int maxQuantity,
+		int quantity, Vector3 position, Player? owner )
+	{
+		var shipmentPrefab = GameObject.GetPrefab( GameModeMarketItems.ShipmentPrefabPath );
+		if ( !shipmentPrefab.IsValid() )
+		{
+			return false;
+		}
+
+		var shipmentObject = shipmentPrefab.Clone();
+		shipmentObject.WorldPosition = position;
+
+		var shipmentEntity = shipmentObject.GetComponent<ShipmentEntity>();
+		var shipmentBaseEntity = shipmentObject.GetComponent<BaseEntity>();
+		if ( !shipmentEntity.IsValid() || !shipmentBaseEntity.IsValid() )
+		{
+			shipmentObject.Destroy();
+			return false;
+		}
+
+		shipmentEntity.MarketItemId = marketItemId;
+		shipmentEntity.ConfigureHost( equipment, maxQuantity, quantity );
+
+		if ( owner.IsValid() )
+		{
+			GameUtils.AssignSpawnedOwnership( shipmentObject, owner );
+			shipmentObject.NetworkSpawn( owner.Connection );
+		}
+		else
+		{
+			shipmentObject.NetworkSpawn();
+		}
+
+		GameManager.Instance.PurchaseSound?.Broadcast( shipmentObject.WorldPosition, shipmentObject );
+		return true;
 	}
 
 	private void AnimatePreview()

@@ -44,6 +44,27 @@ public static class GameModeMarketItems
 		return GameModeEquipments.FindByDtoId( item.ReferenceId.Value );
 	}
 
+	public static GameModeMarketItemDto? FindShipmentMarketItem( GameModeEquipmentDto? equipment )
+	{
+		if ( equipment == null )
+		{
+			return null;
+		}
+
+		return All.FirstOrDefault( item =>
+		{
+			if ( item.Type != GameModeMarketItemType.Equipment || item.Quantity <= 1 )
+			{
+				return false;
+			}
+
+			var itemEquipment = ResolveEquipment( item );
+			return itemEquipment != null &&
+			       (itemEquipment.Id == equipment.Id ||
+			        itemEquipment.GameModeAddonContentId == equipment.GameModeAddonContentId);
+		} );
+	}
+
 	public static string DisplayName( GameModeMarketItemDto? item )
 	{
 		if ( item == null )

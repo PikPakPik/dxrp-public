@@ -1,3 +1,4 @@
+using Dxura.RP.Game.Entities;
 using Dxura.RP.Shared;
 using Sandbox.Diagnostics;
 
@@ -5,6 +6,9 @@ namespace Dxura.RP.Game;
 
 public class DroppedEquipment : Component, Component.IPressable
 {
+	private const float ShipmentMergeRadius = 96f;
+	private const int MinShipmentMergeCount = 2;
+
 	[Property]
 	public GameModeEquipmentDto? Resource { get; private set; }
 	
@@ -132,6 +136,24 @@ public class DroppedEquipment : Component, Component.IPressable
 		GameObject.Destroy();
 	}
 
+	[Rpc.Host]
+	public void MergeNearbyIntoShipmentsHost()
+	{
+		var callerId = Rpc.CallerId;
+		if ( Cooldown.Current.CheckAndStartCooldown( $"{callerId}:shipment:merge", Config.Current.Game.ShipmentUseCooldown ) )
+		{
+			return;
+		}
+
+		var player = GameUtils.GetPlayerByConnectionId( callerId );
+		if ( !player.IsValid() || !HasMergeLineOfSight( player ) )
+		{
+			return;
+		}
+
+		MergeNearbyDropsIntoShipmentsHost( player );
+	}
+
 	public static DroppedEquipment CreateHost( GameModeEquipmentDto dto, Vector3 position, Rotation? rotation = null,
 		Equipment? heldWeapon = null, bool networkSpawn = true, Guid marketItemId = default )
 	{
@@ -186,5 +208,55 @@ public class DroppedEquipment : Component, Component.IPressable
 		}
 
 		return droppedWeapon;
+	}
+
+	private bool HasMergeLineOfSight( Player player )
+	{
+		var tr = Scene.Trace.Ray( player.AimRay, Config.Current.Game.ReachDistance )
+			.IgnoreGameObjectHierarchy( player.GameObject )
+			.WithoutTags( Constants.TraceIgnoreTags )
+			.UseHitboxes()
+			.Run();
+
+		return tr.Hit && tr.GameObject.Root == GameObject.Root;
+	}
+
+	private void MergeNearbyDropsIntoShipmentsHost( Player player )
+	{
+		var nearbyRoots = FindNearbyMergeRoots();
+
+		var nearbyDrops = nearbyRoots
+			.Select( root => root.GetComponent<DroppedEquipment>() )
+			.Where( drop => drop.IsValid() && drop.EquipmentId != Guid.Empty )
+			.GroupBy( drop => drop.GameObject )
+			.Select( group => group.First() )
+			.ToList();
+
+		if ( nearbyDrops.Count == 0 )
+		{
+			return;
+		}
+
+		foreach ( var dropsByEquipment in nearbyDrops.GroupBy( drop => drop.EquipmentId ) )
+		{
+			var drops = dropsByEquipment.ToList();
+			if ( drops.Count >= MinShipmentMergeCount )
+			{
+				ShipmentEntity.CreateFromDropsHost( drops, player );
+			}
+		}
+	}
+
+	private List<GameObject> FindNearbyMergeRoots()
+	{
+		var bounds = new BBox(
+			WorldPosition - Vector3.One * ShipmentMergeRadius,
+			WorldPosition + Vector3.One * ShipmentMergeRadius );
+
+		return Scene.FindInPhysics( bounds )
+			.Select( gameObject => gameObject.Root )
+			.Where( root => root.IsValid() )
+			.Distinct()
+			.ToList();
 	}
 }

@@ -1,3 +1,5 @@
+using Dxura.RP.Game.Entities;
+
 namespace Dxura.RP.Game.Equipments;
 
 /// <summary>
@@ -229,6 +231,23 @@ public class HandsEquipment : InputWeaponComponent, IEquipmentEvents, IInputHint
 		}
 
 		var targetGo = trace.Value.GameObject.Root;
+
+		if ( Input.Down( "run" ) && Input.Pressed( "attack2" ) )
+		{
+			var shipmentEntity = targetGo.GetComponent<ShipmentEntity>();
+			if ( shipmentEntity.IsValid() )
+			{
+				shipmentEntity.DepositNearbyDropsHost();
+				return;
+			}
+
+			var droppedEquipment = targetGo.GetComponent<DroppedEquipment>();
+			if ( droppedEquipment.IsValid() )
+			{
+				droppedEquipment.MergeNearbyIntoShipmentsHost();
+				return;
+			}
+		}
 
 		if ( targetGo.Components.Get<IHandEvents>() != null )
 		{
