@@ -5,7 +5,7 @@ namespace Dxura.RP.Game.Entities;
 
 public class ShipmentEntity : BaseEntity, IWireUsable, Component.IPressable
 {
-	private const float DepositRadius = 32f;
+	private const float DepositRadius = 24f;
 
 	[Property]
 	[ReadOnly]
