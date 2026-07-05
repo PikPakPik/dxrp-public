@@ -10,22 +10,7 @@ public class ArrayWireDefinition : ConstructDefinition<ArrayWire, ArrayWireData>
 
 	protected override ConstructDataValidationResult ValidateTyped( ArrayWireData data )
 	{
-		if ( data.NumberValues.Keys.Any( IsInvalidIndex ) || data.StringValues.Keys.Any( IsInvalidIndex ) )
-		{
-			return ConstructDataValidationResult.Failure( $"Array indices must be between 0 and {MaxArraySize - 1}." );
-		}
-
-		if ( data.StringValues.Values.Any( value => value is { Length: > MaxStoredStringLength } ) )
-		{
-			return ConstructDataValidationResult.Failure( $"Array strings must be {MaxStoredStringLength} characters or shorter." );
-		}
-
 		return ConstructDataValidationResult.Success();
-	}
-
-	private static bool IsInvalidIndex( int index )
-	{
-		return index is < 0 or >= MaxArraySize;
 	}
 
 	protected override GameObject CreateConstructInternal( ArrayWireData data, Vector3 position, Rotation rotation )

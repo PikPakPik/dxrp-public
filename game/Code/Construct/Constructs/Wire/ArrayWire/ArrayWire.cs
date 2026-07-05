@@ -56,8 +56,14 @@ public class ArrayWire() : BaseWireConstruct( ConstructType.ArrayWire ), IWireEv
 
 	protected override void OnDataChanged( IConstructData oldData, IConstructData newData )
 	{
+		var oldValueType = _data.ValueType;
 		_data = newData as ArrayWireData ?? new ArrayWireData();
-		LoadValuesFromData();
+
+		if ( oldValueType != _data.ValueType )
+		{
+			ClearStoredValues();
+		}
+
 		UpdateOutputs();
 	}
 
@@ -109,7 +115,7 @@ public class ArrayWire() : BaseWireConstruct( ConstructType.ArrayWire ), IWireEv
 				break;
 		}
 
-		PersistData();
+		UpdateOutputs();
 	}
 
 	private void ClearCurrentIndex()
@@ -130,15 +136,13 @@ public class ArrayWire() : BaseWireConstruct( ConstructType.ArrayWire ), IWireEv
 				break;
 		}
 
-		PersistData();
+		UpdateOutputs();
 	}
 
 	private void ClearAllValues()
 	{
-		_numberValues.Clear();
- 		_stringValues.Clear();
-
-		PersistData();
+		ClearStoredValues();
+		UpdateOutputs();
 	}
 
 	private void UpdateOutputs()
@@ -221,45 +225,10 @@ public class ArrayWire() : BaseWireConstruct( ConstructType.ArrayWire ), IWireEv
 		};
 	}
 
-	private void LoadValuesFromData()
+	private void ClearStoredValues()
 	{
 		_numberValues.Clear();
 		_stringValues.Clear();
-
-		foreach ( var (index, value) in _data.NumberValues )
-		{
-			if ( IsValidIndex( index ) )
-			{
-				_numberValues[index] = value;
-			}
-		}
-
-		foreach ( var (index, value) in _data.StringValues )
-		{
-			if ( IsValidIndex( index ) )
-			{
-				_stringValues[index] = TrimStoredString( value ?? string.Empty );
-			}
-		}
-	}
-
-	private void PersistData()
-	{
-		_data = new ArrayWireData
-		{
-			ValueType = _data.ValueType,
-			NumberValues = new Dictionary<int, float>( _numberValues ),
-			StringValues = new Dictionary<int, string>( _stringValues )
-		};
-
-		var serializationResult = Construct.Current.Serializer.Serialize( Type, _data );
-		if ( serializationResult.IsSuccess )
-		{
-			SetData( serializationResult.Value );
-			return;
-		}
-
-		UpdateOutputs();
 	}
 
 	private static float ConvertToFloat( object? value )
@@ -280,10 +249,5 @@ public class ArrayWire() : BaseWireConstruct( ConstructType.ArrayWire ), IWireEv
 		return value.Length <= ArrayWireDefinition.MaxStoredStringLength
 			? value
 			: value[..ArrayWireDefinition.MaxStoredStringLength];
-	}
-
-	private static bool IsValidIndex( int index )
-	{
-		return index is >= 0 and < ArrayWireDefinition.MaxArraySize;
 	}
 }
