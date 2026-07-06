@@ -88,7 +88,7 @@
 				        <span>#pausemenu.settings</span>
 			        </span>
 		        </div>
-		        
+
 		        <div style="height: 25vh"></div>
 	        
 		        <div class="flex flex items-center gap-4 p-3 pl-6 bg-secondary shadow-lg cursor-pointer hover-scale absolute bottom-0 mb-4"
@@ -116,6 +116,26 @@
 
         </div>
 
+        <div class="corner-actions flex items-center gap-3 absolute bottom-0 right-0 mb-4 mr-4">
+	        <div class="flex flex items-center gap-2 px-3 py-2 bg-secondary shadow-lg cursor-pointer hover-scale" @onclick="@OpenFeedback">
+		        <i class="material-icons text-2xl text-accent">feedback</i>
+		        <span class="text-white text-sm text-bold">
+			        <span>#pausemenu.feedback</span>
+		        </span>
+	        </div>
+	        <div class="flex flex items-center gap-2 px-3 py-2 bg-secondary shadow-lg cursor-pointer hover-scale" @onclick="@OpenDiscord">
+		        <i class="material-icons text-2xl text-accent">discord</i>
+		        <span class="text-white text-sm text-bold">#tabmenu.discord</span>
+	        </div>
+        </div>
+
+        @if ( _feedbackOpen )
+        {
+	        <div class="feedback-modal-backdrop flex items-center justify-center">
+		        <FeedbackForm OnCancel="@CloseFeedback"/>
+	        </div>
+        }
+
         @* <!-- Footer --> *@
         @* <div class="bg-secondary px-4 py-2 text-center flex items-center justify-center w-full shadow-lg"> *@
 	       @*  <span class="text-gray-400 text-sm">Proudly crafted by <span class="text-accent text-bold ml-1">Dxura</span></span> *@
@@ -129,6 +149,7 @@
     private static bool _closeRequested;
 
     private bool _settingsOpen;
+    private bool _feedbackOpen;
 
     protected override void OnStart()
     {
@@ -142,6 +163,7 @@
 		    _closeRequested = false;
 		    _isOpen = false;
 		    _settingsOpen = false;
+		    _feedbackOpen = false;
 		    IsOpen = false;
 		    StateHasChanged();
 		    return;
@@ -152,6 +174,7 @@
 	    _isOpen = !_isOpen;
 	    IsOpen = _isOpen;
 	    _settingsOpen = false;
+	    _feedbackOpen = false;
 	    Input.EscapePressed = false;
 	    Game.Overlay.CloseAll();
 	    StateHasChanged();
@@ -183,6 +206,27 @@
     {
 	    Sound.Play( "pop" );
 	    _settingsOpen = !_settingsOpen;
+	    _feedbackOpen = false;
+    }
+
+    private void OpenFeedback()
+    {
+	    Sound.Play( "pop" );
+	    _feedbackOpen = !_feedbackOpen;
+	    _settingsOpen = false;
+    }
+
+    private void CloseFeedback()
+    {
+	    _feedbackOpen = false;
+	    StateHasChanged();
+    }
+
+    private const string DiscordUrl = "https://discord.dxrp.net";
+
+    private void OpenDiscord()
+    {
+	    DiscordWebPanel.Open( Panel, DiscordUrl );
     }
 
     private void ExitToMenu()
@@ -193,6 +237,6 @@
 
     protected override int BuildHash()
     {
-        return HashCode.Combine(_isOpen, _settingsOpen, GameUtils.Players.Count(), Player.Local?.WalletBalance, Player.Local?.BankBalance);
+        return HashCode.Combine(_isOpen, _settingsOpen, _feedbackOpen, GameUtils.Players.Count(), Player.Local?.WalletBalance, Player.Local?.BankBalance);
     }
 }
