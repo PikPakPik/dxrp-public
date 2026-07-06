@@ -1349,6 +1349,7 @@
   "system.automessage.rules": "Pamiętaj o przestrzeganiu zasad serwera.",
   "system.automessage.staff_hint": "Potrzebujesz pomocy? Wpisz @ a następnie swoją wiadomość na czacie, aby utworzyć zgłoszenie do personelu.",
   "system.automessage.rulebreakers": "Łamanie zasad? Wpisz @ a następnie swoją wiadomość na czacie, aby utworzyć zgłoszenie do personelu.",
+  "system.automessage.feedback": "Znalazłeś błąd lub masz pomysł? Wpisz /feedback, aby nam o tym powiedzieć.",
   "system.player.joined": "{0} dołączył do serwera",
   "system.player.left": "{0} opuścił serwer",
   "system.server.full": "Serwer jest pełny",

@@ -1349,6 +1349,7 @@
   "system.automessage.rules": "서버 규칙을 준수해주세요.",
   "system.automessage.staff_hint": "도움이 필요하신가요? 채팅에 @와 함께 메시지를 입력해 관리자 티켓을 생성하세요.",
   "system.automessage.rulebreakers": "규칙 위반자를 발견했나요? 채팅에 @와 함께 메시지를 입력해 관리자 티켓을 생성하세요.",
+  "system.automessage.feedback": "버그를 발견했거나 아이디어가 있나요? /feedback을 입력해 알려주세요.",
   "system.player.joined": "{0}님이 서버에 접속했습니다.",
   "system.player.left": "{0}님이 서버에서 나갔습니다.",
   "system.server.full": "서버가 가득 찼습니다.",

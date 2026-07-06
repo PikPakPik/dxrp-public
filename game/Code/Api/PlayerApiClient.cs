@@ -144,6 +144,7 @@ public static class PlayerApiClient
 				return response.StatusCode switch
 				{
 					(HttpStatusCode)429 => (FeedbackSubmitResult.Cooldown, null),
+					(HttpStatusCode)422 => (FeedbackSubmitResult.Flagged, null),
 					_ => (FeedbackSubmitResult.Failed, (string?)null)
 				};
 			},

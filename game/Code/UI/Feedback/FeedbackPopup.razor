@@ -1,0 +1,22 @@
+@namespace Dxura.RP.Game.UI
+@using Game=Sandbox.Game
+@inherits PanelComponent
+
+@attribute [StyleSheet]
+
+<root class="flex items-center justify-center">
+	<FeedbackForm OnCancel="@Close"/>
+</root>
+
+@code {
+	public static void Open()
+	{
+		Game.Overlay.CloseAll();
+		GameManager.ShowUi<FeedbackPopup>();
+	}
+
+	private void Close()
+	{
+		Destroy();
+	}
+}

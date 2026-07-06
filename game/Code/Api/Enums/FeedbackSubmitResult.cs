@@ -4,5 +4,6 @@ public enum FeedbackSubmitResult
 {
 	Failed,
 	Success,
-	Cooldown
+	Cooldown,
+	Flagged
 }

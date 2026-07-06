@@ -129,13 +129,6 @@
 	        </div>
         </div>
 
-        @if ( _feedbackOpen )
-        {
-	        <div class="feedback-modal-backdrop flex items-center justify-center">
-		        <FeedbackForm OnCancel="@CloseFeedback"/>
-	        </div>
-        }
-
         @* <!-- Footer --> *@
         @* <div class="bg-secondary px-4 py-2 text-center flex items-center justify-center w-full shadow-lg"> *@
 	       @*  <span class="text-gray-400 text-sm">Proudly crafted by <span class="text-accent text-bold ml-1">Dxura</span></span> *@
@@ -149,7 +142,6 @@
     private static bool _closeRequested;
 
     private bool _settingsOpen;
-    private bool _feedbackOpen;
 
     protected override void OnStart()
     {
@@ -163,7 +155,6 @@
 		    _closeRequested = false;
 		    _isOpen = false;
 		    _settingsOpen = false;
-		    _feedbackOpen = false;
 		    IsOpen = false;
 		    StateHasChanged();
 		    return;
@@ -174,7 +165,6 @@
 	    _isOpen = !_isOpen;
 	    IsOpen = _isOpen;
 	    _settingsOpen = false;
-	    _feedbackOpen = false;
 	    Input.EscapePressed = false;
 	    Game.Overlay.CloseAll();
 	    StateHasChanged();
@@ -206,20 +196,12 @@
     {
 	    Sound.Play( "pop" );
 	    _settingsOpen = !_settingsOpen;
-	    _feedbackOpen = false;
     }
 
     private void OpenFeedback()
     {
 	    Sound.Play( "pop" );
-	    _feedbackOpen = !_feedbackOpen;
-	    _settingsOpen = false;
-    }
-
-    private void CloseFeedback()
-    {
-	    _feedbackOpen = false;
-	    StateHasChanged();
+	    FeedbackPopup.Open();
     }
 
     private const string DiscordUrl = "https://discord.dxrp.net";
@@ -237,6 +219,6 @@
 
     protected override int BuildHash()
     {
-        return HashCode.Combine(_isOpen, _settingsOpen, _feedbackOpen, GameUtils.Players.Count(), Player.Local?.WalletBalance, Player.Local?.BankBalance);
+        return HashCode.Combine(_isOpen, _settingsOpen, GameUtils.Players.Count(), Player.Local?.WalletBalance, Player.Local?.BankBalance);
     }
 }

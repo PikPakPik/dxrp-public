@@ -106,6 +106,7 @@
 		None,
 		Success,
 		Cooldown,
+		Flagged,
 		Error
 	}
 
@@ -153,6 +154,7 @@
 	{
 		SubmitStatus.Success => "success",
 		SubmitStatus.Cooldown => "warn",
+		SubmitStatus.Flagged => "error",
 		SubmitStatus.Error => "error",
 		_ => ""
 	};
@@ -161,6 +163,7 @@
 	{
 		SubmitStatus.Success => "check_circle",
 		SubmitStatus.Cooldown => "schedule",
+		SubmitStatus.Flagged => "block",
 		SubmitStatus.Error => "error",
 		_ => ""
 	};
@@ -169,6 +172,7 @@
 	{
 		SubmitStatus.Success => Language.GetPhrase( "notify.feedback.success" ),
 		SubmitStatus.Cooldown => Language.GetPhrase( "notify.feedback.cooldown" ),
+		SubmitStatus.Flagged => Language.GetPhrase( "notify.feedback.flagged" ),
 		SubmitStatus.Error => Language.GetPhrase( "notify.feedback.error" ),
 		_ => ""
 	};
@@ -201,6 +205,9 @@
 				break;
 			case FeedbackSubmitResult.Cooldown:
 				_status = SubmitStatus.Cooldown;
+				break;
+			case FeedbackSubmitResult.Flagged:
+				_status = SubmitStatus.Flagged;
 				break;
 			default:
 				_status = SubmitStatus.Error;
