@@ -6,7 +6,6 @@ using Dxura.RP.Shared;
 using Sandbox.Diagnostics;
 using Sandbox.Services;
 using Sandbox.Utility;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Dxura.RP.Game;
@@ -269,7 +268,72 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 	}
 
 	[Rpc.Host]
-	public async void PurchaseEntity( Guid marketItemId )
+	public void PurchaseEntityHost( GameModeEntityDto entity )
+	{
+		var callerId = Rpc.CallerId;
+		var callerSteamId = Rpc.Caller.SteamId;
+		if ( Cooldown.Current.CheckAndStartCooldown( $"{callerId}:entity", Config.Current.Game.EntityCooldown ) )
+		{
+			return;
+		}
+
+		var player = GameUtils.GetPlayerByConnectionId( callerId );
+
+		if ( !player.IsValid() )
+		{
+			return;
+		}
+
+		var entityPrefabPath = entity.PrefabPath();
+		if ( string.IsNullOrWhiteSpace( entityPrefabPath ) )
+		{
+            return;
+		}
+		var marketItem = GameModeMarketItems.All
+			.FirstOrDefault( x => x.Type == GameModeMarketItemType.Entity && x.ReferenceId == entity.Id );
+		var basePrice = (float)Math.Max( 0, (int)MathF.Ceiling( (marketItem?.Cost ?? 0) * EntityPriceMultiplier ) );
+		uint taxAmount = 0;
+		if ( Config.Current.Game.GovernanceTaxEnabled && Governance.Current.TaxRate > 0f && !Governance.Current.IsExemptFromTax( player ) )
+		{
+			return;
+		}
+
+		var prefab = GameObject.GetPrefab( entityPrefabPath );
+		if ( !prefab.IsValid() )
+		{
+			return;
+		}
+
+		if ( player.Restricted )
+		{
+			return;
+		}
+
+		if ( entity.Limit > 0 && GameModeMarketItems.GetOwnedEntityCount( player, entity.GameModeAddonContentId ) >= entity.Limit )
+		{
+			player.Error( "#generic.forbidden" );
+			return;
+		}
+
+		Log.Info( $"Player {callerSteamId} purchased entity '{entity.DisplayName()}'" );
+
+		var entityToSpawn = prefab.Clone();
+
+		entityToSpawn.WorldPosition = GameUtils.GetSpawnPosition( player.AimRay );
+
+		var baseEntityComponent = entityToSpawn.GetComponent<BaseEntity>();
+		if ( baseEntityComponent != null )
+		{
+			baseEntityComponent.Owner = player.SteamId;
+			baseEntityComponent.ConfigureGameModeEntityHost( entity );
+		}
+
+		entityToSpawn.NetworkSpawn( player.Connection );
+		PurchaseSound?.Broadcast( entityToSpawn.WorldPosition, entityToSpawn );
+	}
+
+	[Rpc.Host]
+	public async void PurchaseMarketItemHost( Guid marketItemId )
 	{
 		var callerId = Rpc.CallerId;
 		if ( Cooldown.Current.CheckAndStartCooldown( $"{callerId}:entity", Config.Current.Game.EntityCooldown ) )
@@ -285,111 +349,103 @@ public class GameManager : SingletonComponent<GameManager>, IGameEvents, IConfig
 			return;
 		}
 
-		await player.PurchaseLock.WaitAsync();
-		try
+		if ( !GameModeMarketItems.CanPurchase( player, marketItem ) )
 		{
-			if ( !GameModeMarketItems.CanPurchase( player, marketItem ) )
-			{
-				player.Error( "#generic.forbidden" );
-				return;
-			}
-
-			var displayName = GameModeMarketItems.DisplayName( marketItem );
-			if ( string.IsNullOrWhiteSpace( displayName ) )
-			{
-				return;
-			}
-
-			var price = (uint)Math.Max( 0, (int)MathF.Ceiling( marketItem.Cost * EntityPriceMultiplier ) );
-			if ( price > 0 && !await player.ChargeHost( price, $"Purchased {displayName}", true ) )
-			{
-				return;
-			}
-
-			Log.Info( $"Player {player.SteamId} purchased market item '{displayName}' [{marketItem.Id}] for ${price}" );
-
-			switch ( marketItem.Type )
-			{
-				case GameModeMarketItemType.Entity:
-					var entity = GameModeMarketItems.ResolveEntity( marketItem );
-					if ( entity == null )
-					{
-						return;
-					}
-
-					var entityPrefabPath = entity.PrefabPath();
-					if ( string.IsNullOrWhiteSpace( entityPrefabPath ) )
-					{
-						return;
-					}
-
-					var entityPrefab = GameObject.GetPrefab( entityPrefabPath );
-					if ( !entityPrefab.IsValid() )
-					{
-						return;
-					}
-
-					var entityToSpawn = entityPrefab.Clone();
-					entityToSpawn.WorldPosition = GameUtils.GetSpawnPosition( player.AimRay );
-
-					var baseEntityComponent = entityToSpawn.GetComponent<BaseEntity>();
-					if ( baseEntityComponent != null )
-					{
-						baseEntityComponent.ConfigureGameModeEntityHost( entity );
-					}
-
-					GameUtils.AssignSpawnedOwnership( entityToSpawn, player );
-					entityToSpawn.NetworkSpawn( player.Connection );
-					PurchaseSound?.Broadcast( entityToSpawn.WorldPosition, entityToSpawn );
-					return;
-
-				case GameModeMarketItemType.Equipment:
-					var equipment = GameModeMarketItems.ResolveEquipment( marketItem );
-					if ( equipment == null )
-					{
-						return;
-					}
-
-					if ( marketItem.Quantity > 1 )
-					{
-						var shipmentPrefab = GameObject.GetPrefab( GameModeMarketItems.ShipmentPrefabPath );
-						if ( !shipmentPrefab.IsValid() )
-						{
-							return;
-						}
-
-						var shipmentObject = shipmentPrefab.Clone();
-						shipmentObject.WorldPosition = GameUtils.GetSpawnPosition( player.AimRay );
-
-						var shipmentEntity = shipmentObject.GetComponent<ShipmentEntity>();
-						var shipmentBaseEntity = shipmentObject.GetComponent<BaseEntity>();
-						if ( !shipmentEntity.IsValid() || !shipmentBaseEntity.IsValid() )
-						{
-							shipmentObject.Destroy();
-							return;
-						}
-
-						shipmentEntity.MarketItemId = marketItem.Id;
-						shipmentEntity.ConfigureHost( equipment, marketItem.Quantity );
-
-						GameUtils.AssignSpawnedOwnership( shipmentObject, player );
-						shipmentObject.NetworkSpawn( player.Connection );
-						PurchaseSound?.Broadcast( shipmentObject.WorldPosition, shipmentObject );
-						return;
-					}
-
-					var droppedEquipment = DroppedEquipment.CreateHost(
-						equipment,
-						GameUtils.GetSpawnPosition( player.AimRay ),
-						rotation: Rotation.FromYaw( player.Controller.EyeAngles.yaw + 90 ),
-						marketItemId: marketItem.Id );
-					PurchaseSound?.Broadcast( droppedEquipment.WorldPosition, droppedEquipment.GameObject );
-					return;
-			}
+			player.Error( "#generic.forbidden" );
+			return;
 		}
-		finally
+
+		var displayName = GameModeMarketItems.DisplayName( marketItem );
+		if ( string.IsNullOrWhiteSpace( displayName ) )
 		{
-			player.PurchaseLock.Release();
+			return;
+		}
+
+		var price = (uint)Math.Max( 0, (int)MathF.Ceiling( marketItem.Cost * EntityPriceMultiplier ) );
+		if ( price > 0 && !await player.ChargeHost( price, $"Purchased {displayName}", true ) )
+		{
+			return;
+		}
+
+		Log.Info( $"Player {player.SteamId} purchased market item '{displayName}' [{marketItem.Id}] for ${price}" );
+
+		switch ( marketItem.Type )
+		{
+			case GameModeMarketItemType.Entity:
+				var entity = GameModeMarketItems.ResolveEntity( marketItem );
+				if ( entity == null )
+				{
+					return;
+				}
+
+				var entityPrefabPath = entity.PrefabPath();
+				if ( string.IsNullOrWhiteSpace( entityPrefabPath ) )
+				{
+					return;
+				}
+
+				var entityPrefab = GameObject.GetPrefab( entityPrefabPath );
+				if ( !entityPrefab.IsValid() )
+				{
+					return;
+				}
+
+				var entityToSpawn = entityPrefab.Clone();
+				entityToSpawn.WorldPosition = GameUtils.GetSpawnPosition( player.AimRay );
+
+				var baseEntityComponent = entityToSpawn.GetComponent<BaseEntity>();
+				if ( baseEntityComponent != null )
+				{
+					baseEntityComponent.ConfigureGameModeEntityHost( entity );
+				}
+
+				GameUtils.AssignSpawnedOwnership( entityToSpawn, player );
+				entityToSpawn.NetworkSpawn( player.Connection );
+				PurchaseSound?.Broadcast( entityToSpawn.WorldPosition, entityToSpawn );
+				return;
+
+			case GameModeMarketItemType.Equipment:
+				var equipment = GameModeMarketItems.ResolveEquipment( marketItem );
+				if ( equipment == null )
+				{
+					return;
+				}
+
+				if ( marketItem.Quantity > 1 )
+				{
+					var shipmentPrefab = GameObject.GetPrefab( GameModeMarketItems.ShipmentPrefabPath );
+					if ( !shipmentPrefab.IsValid() )
+					{
+						return;
+					}
+
+					var shipmentObject = shipmentPrefab.Clone();
+					shipmentObject.WorldPosition = GameUtils.GetSpawnPosition( player.AimRay );
+
+					var shipmentEntity = shipmentObject.GetComponent<ShipmentEntity>();
+					var shipmentBaseEntity = shipmentObject.GetComponent<BaseEntity>();
+					if ( !shipmentEntity.IsValid() || !shipmentBaseEntity.IsValid() )
+					{
+						shipmentObject.Destroy();
+						return;
+					}
+
+					shipmentEntity.MarketItemId = marketItem.Id;
+					shipmentEntity.ConfigureHost( equipment, marketItem.Quantity );
+
+					GameUtils.AssignSpawnedOwnership( shipmentObject, player );
+					shipmentObject.NetworkSpawn( player.Connection );
+					PurchaseSound?.Broadcast( shipmentObject.WorldPosition, shipmentObject );
+					return;
+				}
+
+				var droppedEquipment = DroppedEquipment.CreateHost(
+					equipment,
+					GameUtils.GetSpawnPosition( player.AimRay ),
+					rotation: Rotation.FromYaw( player.Controller.EyeAngles.yaw + 90 ),
+					marketItemId: marketItem.Id );
+				PurchaseSound?.Broadcast( droppedEquipment.WorldPosition, droppedEquipment.GameObject );
+				return;
 		}
 	}
 
