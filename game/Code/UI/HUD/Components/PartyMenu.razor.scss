@@ -147,6 +147,22 @@ PartyMenu {
     text-align: center;
   }
 
+  .settings-pane {
+    .pane-hint {
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .size-count {
+      font-size: $text-xl;
+      font-weight: 700;
+      color: $color-white;
+      text-align: center;
+      letter-spacing: 1px;
+      margin: 4px 0;
+    }
+  }
+
   .pane-note {
     font-size: 12px;
     color: $color-gray-400;
@@ -193,6 +209,81 @@ PartyMenu {
       font-weight: 600;
       color: $color-white;
     }
+  }
+
+  // ── Browse (read-only parties + online players) ─────────────────────────────────────────────
+  .browse-pane {
+    gap: 6px;
+    overflow-y: scroll;
+  }
+
+  .browse-list {
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .browse-party-block {
+    gap: 0;
+  }
+
+  .browse-row {
+    background-color: rgba(white, 0.05);
+    border-radius: $rounding;
+    padding: 6px 10px;
+    pointer-events: all;
+  }
+
+  .browse-expand {
+    gap: 4px;
+    margin: 0 4px 4px 4px;
+    padding: 6px 8px 8px 8px;
+    border-radius: $rounding;
+    background-color: rgba(black, 0.22);
+  }
+
+  .browse-member-row {
+    padding: 4px 6px;
+    border-radius: $rounding;
+    background-color: rgba(white, 0.04);
+  }
+
+  .browse-chevron {
+    font-size: 18px;
+    color: $color-gray-400;
+    pointer-events: none;
+  }
+
+  .party-color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .browse-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+  }
+
+  .browse-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: $color-white;
+  }
+
+  .browse-leader {
+    font-size: 11px;
+    color: $color-gray-400;
+  }
+
+  .browse-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: $color-tertiary;
   }
 
   // ── Buttons ──────────────────────────────────────────────────────────────────────────────────
@@ -304,6 +395,14 @@ PartyMenu {
 
   .color-row {
     margin-top: 4px;
+  }
+
+  .settings-apply-row {
+    width: 100%;
+
+    .primary-btn {
+      margin-left: auto;
+    }
   }
 
   .color-preview {

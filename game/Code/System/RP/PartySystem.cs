@@ -48,11 +48,14 @@ public class PartyData
 	/// <summary>Packed 0xRRGGBB highlight color (leader-customizable; drives nameplate + future party HUD).</summary>
 	public uint Color { get; set; }
 
+	/// <summary>Leader-selected short party tag (rendered in nameplates/HUD).</summary>
+	public string Name { get; set; } = PartySystem.DefaultPartyName;
+
 	/// <summary>
-	/// When true, members of this party see each other's silhouettes through geometry using the party color.
-	/// Leader-controlled party option; still gated by <see cref="PartySystemConfig.AllowMemberOutline"/>.
+	/// Leader-selected desired party size (including leader). This is clamped by server config and
+	/// the hard gameplay cap, and is used as the effective member cap for invite/accept flow.
 	/// </summary>
-	public bool MemberOutlineEnabled { get; set; } = true;
+	public int DesiredPartySize { get; set; }
 }
 
 /// <summary>
@@ -78,6 +81,13 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 	/// the reference "party halo" color and reads clearly as a friendly/ally marker.
 	/// </summary>
 	public const uint DefaultPartyColor = 0x2ECC40;
+	public const string DefaultPartyName = "PARTY";
+	public const int PartyNameMaxLength = 12;
+
+	/// <summary>
+	/// Hard gameplay cap for party size, inclusive of the leader.
+	/// </summary>
+	public const int HardPartySizeCap = 5;
 
 	// ── Synced authoritative state (host → clients) ───────────────────────────────────────────
 	// partyId → all data for that party (members, leader, invites, color)
@@ -139,13 +149,47 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		return partyId.HasValue ? GetPartyColor( partyId.Value ) : DefaultPartyColor;
 	}
 
+	public string GetPartyName( Guid partyId ) =>
+		Parties.TryGetValue( partyId, out var data ) && !string.IsNullOrWhiteSpace( data.Name )
+			? data.Name
+			: DefaultPartyName;
+
+	public string GetPartyNameForMember( long steamId )
+	{
+		var partyId = GetPartyId( steamId );
+		return partyId.HasValue ? GetPartyName( partyId.Value ) : DefaultPartyName;
+	}
+
 	/// <summary>
-	/// Whether <paramref name="partyId"/> should render member outlines for its roster (system + party option).
+	/// Effective operator cap for parties, clamped by the gameplay hard cap.
 	/// </summary>
-	public bool IsMemberOutlineEnabled( Guid partyId ) =>
-		Settings.AllowMemberOutline
-		&& Parties.TryGetValue( partyId, out var data )
-		&& data.MemberOutlineEnabled;
+	public int GetOperatorPartySizeCap() => Math.Clamp( Settings.MaxPartySize, 1, HardPartySizeCap );
+
+	/// <summary>
+	/// Desired party size for <paramref name="partyId"/> after clamping against operator + hard caps and
+	/// current roster count.
+	/// </summary>
+	public int GetDesiredPartySize( Guid partyId )
+	{
+		var operatorCap = GetOperatorPartySizeCap();
+		if ( !Parties.TryGetValue( partyId, out var data ) )
+		{
+			return operatorCap;
+		}
+
+		var memberCount = Math.Clamp( data.Members?.Count ?? 1, 1, operatorCap );
+		var desired = data.DesiredPartySize > 0 ? data.DesiredPartySize : operatorCap;
+		return Math.Clamp( desired, memberCount, operatorCap );
+	}
+
+	/// <summary>
+	/// Desired party size for the party the specified member currently belongs to.
+	/// </summary>
+	public int GetDesiredPartySizeForMember( long steamId )
+	{
+		var partyId = GetPartyId( steamId );
+		return partyId.HasValue ? GetDesiredPartySize( partyId.Value ) : GetOperatorPartySizeCap();
+	}
 
 	/// <summary>
 	/// Builds a client-readable view of a party for UI/HUD. This is display state only —
@@ -189,6 +233,20 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		}
 	}
 
+	/// <summary>
+	/// Client-readable snapshot of every active party, for the /party menu "Browse" tab. Read-only —
+	/// built entirely from already-synced state, ordered by name then id for a stable display order.
+	/// </summary>
+	public IEnumerable<PartyRoom> GetActiveParties()
+	{
+		return Parties.Keys
+			.Select( GetRoomView )
+			.Where( room => room is not null )
+			.Select( room => room! )
+			.OrderBy( room => GetPartyName( room.Id ), StringComparer.OrdinalIgnoreCase )
+			.ThenBy( room => room.Id );
+	}
+
 	// ── Host mutations (invoked from PartyCommand.ExecuteHost, which already runs on the host) ──
 
 	/// <summary>Invite <paramref name="target"/> to the caller's party, auto-creating one if needed.</summary>
@@ -216,7 +274,7 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		{
 			// A new party starts with 1 member; if MaxPartySize is already at capacity, bail before creating
 			// so the caller isn't orphaned as the leader of a party they can never invite anyone into.
-			if ( Settings.MaxPartySize <= 1 )
+			if ( GetOperatorPartySizeCap() <= 1 )
 			{
 				caller.Error( Language.GetPhrase( "party.party_full" ) );
 				return;
@@ -232,7 +290,7 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 				return;
 			}
 
-			if ( GetPartySize( partyId.Value ) >= Settings.MaxPartySize )
+			if ( GetPartySize( partyId.Value ) >= GetDesiredPartySize( partyId.Value ) )
 			{
 				caller.Error( Language.GetPhrase( "party.party_full" ) );
 				return;
@@ -289,7 +347,7 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 			return;
 		}
 
-		if ( GetPartySize( partyId.Value ) >= Settings.MaxPartySize )
+		if ( GetPartySize( partyId.Value ) >= GetDesiredPartySize( partyId.Value ) )
 		{
 			caller.Error( Language.GetPhrase( "party.party_full" ) );
 			return;
@@ -340,6 +398,7 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 
 		RemovePlayerInternal( target.SteamId );
 		target.Warn( Language.GetPhrase( "party.kicked" ) );
+		target.SendMessage( Language.GetPhrase( "party.kicked" ) );
 		NotifyParty( partyId.Value, string.Format( Language.GetPhrase( "party.member_kicked" ), target.DisplayName ) );
 	}
 
@@ -411,7 +470,7 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		var names = string.Join( ", ", room.Members.Select( m =>
 			m.IsLeader ? string.Format( Language.GetPhrase( "party.leader_tag" ), m.Name ) : m.Name ) );
 
-		caller.SendMessage( string.Format( Language.GetPhrase( "party.info" ), room.Members.Count, Settings.MaxPartySize, names ) );
+		caller.SendMessage( string.Format( Language.GetPhrase( "party.info" ), room.Members.Count, GetDesiredPartySize( partyId.Value ), names ) );
 	}
 
 	/// <summary>
@@ -446,10 +505,9 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 	}
 
 	/// <summary>
-	/// Leader toggles whether this party draws member silhouettes through geometry
-	/// (<see cref="HighlightOutline.ObscuredColor"/> + camera <see cref="Highlight"/>).
+	/// Leader sets short party tag text (max 12 chars). Empty/invalid input falls back to PARTY.
 	/// </summary>
-	public void HostSetMemberOutline( Player caller, bool enabled )
+	public void HostSetPartyName( Player caller, string name )
 	{
 		if ( !Networking.IsHost || caller is null )
 		{
@@ -469,23 +527,15 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 			return;
 		}
 
-		if ( !Settings.AllowMemberOutline )
-		{
-			caller.Error( Language.GetPhrase( "party.outline_disabled_server" ) );
-			return;
-		}
-
+		var normalized = NormalizePartyName( name );
 		var data = Clone( Parties[partyId.Value] );
-		if ( data.MemberOutlineEnabled == enabled )
+		if ( string.Equals( data.Name, normalized, StringComparison.Ordinal ) )
 		{
 			return;
 		}
 
-		data.MemberOutlineEnabled = enabled;
+		data.Name = normalized;
 		Parties[partyId.Value] = data;
-
-		var phrase = enabled ? "party.outline_enabled" : "party.outline_disabled";
-		NotifyParty( partyId.Value, Language.GetPhrase( phrase ) );
 	}
 
 	/// <summary>
@@ -664,12 +714,12 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 	}
 
 	[Rpc.Host]
-	public void RequestSetMemberOutline( bool enabled )
+	public void RequestSetPartyName( string name )
 	{
 		var caller = GameUtils.GetPlayerByConnectionId( Rpc.CallerId );
 		if ( caller.IsValid() )
 		{
-			HostSetMemberOutline( caller, enabled );
+			HostSetPartyName( caller, name );
 		}
 	}
 
@@ -688,8 +738,25 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		Members = new List<long>( src.Members ),
 		Invites = new List<long>( src.Invites ),
 		Color = src.Color,
-		MemberOutlineEnabled = src.MemberOutlineEnabled
+		Name = NormalizePartyName( src.Name ),
+		DesiredPartySize = src.DesiredPartySize
 	};
+
+	public static string NormalizePartyName( string? raw )
+	{
+		if ( string.IsNullOrWhiteSpace( raw ) )
+		{
+			return DefaultPartyName;
+		}
+
+		var cleaned = new string( raw.Trim().ToUpperInvariant().Where( char.IsLetterOrDigit ).ToArray() );
+		if ( cleaned.Length == 0 )
+		{
+			return DefaultPartyName;
+		}
+
+		return cleaned.Length > PartyNameMaxLength ? cleaned[..PartyNameMaxLength] : cleaned;
+	}
 
 	private Guid CreatePartyForLeader( Player leader )
 	{
@@ -700,7 +767,8 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 			Members = new List<long> { leader.SteamId },
 			Invites = new List<long>(),
 			Color = DefaultPartyColor,
-			MemberOutlineEnabled = Settings.AllowMemberOutline
+			Name = DefaultPartyName,
+			DesiredPartySize = GetOperatorPartySizeCap()
 		};
 		SendPartyChat( leader, Language.GetPhrase( "party.created" ) );
 		return partyId;

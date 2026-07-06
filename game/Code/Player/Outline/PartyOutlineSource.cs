@@ -1,3 +1,5 @@
+using Dxura.RP.Game.Minigame;
+
 namespace Dxura.RP.Game;
 
 /// <summary>
@@ -8,7 +10,16 @@ public sealed class PartyOutlineSource : IPlayerOutlineSource
 	public PlayerOutlineRequest? GetOutlineRequest( Player viewer, Player target )
 	{
 		var party = PartySystem.Instance;
-		if ( party is null || !party.Settings.AllowMemberOutline )
+		if ( party is null || !party.Settings.AllowMemberOutline || !PartyPreferences.MemberOutlineEnabled )
+		{
+			return null;
+		}
+
+		// Suppress party ESP while a minigame participant is involved so members inside a minigame
+		// gain no through-wall advantage over each other (matches the minigame PVP rule, #117).
+		var minigame = MinigameSystem.Instance;
+		if ( minigame.IsValid()
+			&& ( minigame.IsPlayerInMinigame( viewer.SteamId ) || minigame.IsPlayerInMinigame( target.SteamId ) ) )
 		{
 			return null;
 		}
@@ -21,7 +32,7 @@ public sealed class PartyOutlineSource : IPlayerOutlineSource
 				continue;
 			}
 
-			if ( !members.Contains( target.SteamId ) || !kv.Value.MemberOutlineEnabled )
+			if ( !members.Contains( target.SteamId ) )
 			{
 				return null;
 			}

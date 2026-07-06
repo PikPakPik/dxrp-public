@@ -17,9 +17,9 @@ public partial class FeedbackPopup
 		Destroy();
 	}
 
-	// Hides this popup for a couple of frames so the resulting screenshot shows the rest of the
-	// game/HUD underneath, then restores it. Runs on the same GameObject as the HUD, so everything
-	// else (chat, health, etc.) stays visible in the capture.
+	// Hides this popup and closes the pause menu (which is what opened it) so the resulting
+	// screenshot shows the rest of the game/HUD underneath. Runs on the same GameObject as the
+	// HUD, so everything else (chat, health, etc.) stays visible in the capture.
 	private async Task<byte[]?> CaptureScreenshot()
 	{
 		if ( !Scene.Camera.IsValid() )
@@ -28,6 +28,7 @@ public partial class FeedbackPopup
 		}
 
 		_capturing = true;
+		PauseMenu.Close();
 		StateHasChanged();
 
 		// Give the hidden state a couple of real frames to actually render before capturing.
