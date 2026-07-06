@@ -311,7 +311,7 @@ public class PocketSystem : SingletonComponent<PocketSystem>, IGameEvents
 	[Rpc.Host]
 	public void RequestPocketContentsHost( long playerId, Guid requestId )
 	{
-		if ( !Rpc.Caller.IsHost && !RankSystem.HasPermission( Rpc.Caller.SteamId, Permission.ViewPocket ) )
+		if ( !RankSystem.HasPermission( Rpc.Caller.SteamId, Permission.ViewPocket ) )
 		{
 			return;
 		}
@@ -339,6 +339,12 @@ public class PocketSystem : SingletonComponent<PocketSystem>, IGameEvents
 	[Rpc.Broadcast( NetFlags.HostOnly | NetFlags.Reliable )]
 	private void BroadcastPocketContentsClient( long playerId, Guid requestId, string[] items )
 	{
+		if ( !RankSystem.HasLocalPermission( Permission.ViewPocket ) )
+		{
+			ClearPocketViewClient();
+			return;
+		}
+
 		if ( requestId != AdminViewRequestId )
 		{
 			return;
