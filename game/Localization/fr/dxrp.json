@@ -1548,6 +1548,7 @@
   "feedback.submit": "Envoyer",
   "feedback.submitting": "Envoi en cours...",
   "feedback.disclosure": "Le feedback est visible publiquement et lié à votre SteamID.",
+  "feedback.include_screenshot": "Inclure une capture d'écran",
   "notify.feedback.success": "Merci ! Votre feedback a été envoyé.",
   "notify.feedback.cooldown": "Vous avez déjà envoyé un feedback récemment. Réessayez dans quelques minutes.",
   "notify.feedback.flagged": "Votre feedback n'a pas pu être envoyé. Reformulez-le et réessayez.",

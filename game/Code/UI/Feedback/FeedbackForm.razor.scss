@@ -84,6 +84,21 @@ FeedbackForm {
     }
   }
 
+  .feedback-checkbox {
+    color: $color-gray-400;
+    font-size: $text-sm;
+    cursor: pointer;
+    transition: color 0.15s ease;
+
+    i {
+      font-size: $text-lg;
+    }
+
+    &:hover {
+      color: $color-white;
+    }
+  }
+
   .feedback-status {
     padding: $space-3;
     border-radius: $space-1;

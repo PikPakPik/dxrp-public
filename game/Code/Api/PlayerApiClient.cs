@@ -108,7 +108,7 @@ public static class PlayerApiClient
 			"Failed to inform server of consent" );
 	}
 
-	public static async Task<(FeedbackSubmitResult Result, string? IssueUrl)> SubmitFeedback( FeedbackType type, string title, string description )
+	public static async Task<(FeedbackSubmitResult Result, string? IssueUrl)> SubmitFeedback( FeedbackType type, string title, string description, byte[]? screenshot = null )
 	{
 		if ( string.IsNullOrEmpty( ServerApiLink.Current?.TenantId ) )
 		{
@@ -121,7 +121,8 @@ public static class PlayerApiClient
 				{
 					Type = type,
 					Title = title,
-					Description = description
+					Description = description,
+					Screenshot = screenshot != null ? Convert.ToBase64String( screenshot ) : null
 				};
 
 				var json = JsonSerializer.Serialize( payload );

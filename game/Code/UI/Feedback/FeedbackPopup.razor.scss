@@ -9,4 +9,9 @@ FeedbackPopup {
   background-color: rgba(black, 0.94);
   z-index: 999999;
   pointer-events: all;
+
+  &.capturing {
+    opacity: 0;
+    pointer-events: none;
+  }
 }

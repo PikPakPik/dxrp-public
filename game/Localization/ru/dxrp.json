@@ -1548,6 +1548,7 @@
   "feedback.submit": "Отправить",
   "feedback.submitting": "Отправка...",
   "feedback.disclosure": "Отзыв публично виден и привязан к вашему SteamID.",
+  "feedback.include_screenshot": "Добавить скриншот",
   "notify.feedback.success": "Спасибо! Ваш отзыв отправлен.",
   "notify.feedback.cooldown": "Вы уже отправляли отзыв недавно. Попробуйте снова через несколько минут.",
   "notify.feedback.flagged": "Не удалось отправить отзыв. Переформулируйте его и попробуйте снова.",
