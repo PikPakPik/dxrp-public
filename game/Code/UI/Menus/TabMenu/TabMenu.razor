@@ -100,13 +100,8 @@
 
 			<div class="p-4 flex flex-col gap-1">
 				<button class="menuButton flex items-center text-lg p-3 cursor-pointer text-tertiary"
-				        @onclick="@(() =>
-				                  {
-					                  _ = new WebPanel { Parent = Panel, Surface = { Url = Config.Current.Game.DiscordUrl } };
-					                  Clipboard.SetText( Config.Current.Game.DiscordUrl );
-					                  _discordText = "#generic.copied";
-				                  })">
-					<i class="material-icons mr-3">discord</i> @_discordText
+				        @onclick="@(() => DiscordWebPanel.Open( Panel, Config.Current.Game.DiscordUrl ))">
+					<i class="material-icons mr-3">discord</i> <span>#tabmenu.discord</span>
 				</button>
 				
 				<button class="menuButton flex items-center text-lg p-3 cursor-pointer text-tertiary"
@@ -196,7 +191,6 @@
 	private MenuSection SelectedSection { get; set; } = MenuSection.Dashboard;
 	private bool IsActive { get; set; }
 
-	private string _discordText = "#tabmenu.discord";
 	private string _supportText = "#generic.support.project";
 	private int _playersSectionRevision;
 	
@@ -251,7 +245,6 @@
 			{
 				IsActive = true;
 				IsOpen = true;
-				_discordText = "#tabmenu.discord";
 				_supportText = "#generic.support.project";
 				StateHasChanged();
 			}
