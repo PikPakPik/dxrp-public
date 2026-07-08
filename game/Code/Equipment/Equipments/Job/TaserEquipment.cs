@@ -80,7 +80,7 @@ public class TaserEquipment : InputWeaponComponent, IEquipmentEvents
 
 		if ( !CanShoot() )
 		{
-			if ( AmmoComponent is { HasAmmo: false } && TimeSinceShoot >= DryShootDelay && !Tags.Has( "reloading" ) )
+			if ( AmmoComponent is { HasAmmo: false } && TimeSinceShoot >= DryShootDelay && !Equipment.Tags.Has( "reloading" ) )
 			{
 				DryShoot();
 			}
@@ -218,18 +218,20 @@ public class TaserEquipment : InputWeaponComponent, IEquipmentEvents
 			stunDirection = owner.AimRay.Forward;
 		}
 
-		target.DamageTakenPosition = hitPosition;
-		target.DamageTakenForce = (stunDirection + Vector3.Up * 0.35f).Normal * 750f;
+		var stunForce = (stunDirection + Vector3.Up * 0.35f).Normal * 750f;
 
 		target.GameObject.TakeDamageHost( new DamageInfo(
 			owner,
 			Damage,
 			Equipment,
 			serverTrace.Value.EndPosition,
-			target.DamageTakenForce * 0.1f,
+			stunForce * 0.1f,
 			serverTrace.Value.GetHitboxTags() ) );
 
-		target.AddStatus( Constants.StunStatus, Config.Current.Game.StunDuration );
+		target.DamageTakenPosition = hitPosition;
+		target.DamageTakenForce = stunForce;
+
+		target.AddStatus( Constants.StunStatus, StunDuration );
 		StunSound?.Broadcast( target.WorldPosition, target.GameObject );
 	}
 

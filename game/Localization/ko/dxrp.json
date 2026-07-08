@@ -1513,7 +1513,7 @@
   "input.fiber_wire.snap_neck": "목 꺾기 (뒤에서)",
   "input.handcuffs.arrest": "체포",
   "input.handcuffs.unarrest": "석방",
-  "input.taser.stun": "Taser",
+  "input.taser.stun": "기절시키기",
   "input.grenade.throw": "던지기",
   "input.grenade.cook": "쿠킹",
   "input.excrement.throw": "던지기",
