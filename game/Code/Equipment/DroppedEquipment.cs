@@ -7,6 +7,7 @@ namespace Dxura.RP.Game;
 public class DroppedEquipment : Component, Component.IPressable
 {
 	private const float ShipmentMergeRadius = 96f;
+	private const float ExistingShipmentDepositRadius = 32f;
 	private const int MinShipmentMergeCount = 2;
 
 	[Property]
@@ -232,23 +233,19 @@ public class DroppedEquipment : Component, Component.IPressable
 			return;
 		}
 
-		var createdShipment = false;
+		if ( TryDepositIntoCloseExistingShipmentHost( nearbyRoots, nearbyDrops ) )
+		{
+			return;
+		}
+
 		foreach ( var dropsByEquipment in nearbyDrops.GroupBy( drop => drop.EquipmentId ) )
 		{
 			var drops = dropsByEquipment.ToList();
 			if ( drops.Count >= MinShipmentMergeCount )
 			{
 				ShipmentEntity.CreateFromDropsHost( drops, player );
-				createdShipment = true;
 			}
 		}
-
-		if ( createdShipment )
-		{
-			return;
-		}
-
-		DepositNearbyDropsIntoExistingShipmentsHost( nearbyRoots, nearbyDrops );
 	}
 
 	private List<GameObject> FindNearbyMergeRoots()
@@ -274,28 +271,32 @@ public class DroppedEquipment : Component, Component.IPressable
 			.ToList();
 	}
 
-	private void DepositNearbyDropsIntoExistingShipmentsHost( IEnumerable<GameObject> nearbyRoots,
+	private bool TryDepositIntoCloseExistingShipmentHost( IEnumerable<GameObject> nearbyRoots,
 		IEnumerable<DroppedEquipment> nearbyDrops )
 	{
+		var maxDistanceSquared = ExistingShipmentDepositRadius * ExistingShipmentDepositRadius;
 		var shipment = nearbyRoots
 			.Select( root => root.GetComponent<ShipmentEntity>() )
 			.Where( shipment => shipment.IsValid() )
 			.GroupBy( shipment => shipment.GameObject )
 			.Select( group => group.First() )
-			.Where( shipment => nearbyDrops.Any( shipment.CanDeposit ) )
+			.Where( shipment => shipment.CanDeposit( this ) )
+			.Where( shipment => shipment.WorldPosition.DistanceSquared( WorldPosition ) <= maxDistanceSquared )
 			.OrderBy( shipment => shipment.WorldPosition.DistanceSquared( WorldPosition ) )
 			.FirstOrDefault();
 
 		if ( !shipment.IsValid() )
 		{
-			return;
+			return false;
 		}
 
 		var depositableDrops = nearbyDrops
 			.Where( drop => shipment.CanDeposit( drop ) )
+			.Where( drop => drop.WorldPosition.DistanceSquared( shipment.WorldPosition ) <= maxDistanceSquared )
 			.OrderBy( drop => drop.WorldPosition.DistanceSquared( shipment.WorldPosition ) )
 			.ToList();
 
+		var depositedAny = false;
 		foreach ( var drop in depositableDrops )
 		{
 			if ( !shipment.TryDepositHost( drop ) )
@@ -303,10 +304,14 @@ public class DroppedEquipment : Component, Component.IPressable
 				continue;
 			}
 
+			depositedAny = true;
+
 			if ( shipment.Quantity >= shipment.MaxQuantity )
 			{
 				break;
 			}
 		}
+
+		return depositedAny;
 	}
 }
