@@ -1554,6 +1554,7 @@
   "pausemenu.servers": "서버",
   "pausemenu.settings": "설정",
   "pausemenu.feedback": "Feedback",
+  "pausemenu.changelog": "Changelog",
   "pausemenu.disconnect": "연결 종료",
   "feedback.title": "Feedback",
   "feedback.type": "종류",

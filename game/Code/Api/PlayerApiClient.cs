@@ -122,7 +122,8 @@ public static class PlayerApiClient
 					Type = type,
 					Title = title,
 					Description = description,
-					Screenshot = screenshot != null ? Convert.ToBase64String( screenshot ) : null
+					Screenshot = screenshot != null ? Convert.ToBase64String( screenshot ) : null,
+					Version = Application.Version
 				};
 
 				var json = JsonSerializer.Serialize( payload );
