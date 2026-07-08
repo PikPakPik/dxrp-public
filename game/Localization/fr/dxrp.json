@@ -193,6 +193,7 @@
   "command.dance.not_found": "Émote de danse non trouvée.",
   "command.drop.no_weapon": "Vous n'avez pas d'arme équipée",
   "command.drop.cannot_drop": "Vous ne pouvez pas jeter cette arme",
+  "command.emote.sitting": "Vous ne pouvez pas faire d'émote en étant assis.",
   "command.emote.unknown": "Émote inconnue : {0}",
   "command.forceselldoor.help": "Forcer la vente de la porte que vous regardez (Staff uniquement)",
   "command.forceselldoor.not_door": "Vous ne regardez pas une porte.",

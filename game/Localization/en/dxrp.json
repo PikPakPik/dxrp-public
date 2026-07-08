@@ -197,6 +197,7 @@
   "command.dance.not_found": "Dance emote not found.",
   "command.drop.no_weapon": "You don't have a weapon equipped",
   "command.drop.cannot_drop": "You cannot drop this weapon",
+  "command.emote.sitting": "You cannot emote while sitting.",
   "command.emote.unknown": "Unknown emote: {0}",
   "command.forceselldoor.help": "Force sell the door you are looking at (Staff only)",
   "command.forceselldoor.not_door": "You are not looking at a door.",
