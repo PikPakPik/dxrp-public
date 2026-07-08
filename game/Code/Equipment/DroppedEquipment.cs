@@ -225,26 +225,30 @@ public class DroppedEquipment : Component, Component.IPressable
 	{
 		var nearbyRoots = FindNearbyMergeRoots();
 
-		var nearbyDrops = nearbyRoots
-			.Select( root => root.GetComponent<DroppedEquipment>() )
-			.Where( drop => drop.IsValid() && drop.EquipmentId != Guid.Empty )
-			.GroupBy( drop => drop.GameObject )
-			.Select( group => group.First() )
-			.ToList();
+		var nearbyDrops = FindNearbyDrops( nearbyRoots );
 
 		if ( nearbyDrops.Count == 0 )
 		{
 			return;
 		}
 
+		var createdShipment = false;
 		foreach ( var dropsByEquipment in nearbyDrops.GroupBy( drop => drop.EquipmentId ) )
 		{
 			var drops = dropsByEquipment.ToList();
 			if ( drops.Count >= MinShipmentMergeCount )
 			{
 				ShipmentEntity.CreateFromDropsHost( drops, player );
+				createdShipment = true;
 			}
 		}
+
+		if ( createdShipment )
+		{
+			return;
+		}
+
+		DepositNearbyDropsIntoExistingShipmentsHost( nearbyRoots, nearbyDrops );
 	}
 
 	private List<GameObject> FindNearbyMergeRoots()
@@ -258,5 +262,51 @@ public class DroppedEquipment : Component, Component.IPressable
 			.Where( root => root.IsValid() )
 			.Distinct()
 			.ToList();
+	}
+
+	private static List<DroppedEquipment> FindNearbyDrops( IEnumerable<GameObject> nearbyRoots )
+	{
+		return nearbyRoots
+			.Select( root => root.GetComponent<DroppedEquipment>() )
+			.Where( drop => drop.IsValid() && drop.EquipmentId != Guid.Empty )
+			.GroupBy( drop => drop.GameObject )
+			.Select( group => group.First() )
+			.ToList();
+	}
+
+	private void DepositNearbyDropsIntoExistingShipmentsHost( IEnumerable<GameObject> nearbyRoots,
+		IEnumerable<DroppedEquipment> nearbyDrops )
+	{
+		var shipment = nearbyRoots
+			.Select( root => root.GetComponent<ShipmentEntity>() )
+			.Where( shipment => shipment.IsValid() )
+			.GroupBy( shipment => shipment.GameObject )
+			.Select( group => group.First() )
+			.Where( shipment => nearbyDrops.Any( shipment.CanDeposit ) )
+			.OrderBy( shipment => shipment.WorldPosition.DistanceSquared( WorldPosition ) )
+			.FirstOrDefault();
+
+		if ( !shipment.IsValid() )
+		{
+			return;
+		}
+
+		var depositableDrops = nearbyDrops
+			.Where( drop => shipment.CanDeposit( drop ) )
+			.OrderBy( drop => drop.WorldPosition.DistanceSquared( shipment.WorldPosition ) )
+			.ToList();
+
+		foreach ( var drop in depositableDrops )
+		{
+			if ( !shipment.TryDepositHost( drop ) )
+			{
+				continue;
+			}
+
+			if ( shipment.Quantity >= shipment.MaxQuantity )
+			{
+				break;
+			}
+		}
 	}
 }
