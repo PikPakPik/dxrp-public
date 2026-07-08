@@ -1652,6 +1652,7 @@
   "pausemenu.servers": "Servers",
   "pausemenu.settings": "Settings",
   "pausemenu.feedback": "Feedback",
+  "pausemenu.changelog": "Changelog",
   "pausemenu.disconnect": "Disconnect",
   "feedback.title": "Feedback",
   "feedback.type": "Type",

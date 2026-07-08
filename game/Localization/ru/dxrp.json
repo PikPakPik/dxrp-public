@@ -1553,6 +1553,7 @@
   "pausemenu.servers": "Серверы",
   "pausemenu.settings": "Настройки",
   "pausemenu.feedback": "Feedback",
+  "pausemenu.changelog": "Changelog",
   "pausemenu.disconnect": "Отключиться",
   "feedback.title": "Обратная связь",
   "feedback.type": "Тип",
