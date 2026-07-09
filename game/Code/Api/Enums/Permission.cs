@@ -144,6 +144,9 @@ public enum Permission
 	[PermissionMeta( "player.spectate", "Spectate", "Spectate another player's perspective", "Moderation" )]
 	PlayerSpectate,
 
+	[PermissionMeta( "player.pocket.view", "View Pocket", "View the contents of a player's pocket", "Moderation" )]
+	ViewPocket,
+
 	[PermissionMeta( "player.tickets.handle", "Handle Tickets", "Able to claim/resolve in-game tickets (with given permissions)", "Moderation" )]
 	HandleTickets,
 

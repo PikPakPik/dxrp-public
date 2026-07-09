@@ -193,6 +193,7 @@
   "command.dance.not_found": "Эмоция танца не найдена.",
   "command.drop.no_weapon": "У вас нет оружия в руках",
   "command.drop.cannot_drop": "Вы не можете выбросить это оружие",
+  "command.emote.sitting": "Вы не можете использовать эмоции сидя.",
   "command.emote.unknown": "Неизвестная эмоция: {0}",
   "command.forceselldoor.help": "Принудительно продать дверь, на которую вы смотрите (только для персонала)",
   "command.forceselldoor.not_door": "Вы не смотрите на дверь.",

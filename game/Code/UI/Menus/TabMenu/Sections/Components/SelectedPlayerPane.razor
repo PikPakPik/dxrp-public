@@ -33,7 +33,9 @@
 		var canSpectate = canTargetRank && RankSystem.HasLocalPermission( Permission.PlayerSpectate );
 		var canUnwanted = isWanted && isLocalPlayerGovernment;
 		var canForceScreenshotAction = canForceScreenshot && !string.IsNullOrEmpty( ServerApiLink.Current?.TenantId );
-		var hasPrimaryActionButtons = canTeleport || canSpectate || canUnwanted || canForceScreenshotAction;
+		var canViewPocket = RankSystem.HasLocalPermission( Permission.ViewPocket );
+		var hasOtherPlayerActionButtons = canTeleport || canSpectate || canUnwanted || canForceScreenshotAction;
+		var hasPrimaryActionButtons = ( !SelectedPlayer.IsLocalPlayer && hasOtherPlayerActionButtons ) || canViewPocket;
 	}
 
 	<div class="flex gap-4 items-stretch flex-grow min-h-0">
@@ -101,129 +103,142 @@
 				</div>
 			</div>
 
-			@if ( !SelectedPlayer.IsLocalPlayer )
+			@if ( !SelectedPlayer.IsLocalPlayer || canViewPocket )
 			{
 				<div class="section-group flex flex-col gap-2 min-w-0 self-start">
 					<div class="section-group-title">Actions</div>
 					@if ( hasPrimaryActionButtons )
 					{
 						<div class="player-action-buttons flex gap-2 flex-wrap">
-						@if ( canTeleport )
+						@if ( !SelectedPlayer.IsLocalPlayer )
 						{
-							<button class="btn-compact btn-secondary player-action-btn" onclick=@( () =>
-							                              {
-								                              Game.Chat.Current.ExecuteCommandHost( "goto", SelectedPlayer.SteamId.ToString() );
-								                              CloseTabMenu();
-							                              })>#tabmenu.players.teleport_to</button>
-							<button class="btn-compact btn-secondary player-action-btn" onclick=@( () =>
-							                              {
-								                              Game.Chat.Current.ExecuteCommandHost( "bring", SelectedPlayer.SteamId.ToString() );
-								                              CloseTabMenu();
-							                              })>#tabmenu.players.bring</button>
-							<button class="btn-compact btn-secondary player-action-btn" onclick=@( () =>
-							                              {
-								                              Game.Chat.Current.ExecuteCommandHost( "return", SelectedPlayer.SteamId.ToString() );
-								                              CloseTabMenu();
-							                              })>#tabmenu.players.return</button>
-						}
-
-						@if ( canSpectate )
-						{
-							<button class="btn-compact btn-primary player-action-btn" onclick=@( () =>
-							                                   {
-								                                   Game.Chat.Current.ExecuteCommandHost( SpectateCommand.Name, SelectedPlayer.SteamId.ToString() );
-								                                   CloseTabMenu();
-							                                   })>Spectate</button>
-						}
-
-						@if ( canUnwanted )
-						{
-							<button class="btn-compact btn-primary player-action-btn" onclick=@( () =>
-							                              {
-								                              if ( Cooldown.Current.CheckAndStartCooldown( "wanted", Config.Current.Game.WantedCooldown , true ))
+							@if ( canTeleport )
+							{
+								<button class="btn-compact btn-secondary player-action-btn" onclick=@( () =>
 								                              {
-									                              return;
-								                              }
+									                              Game.Chat.Current.ExecuteCommandHost( "goto", SelectedPlayer.SteamId.ToString() );
+									                              CloseTabMenu();
+								                              })>#tabmenu.players.teleport_to</button>
+								<button class="btn-compact btn-secondary player-action-btn" onclick=@( () =>
+								                              {
+									                              Game.Chat.Current.ExecuteCommandHost( "bring", SelectedPlayer.SteamId.ToString() );
+									                              CloseTabMenu();
+								                              })>#tabmenu.players.bring</button>
+								<button class="btn-compact btn-secondary player-action-btn" onclick=@( () =>
+								                              {
+									                              Game.Chat.Current.ExecuteCommandHost( "return", SelectedPlayer.SteamId.ToString() );
+									                              CloseTabMenu();
+								                              })>#tabmenu.players.return</button>
+							}
 
-								                              Governance.Current.Unwanted( SelectedPlayer.SteamId );
-								                              CloseTabMenu();
-							                              })>#tabmenu.players.unwanted</button>
+							@if ( canSpectate )
+							{
+								<button class="btn-compact btn-primary player-action-btn" onclick=@( () =>
+								                                   {
+									                                   Game.Chat.Current.ExecuteCommandHost( SpectateCommand.Name, SelectedPlayer.SteamId.ToString() );
+									                                   CloseTabMenu();
+								                                   })>Spectate</button>
+							}
+
+							@if ( canUnwanted )
+							{
+								<button class="btn-compact btn-primary player-action-btn" onclick=@( () =>
+								                              {
+									                              if ( Cooldown.Current.CheckAndStartCooldown( "wanted", Config.Current.Game.WantedCooldown , true ))
+									                              {
+										                              return;
+									                              }
+
+									                              Governance.Current.Unwanted( SelectedPlayer.SteamId );
+									                              CloseTabMenu();
+								                              })>#tabmenu.players.unwanted</button>
+							}
+
+							@if ( canForceScreenshotAction )
+							{
+								<button class="btn-compact btn-bad player-action-btn" onclick=@( () =>
+								                              {
+									                              if ( Cooldown.Current.CheckAndStartCooldown("screenshot:force", Config.Current.Game.ActionCooldown ) )
+									                              {
+										                              Notify.Cooldown( "screenshot:force" );
+										                              return;
+									                              }
+
+									                              AdminSystem.Instance.ForceScreenshotHost( SelectedPlayer.SteamId );
+									                              Notify.Success( "#tabmenu.players.screenshot_forced" );
+									                              CloseTabMenu();
+								                              })>#tabmenu.players.screenshot</button>
+							}
 						}
 
-						@if ( canForceScreenshotAction )
+						@if ( canViewPocket )
 						{
-							<button class="btn-compact btn-bad player-action-btn" onclick=@( () =>
-							                              {
-								                              if ( Cooldown.Current.CheckAndStartCooldown("screenshot:force", Config.Current.Game.ActionCooldown ) )
-								                              {
-									                              Notify.Cooldown( "screenshot:force" );
-									                              return;
-								                              }
-
-								                              AdminSystem.Instance.ForceScreenshotHost( SelectedPlayer.SteamId );
-								                              Notify.Success( "#tabmenu.players.screenshot_forced" );
-								                              CloseTabMenu();
-							                              })>#tabmenu.players.screenshot</button>
+							<button class="btn-compact btn-secondary player-action-btn" onclick=@( () => _pocketView?.RequestPocketContents() )>#tabmenu.players.pocket.view</button>
 						}
 						</div>
 					}
 
-					<div class="action-input-group flex flex-col gap-2 min-w-0 self-start" style="width: 100%; max-width: 500px;">
-						<div class="flex gap-2 items-center min-w-0">
-							<TabMenuTextEntry
-								@ref="_reasonTextEntry"
-								class="player-action-input text-tertiary min-w-0"
-								placeholder="#tabmenu.players.text_placeholder"
-								MaxLength=@( Config.Current.Game.ChatMaxLength )
-								style="flex: 1 1 280px; min-width: 280px;"
-								Value:bind="@_textField"/>
-							<button class="btn-compact btn-primary player-action-btn" onclick=@SendMessage>#tabmenu.players.message</button>
+					@if ( !SelectedPlayer.IsLocalPlayer )
+					{
+						<div class="action-input-group flex flex-col gap-2 min-w-0 self-start" style="width: 100%; max-width: 500px;">
+							<div class="flex gap-2 items-center min-w-0">
+								<TabMenuTextEntry
+									@ref="_reasonTextEntry"
+									class="player-action-input text-tertiary min-w-0"
+									placeholder="#tabmenu.players.text_placeholder"
+									MaxLength=@( Config.Current.Game.ChatMaxLength )
+									style="flex: 1 1 280px; min-width: 280px;"
+									Value:bind="@_textField"/>
+								<button class="btn-compact btn-primary player-action-btn" onclick=@SendMessage>#tabmenu.players.message</button>
+							</div>
+
+							<div class="player-action-buttons flex gap-2 flex-wrap">
+								@if ( isLocalPlayerGovernment && !isWanted )
+								{
+									<button class="btn-compact btn-primary player-action-btn" onclick=@( () => MarkWanted( SelectedPlayer.SteamId ) )>#tabmenu.players.wanted</button>
+								}
+
+								@if ( canRequestWarrant && !hasWarrant && !SelectedPlayer.Job.IsGovernmentRole() )
+								{
+									<button class="btn-compact btn-primary player-action-btn" onclick=@( () => RequestWarrant( SelectedPlayer.SteamId ) )>#tabmenu.players.action.warrant</button>
+								}
+
+								@if ( hasAdminActions )
+								{
+									<div class="admin-action-box flex gap-2 flex-wrap">
+										@if ( canDemote )
+										{
+											<button class="btn-compact btn-warn player-action-btn" onclick=@( () => DemotePlayer( SelectedPlayer.SteamId, SelectedPlayer.DisplayName, SelectedPlayer.Job.Id.ToString() ) )>#tabmenu.players.action.demote</button>
+										}
+
+										@if ( canJail )
+										{
+											<button class="btn-compact btn-warn player-action-btn" onclick=@( () => QuickJailPlayer( SelectedPlayer.SteamId, SelectedPlayer.DisplayName ) )>#tabmenu.players.jail_10m</button>
+										}
+
+										@if ( canBan )
+										{
+											<button class="btn-compact btn-bad player-action-btn" onclick=@( () => QuickBanPlayer( SelectedPlayer.SteamId, SelectedPlayer.DisplayName ) )>#tabmenu.players.ban_1d</button>
+										}
+
+										@if ( canWarn )
+										{
+											<button class="btn-compact btn-warn player-action-btn" onclick=@( () => WarnPlayer( SelectedPlayer.SteamId, SelectedPlayer.DisplayName ) )>#tabmenu.players.warn</button>
+										}
+
+										@if ( canKick )
+										{
+											<button class="btn-compact btn-bad player-action-btn" onclick=@( () => KickPlayer( SelectedPlayer.SteamId ) )>#tabmenu.players.kick</button>
+										}
+									</div>
+								}
+							</div>
 						</div>
-
-						<div class="player-action-buttons flex gap-2 flex-wrap">
-							@if ( isLocalPlayerGovernment && !isWanted )
-							{
-								<button class="btn-compact btn-primary player-action-btn" onclick=@( () => MarkWanted( SelectedPlayer.SteamId ) )>#tabmenu.players.wanted</button>
-							}
-
-							@if ( canRequestWarrant && !hasWarrant && !SelectedPlayer.Job.IsGovernmentRole() )
-							{
-								<button class="btn-compact btn-primary player-action-btn" onclick=@( () => RequestWarrant( SelectedPlayer.SteamId ) )>#tabmenu.players.action.warrant</button>
-							}
-
-							@if ( hasAdminActions )
-							{
-								<div class="admin-action-box flex gap-2 flex-wrap">
-									@if ( canDemote )
-									{
-										<button class="btn-compact btn-warn player-action-btn" onclick=@( () => DemotePlayer( SelectedPlayer.SteamId, SelectedPlayer.DisplayName, SelectedPlayer.Job.Id.ToString() ) )>#tabmenu.players.action.demote</button>
-									}
-
-									@if ( canJail )
-									{
-										<button class="btn-compact btn-warn player-action-btn" onclick=@( () => QuickJailPlayer( SelectedPlayer.SteamId, SelectedPlayer.DisplayName ) )>#tabmenu.players.jail_10m</button>
-									}
-
-									@if ( canBan )
-									{
-										<button class="btn-compact btn-bad player-action-btn" onclick=@( () => QuickBanPlayer( SelectedPlayer.SteamId, SelectedPlayer.DisplayName ) )>#tabmenu.players.ban_1d</button>
-									}
-
-									@if ( canWarn )
-									{
-										<button class="btn-compact btn-warn player-action-btn" onclick=@( () => WarnPlayer( SelectedPlayer.SteamId, SelectedPlayer.DisplayName ) )>#tabmenu.players.warn</button>
-									}
-
-									@if ( canKick )
-									{
-										<button class="btn-compact btn-bad player-action-btn" onclick=@( () => KickPlayer( SelectedPlayer.SteamId ) )>#tabmenu.players.kick</button>
-									}
-								</div>
-							}
-						</div>
-					</div>
+					}
 				</div>
 			}
+
+			<PlayerPocketView Player="@SelectedPlayer" @ref="_pocketView"/>
 
 			<PlayerSanctionHistory Player="@SelectedPlayer"/>
 		</div>
@@ -241,6 +256,7 @@
 
 	private TextEntry? _reasonTextEntry;
 	private string _textField = string.Empty;
+	private PlayerPocketView? _pocketView;
 
 	private void ClosePane()
 	{

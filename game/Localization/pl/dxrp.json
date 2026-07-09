@@ -193,6 +193,7 @@
   "command.dance.not_found": "Nie znaleziono emoty tańca.",
   "command.drop.no_weapon": "Nie masz wyposażonej broni",
   "command.drop.cannot_drop": "Nie możesz upuścić tej broni",
+  "command.emote.sitting": "Nie możesz robić emotki siedząc.",
   "command.emote.unknown": "Nieznana emota: {0}",
   "command.forceselldoor.help": "Wymuś sprzedaż drzwi, na które patrzysz (Tylko personel)",
   "command.forceselldoor.not_door": "Nie patrzysz na drzwi.",
