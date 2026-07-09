@@ -9,12 +9,19 @@ public sealed class PalletEntityConfig
 
 [Title( "Pallet" )]
 [Category( "Entities" )]
-public class PalletEntity : BaseEntity, Component.ICollisionListener
+public class PalletEntity : BaseEntity, Component.ITriggerListener
 {
-	// The pallet's own solid collider - defines both the physical support surface items land
-	// on and the footprint used to lay out the stacking grid.
+	// The pallet's own solid collider - defines the physical support surface (so players/props
+	// can rest on the pallet) and the footprint used to lay out the stacking grid.
 	[Property]
 	public required BoxCollider PlacementArea { get; set; }
+
+	// A separate trigger volume covering the placement area (and stack height) used purely to
+	// detect incoming items. Detection can't rely on physical collision, since dropped items are
+	// often unowned/host-spawned and never get their rigidbody physically simulated on a
+	// dedicated server, so they'd never generate a collision event.
+	[Property]
+	public required BoxCollider ItemDetector { get; set; }
 
 	private PalletEntityConfig _config = null!;
 
@@ -60,17 +67,14 @@ public class PalletEntity : BaseEntity, Component.ICollisionListener
 		_config = GetConfig( new PalletEntityConfig() );
 	}
 
-	// Uses collision (physical contact with the pallet's own solid collider), not a trigger
-	// volume - items land on the pallet due to gravity no matter how tall the stack gets,
-	// so there's no fixed-height trigger volume to outgrow.
-	public void OnCollisionStart( Collision collision )
+	public void OnTriggerEnter( GameObject other )
 	{
-		if ( !Networking.IsHost || !collision.Other.GameObject.IsValid() )
+		if ( !Networking.IsHost || !other.IsValid() )
 		{
 			return;
 		}
 
-		var root = collision.Other.GameObject.Root;
+		var root = other.Root;
 
 		if ( root == GameObject )
 		{
