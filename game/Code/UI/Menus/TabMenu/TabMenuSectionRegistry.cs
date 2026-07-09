@@ -111,6 +111,24 @@ public sealed class TabMenuSectionRegistry
 		_registeredSections.Add( section );
 	}
 
+	public bool Remove( string id )
+	{
+		if ( string.IsNullOrWhiteSpace( id ) )
+		{
+			return false;
+		}
+
+		var section = _registeredSections.FirstOrDefault( section => string.Equals( section.Id, id, StringComparison.OrdinalIgnoreCase ) );
+		if ( section == null )
+		{
+			return false;
+		}
+
+		_registeredSections.Remove( section );
+		_registeredIds.Remove( section.Id );
+		return true;
+	}
+
 	private static IReadOnlyList<TabMenuSectionDefinition> BuildSections()
 	{
 		var registry = new TabMenuSectionRegistry();
