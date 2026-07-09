@@ -80,20 +80,16 @@
 	private bool IsActive { get; set; }
 
 	private readonly Dictionary<string, string> _entryLabelOverrides = new( StringComparer.OrdinalIgnoreCase );
+	private IReadOnlyList<TabMenuSectionDefinition> _availableSections = [];
 	private int _selectedSectionRevision;
 	
 	private static TabMenu? _instance;
 
-	private IReadOnlyList<TabMenuSectionDefinition> AvailableSections =>
-		TabMenuSectionRegistry.Sections
-			.Where( section => section.IsAvailable( IsPlayerDead(), IsPlayerRestricted() ) )
-			.ToArray();
-
-	private IEnumerable<TabMenuSectionDefinition> MainSections => AvailableSections.Where( section => !section.Footer );
-	private IEnumerable<TabMenuSectionDefinition> FooterSections => AvailableSections.Where( section => section.Footer );
+	private IEnumerable<TabMenuSectionDefinition> MainSections => _availableSections.Where( section => !section.Footer );
+	private IEnumerable<TabMenuSectionDefinition> FooterSections => _availableSections.Where( section => section.Footer );
 
 	private TabMenuSectionDefinition? SelectedSection =>
-		AvailableSections.FirstOrDefault( section => section.IsTab && section.Id == SelectedSectionId )
+		_availableSections.FirstOrDefault( section => section.IsTab && section.Id == SelectedSectionId )
 		?? GetDefaultSection();
 
 	private string SelectedSectionHostKey => $"{SelectedSection?.Id}:{_selectedSectionRevision}";
@@ -110,9 +106,9 @@
 
 	private TabMenuSectionDefinition? GetDefaultSection()
 	{
-		return AvailableSections.FirstOrDefault( section => section.Id == "dashboard" )
-		       ?? AvailableSections.FirstOrDefault( section => section.Id == "players" )
-		       ?? AvailableSections.FirstOrDefault( section => section.IsTab );
+		return _availableSections.FirstOrDefault( section => section.Id == "dashboard" )
+		       ?? _availableSections.FirstOrDefault( section => section.Id == "players" )
+		       ?? _availableSections.FirstOrDefault( section => section.IsTab );
 	}
 
 	protected override void OnStart()
@@ -120,12 +116,18 @@
 		_instance = this;
 		IsOpen = false;
 		TabMenuSectionRegistry.Reload();
+		RefreshAvailableSections();
 		
 		EnsureSelectedSectionAvailable();
 	}
 
 	protected override void OnUpdate()
 	{
+		if ( IsActive )
+		{
+			RefreshAvailableSections();
+		}
+
 		if ( Input.Pressed( "TabMenu" ) || (IsActive && PauseMenu.IsOpen) )
 		{
 			if ( IsActive )
@@ -138,6 +140,7 @@
 				IsOpen = true;
 				_entryLabelOverrides.Clear();
 				TabMenuSectionRegistry.Reload();
+				RefreshAvailableSections();
 				EnsureSelectedSectionAvailable();
 				StateHasChanged();
 			}
@@ -150,9 +153,19 @@
 		}
 	}
 
+	private void RefreshAvailableSections()
+	{
+		var isPlayerDead = IsPlayerDead();
+		var isPlayerRestricted = IsPlayerRestricted();
+
+		_availableSections = TabMenuSectionRegistry.Sections
+			.Where( section => section.IsAvailable( isPlayerDead, isPlayerRestricted ) )
+			.ToArray();
+	}
+
 	private void EnsureSelectedSectionAvailable()
 	{
-		if ( AvailableSections.Any( section => section.IsTab && section.Id == SelectedSectionId ) )
+		if ( _availableSections.Any( section => section.IsTab && section.Id == SelectedSectionId ) )
 		{
 			return;
 		}
@@ -173,7 +186,7 @@
 
 	private void HandleMenuEntry( string sectionId )
 	{
-		var section = AvailableSections.FirstOrDefault( section => section.Id == sectionId );
+		var section = _availableSections.FirstOrDefault( section => section.Id == sectionId );
 		if ( section == null )
 		{
 			return;
@@ -213,18 +226,6 @@
 			Log.Warning( $"Failed to run tab menu entry '{section.Id}': {ex.Message}" );
 		}
 
-		StateHasChanged();
-	}
-
-	private void SetSelectedSection( string sectionId )
-	{
-		var section = AvailableSections.FirstOrDefault( section => section.IsTab && section.Id == sectionId );
-		if ( section == null )
-		{
-			return;
-		}
-
-		SelectedSectionId = sectionId;
 		StateHasChanged();
 	}
 	
@@ -275,7 +276,7 @@
 
 	protected override int BuildHash()
 	{
-		var visibleSectionIds = string.Join( '|', AvailableSections.Select( section => section.Id ) );
+		var visibleSectionIds = string.Join( '|', _availableSections.Select( section => section.Id ) );
 		var entryLabels = string.Join( '|', _entryLabelOverrides.Select( entry => $"{entry.Key}:{entry.Value}" ) );
 		return HashCode.Combine( SelectedSectionId, _selectedSectionRevision, visibleSectionIds, entryLabels, GameManager.Instance.SalaryMultiplier );
 	}
