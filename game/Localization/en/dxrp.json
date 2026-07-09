@@ -1886,6 +1886,7 @@
   "entity.rollingtable.name": "Rolling Table",
   "entity.pallet.name": "Pallet",
   "entity.pallet.count": "Pallet ({0}/{1})",
+  "entity.pallet.description": "A pallet for stacking and storing goods.",
   "resource.weed_brick.name": "Weed Brick",
   "entity.ammocache.name": "Ammo Cache",
   "entity.gunlicense.name": "Gun License",
