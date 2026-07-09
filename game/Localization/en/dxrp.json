@@ -1879,6 +1879,8 @@
   "entity.dryrack.name": "Dry Rack",
   "entity.growlight.name": "Grow Light",
   "entity.rollingtable.name": "Rolling Table",
+  "entity.pallet.name": "Pallet",
+  "entity.pallet.count": "Pallet ({0}/{1})",
   "resource.weed_brick.name": "Weed Brick",
   "entity.ammocache.name": "Ammo Cache",
   "entity.gunlicense.name": "Gun License",
