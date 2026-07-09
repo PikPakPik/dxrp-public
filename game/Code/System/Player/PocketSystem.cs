@@ -322,12 +322,16 @@ public class PocketSystem : SingletonComponent<PocketSystem>, IGameEvents
 			return;
 		}
 
+		var target = GameUtils.GetPlayerById( playerId );
+		if ( !target.IsValid() )
+		{
+			return;
+		}
+
 		var items = ListPocketDisplayNames( playerId );
 
-		var target = GameUtils.GetPlayerById( playerId );
-		var targetName = target.IsValid() ? target.SteamName : "Unknown";
 		_ = ServerApiClient.Audit( "PocketView",
-			$"{caller.SteamName} ({caller.SteamId}) viewed the pocket of {targetName} ({playerId}) ({items.Length} items)",
+			$"{caller.SteamName} ({caller.SteamId}) viewed the pocket of {target.SteamName} ({playerId}) ({items.Length} items)",
 			caller.SteamId );
 
 		using ( Rpc.FilterInclude( c => c.Id == caller.ConnectionId ) )

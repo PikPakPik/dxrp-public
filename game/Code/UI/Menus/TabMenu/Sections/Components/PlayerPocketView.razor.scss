@@ -39,11 +39,6 @@ PlayerPocketView {
     padding-top: $space-3;
   }
 
-  .view-pocket-btn {
-    align-self: flex-start;
-    margin: 0 $space-4 $space-2;
-  }
-
   .loading {
     color: $color-gray-400;
     font-size: $text-xs;
@@ -66,7 +61,7 @@ PlayerPocketView {
     flex-wrap: wrap;
     gap: $space-2;
     width: 100%;
-    padding: 0 $space-4 $space-2;
+    padding: 0 $space-4 $space-2 0;
   }
 
   .pocket-entry {
@@ -75,8 +70,8 @@ PlayerPocketView {
     gap: $space-2;
     flex-shrink: 0;
     padding: $space-1 $space-2;
-    border-radius: $space-2;
-    background-color: rgba($color-secondary, 0.95);
+    border-radius: 0;
+    background-color: rgba($color-accent, 0.22);
   }
 
   .item-name {

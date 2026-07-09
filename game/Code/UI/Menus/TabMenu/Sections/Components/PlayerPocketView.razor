@@ -4,7 +4,7 @@
 
 @attribute [StyleSheet]
 
-@if ( !CanViewPocket || Player == null || !Player.IsValid() )
+@if ( !CanViewPocket || Player == null || !Player.IsValid() || !HasRequestedCurrentPlayer )
 {
 	return;
 }
@@ -19,11 +19,7 @@
 	</div>
 
 	<div class="pocket-body">
-		@if ( !HasRequestedCurrentPlayer )
-		{
-			<button class="btn-compact btn-secondary view-pocket-btn" onclick=@RequestPocketContents>#tabmenu.players.pocket.view</button>
-		}
-		else if ( IsLoadingCurrentPlayer )
+		@if ( IsLoadingCurrentPlayer )
 		{
 			<div class="loading">#tabmenu.players.pocket.loading</div>
 		}
@@ -57,7 +53,7 @@
 
 	private static PocketSystem? System => PocketSystem.Instance;
 
-	private bool CanViewPocket => System.IsValid() && Player != null && !Player.IsLocalPlayer &&
+	private bool CanViewPocket => System.IsValid() && Player != null &&
 	                              RankSystem.HasLocalPermission( Permission.ViewPocket );
 
 	private bool HasRequestedCurrentPlayer => _requestedPlayerId != null && _requestedPlayerId == Player?.SteamId &&
@@ -97,7 +93,7 @@
 		}
 	}
 
-	private void RequestPocketContents()
+	public void RequestPocketContents()
 	{
 		if ( System == null || Player == null || !Player.IsValid() )
 		{
