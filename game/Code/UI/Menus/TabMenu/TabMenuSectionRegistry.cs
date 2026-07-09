@@ -210,26 +210,6 @@ public sealed class TabMenuSectionRegistry
 			Order = 1000,
 			Placement = TabMenuEntryPlacement.Bottom
 		} );
-
-		Register( new TabMenuSectionDefinition
-		{
-			Id = "discord",
-			Label = "#tabmenu.discord",
-			Icon = "discord",
-			Order = 10,
-			Placement = TabMenuEntryPlacement.Bottom,
-			OnClick = context => DiscordWebPanel.Open( context.Panel, Config.Current.Game.DiscordUrl )
-		} );
-
-		Register( new TabMenuSectionDefinition
-		{
-			Id = "support",
-			Label = "#generic.support.project",
-			Icon = "handshake",
-			Order = 20,
-			Placement = TabMenuEntryPlacement.Bottom,
-			CopyText = () => "https://opencollective.com/dxrp"
-		} );
 	}
 
 	private void RegisterAddonSections()
