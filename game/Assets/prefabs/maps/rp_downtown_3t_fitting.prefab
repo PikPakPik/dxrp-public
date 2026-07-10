@@ -7021,6 +7021,30 @@
                   },
                   "Property": "Position",
                   "Value": "-1952,1474.23401,32.9999886"
+                },
+                {
+                  "Target": {
+                    "Type": "Component",
+                    "IdValue": "f6e098e6-8981-4c24-a3db-2fdf9ee97a60"
+                  },
+                  "Property": "Stat",
+                  "Value": "garbage-collected"
+                },
+                {
+                  "Target": {
+                    "Type": "Component",
+                    "IdValue": "f6e098e6-8981-4c24-a3db-2fdf9ee97a60"
+                  },
+                  "Property": "Title",
+                  "Value": "Recyclers"
+                },
+                {
+                  "Target": {
+                    "Type": "Component",
+                    "IdValue": "f6e098e6-8981-4c24-a3db-2fdf9ee97a60"
+                  },
+                  "Property": "Unit",
+                  "Value": ""
                 }
               ],
               "MovedObjects": []
@@ -7085,7 +7109,107 @@
             "__version": 2,
             "__Prefab": "prefabs/world/stat_board.prefab",
             "__PrefabInstancePatch": {
-              "AddedObjects": [],
+              "AddedObjects": [
+                {
+                  "Id": {
+                    "Type": "GameObject",
+                    "IdValue": "f2ac4da4-690b-47cd-87df-93fdf4c4b323"
+                  },
+                  "Parent": {
+                    "Type": "GameObject",
+                    "IdValue": "9d1f4d2c-66ef-4e6e-94c4-cc791ff2b5b0"
+                  },
+                  "PreviousElement": {
+                    "Type": "GameObject",
+                    "IdValue": "43060705-bb27-4b8a-9732-df9707eab3f2"
+                  },
+                  "ContainerProperty": "Children",
+                  "IsContainerArray": true,
+                  "Data": {
+                    "__guid": "f2ac4da4-690b-47cd-87df-93fdf4c4b323",
+                    "__version": 2,
+                    "Flags": 0,
+                    "Name": "Countdown",
+                    "Position": "4.5,0,23.0377808",
+                    "Rotation": "0,0,0,1",
+                    "Scale": "1,1,1",
+                    "Tags": "",
+                    "Enabled": true,
+                    "NetworkMode": 2,
+                    "NetworkFlags": 0,
+                    "NetworkOrphaned": 0,
+                    "NetworkTransmit": true,
+                    "OwnerTransfer": 1,
+                    "Components": [],
+                    "Children": []
+                  }
+                },
+                {
+                  "Id": {
+                    "Type": "Component",
+                    "IdValue": "29ec83b3-c4a5-44ef-bafd-ffa5b7358570"
+                  },
+                  "Parent": {
+                    "Type": "GameObject",
+                    "IdValue": "f2ac4da4-690b-47cd-87df-93fdf4c4b323"
+                  },
+                  "PreviousElement": null,
+                  "ContainerProperty": "Components",
+                  "IsContainerArray": true,
+                  "Data": {
+                    "__type": "Sandbox.WorldPanel",
+                    "__guid": "29ec83b3-c4a5-44ef-bafd-ffa5b7358570",
+                    "__enabled": true,
+                    "Flags": 0,
+                    "HorizontalAlign": "Center",
+                    "InteractionRange": 1000,
+                    "LookAtCamera": false,
+                    "OnComponentDestroy": null,
+                    "OnComponentDisabled": null,
+                    "OnComponentEnabled": null,
+                    "OnComponentFixedUpdate": null,
+                    "OnComponentStart": null,
+                    "OnComponentUpdate": null,
+                    "PanelSize": "724.920105,261.130188",
+                    "RenderOptions": {
+                      "GameLayer": true,
+                      "OverlayLayer": false,
+                      "BloomLayer": false,
+                      "AfterUILayer": false
+                    },
+                    "RenderScale": 1,
+                    "VerticalAlign": "Center"
+                  }
+                },
+                {
+                  "Id": {
+                    "Type": "Component",
+                    "IdValue": "51f41640-15d3-457e-8cf6-5ee5c025e3c3"
+                  },
+                  "Parent": {
+                    "Type": "GameObject",
+                    "IdValue": "f2ac4da4-690b-47cd-87df-93fdf4c4b323"
+                  },
+                  "PreviousElement": {
+                    "Type": "Component",
+                    "IdValue": "29ec83b3-c4a5-44ef-bafd-ffa5b7358570"
+                  },
+                  "ContainerProperty": "Components",
+                  "IsContainerArray": true,
+                  "Data": {
+                    "__type": "Dxura.RP.Game.MinigameAutoCountdown",
+                    "__guid": "51f41640-15d3-457e-8cf6-5ee5c025e3c3",
+                    "__enabled": true,
+                    "Flags": 0,
+                    "OnComponentDestroy": null,
+                    "OnComponentDisabled": null,
+                    "OnComponentEnabled": null,
+                    "OnComponentFixedUpdate": null,
+                    "OnComponentStart": null,
+                    "OnComponentUpdate": null
+                  }
+                }
+              ],
               "RemovedObjects": [],
               "PropertyOverrides": [
                 {
@@ -7111,6 +7235,38 @@
                   },
                   "Property": "Rotation",
                   "Value": "0,0,-0.707106829,0.707106829"
+                },
+                {
+                  "Target": {
+                    "Type": "Component",
+                    "IdValue": "f6e098e6-8981-4c24-a3db-2fdf9ee97a60"
+                  },
+                  "Property": "Stat",
+                  "Value": "minigame-win"
+                },
+                {
+                  "Target": {
+                    "Type": "Component",
+                    "IdValue": "f6e098e6-8981-4c24-a3db-2fdf9ee97a60"
+                  },
+                  "Property": "Subtitle",
+                  "Value": "Minigame Wins"
+                },
+                {
+                  "Target": {
+                    "Type": "Component",
+                    "IdValue": "f6e098e6-8981-4c24-a3db-2fdf9ee97a60"
+                  },
+                  "Property": "Title",
+                  "Value": "Champions "
+                },
+                {
+                  "Target": {
+                    "Type": "Component",
+                    "IdValue": "f6e098e6-8981-4c24-a3db-2fdf9ee97a60"
+                  },
+                  "Property": "Unit",
+                  "Value": "\uD83C\uDFC6"
                 }
               ],
               "MovedObjects": []
@@ -7148,6 +7304,38 @@
                   },
                   "Property": "Position",
                   "Value": "-1952,1584,32.9999886"
+                },
+                {
+                  "Target": {
+                    "Type": "Component",
+                    "IdValue": "f6e098e6-8981-4c24-a3db-2fdf9ee97a60"
+                  },
+                  "Property": "Stat",
+                  "Value": "weed-sold"
+                },
+                {
+                  "Target": {
+                    "Type": "Component",
+                    "IdValue": "f6e098e6-8981-4c24-a3db-2fdf9ee97a60"
+                  },
+                  "Property": "Subtitle",
+                  "Value": "Bundles Sold"
+                },
+                {
+                  "Target": {
+                    "Type": "Component",
+                    "IdValue": "f6e098e6-8981-4c24-a3db-2fdf9ee97a60"
+                  },
+                  "Property": "Title",
+                  "Value": "Dealers"
+                },
+                {
+                  "Target": {
+                    "Type": "Component",
+                    "IdValue": "f6e098e6-8981-4c24-a3db-2fdf9ee97a60"
+                  },
+                  "Property": "Unit",
+                  "Value": ""
                 }
               ],
               "MovedObjects": []
