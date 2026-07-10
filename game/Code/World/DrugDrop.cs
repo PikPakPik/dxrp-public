@@ -166,13 +166,20 @@ public class DrugDrop : Component, Component.ITriggerListener, IContextualObject
 
 	private void QueuePalletPayout( Entities.PalletEntity pallet )
 	{
+		var cargoCount = pallet.SellCargoHost();
+
+		pallet.GameObject.Destroy();
+
+		if ( cargoCount == 0 )
+		{
+			return;
+		}
+
 		// The pallet itself sells alongside its cargo, and gets consumed with it.
 		// Payout always happens even if the pallet has no resolvable owner (e.g. map-placed
 		// or admin-spawned pallets) - only stat tracking depends on finding a player.
-		var soldCount = pallet.SellCargoHost() + 1;
+		var soldCount = cargoCount + 1;
 		var owner = GameUtils.GetPlayerById( pallet.Owner );
-
-		pallet.GameObject.Destroy();
 
 		_pendingPayoutTotal += PaymentPerDrop * (uint)soldCount;
 
