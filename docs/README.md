@@ -1,6 +1,6 @@
 # Contributing to the DXRP docs
 
-Everything under this folder is published to [dxrp.net/docs](https://dxrp.net/docs). Open a PR against this folder to fix or add documentation, no access to the private portal repo is needed.
+Everything under this folder is published to [dxrp.net/docs](https://dxrp.net/docs). Open a PR against this folder to fix or add documentation, no access to the private site repo is needed.
 
 ## Structure
 
@@ -42,4 +42,4 @@ Put images in an `images/<page-slug>/` folder next to the page and reference the
 
 ## Publishing
 
-Content here doesn't go live automatically. A maintainer with access to the private portal repo runs its `sync-docs.ps1` script, which copies these pages into the webapp and regenerates its navigation. The portal's docs landing page (`/docs`) itself is hand-coded and isn't generated from this folder.
+[dxrp.net](https://dxrp.net) fetches pages from this folder live, directly from GitHub, at page-load time. There's no build or deploy step here: once a PR merges to `main`, the change is live on [dxrp.net/docs](https://dxrp.net/docs) immediately. The `/docs` landing page itself is hand-coded and isn't generated from this folder.
