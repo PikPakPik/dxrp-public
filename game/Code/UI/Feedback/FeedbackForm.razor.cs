@@ -106,13 +106,28 @@ public partial class FeedbackForm
 		_status = SubmitStatus.None;
 		StateHasChanged();
 
-		byte[]? screenshot = null;
-		if ( _includeScreenshot && CaptureScreenshot != null )
+		FeedbackSubmitResult result;
+		string? issueUrl;
+
+		try
 		{
-			screenshot = await CaptureScreenshot();
+			byte[]? screenshot = null;
+			if ( _includeScreenshot && CaptureScreenshot != null )
+			{
+				screenshot = await CaptureScreenshot();
+			}
+
+			( result, issueUrl ) = await PlayerApiClient.SubmitFeedback( _type, _title.Trim(), _description.Trim(), screenshot );
+		}
+		catch ( Exception ex )
+		{
+			Log.Error( $"Failed to submit feedback: {ex.Message}" );
+			result = FeedbackSubmitResult.Failed;
+			issueUrl = null;
 		}
 
-		var ( result, issueUrl ) = await PlayerApiClient.SubmitFeedback( _type, _title.Trim(), _description.Trim(), screenshot );
+		// Both screenshot encoding and the API request run off the UI thread.
+		await GameTask.MainThread();
 
 		_isSubmitting = false;
 		_issueUrl = issueUrl;

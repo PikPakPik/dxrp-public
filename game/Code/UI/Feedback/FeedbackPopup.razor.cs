@@ -22,6 +22,10 @@ public partial class FeedbackPopup
 	// HUD, so everything else (chat, health, etc.) stays visible in the capture.
 	private async Task<byte[]?> CaptureScreenshot()
 	{
+		// UI callbacks normally start on the main thread, but their continuations do not
+		// necessarily stay there. All scene and render-target work must remain on it.
+		await GameTask.MainThread();
+
 		if ( !Scene.Camera.IsValid() )
 		{
 			return null;
@@ -34,23 +38,32 @@ public partial class FeedbackPopup
 		// Give the hidden state a couple of real frames to actually render before capturing.
 		await GameTask.DelayRealtime( 50 );
 
-		var texture = Texture.CreateRenderTarget().WithSize( (int)Screen.Width, (int)Screen.Height ).Create();
-		byte[] png;
+		// DelayRealtime resumes on a worker thread. Return to the main thread before
+		// interacting with the camera or GPU resources.
+		await GameTask.MainThread();
+
+		Texture? texture = null;
+		byte[]? png = null;
 
 		try
 		{
-			Scene.Camera.RenderToTexture( texture );
+			if ( Scene.Camera.IsValid() )
+			{
+				texture = Texture.CreateRenderTarget().WithSize( (int)Screen.Width, (int)Screen.Height ).Create();
+				Scene.Camera.RenderToTexture( texture );
 
-			await GameTask.WorkerThread();
-			var bitmap = texture.GetBitmap( 0 );
-			png = bitmap.ToPng();
+				await GameTask.WorkerThread();
+				using var bitmap = texture.GetBitmap( 0 );
+				png = bitmap.ToPng();
+			}
 		}
-		finally
+		catch ( Exception ex )
 		{
-			texture.Dispose();
+			Log.Error( $"Failed to capture feedback screenshot: {ex.Message}" );
 		}
 
 		await GameTask.MainThread();
+		texture?.Dispose();
 		_capturing = false;
 		StateHasChanged();
 
