@@ -12,11 +12,13 @@ public sealed class Elevator : Component
 	private Vector3 _startPosition;
 	private Vector3 _targetPosition;
 	private TimeSince _idleTime = 0;
+	private Collider? _collider;
 
 	protected override void OnStart()
 	{
 		_startPosition = WorldPosition;
 		_targetPosition = TopPosition;
+		_collider = GameObject.GetComponentInChildren<Collider>();
 	}
 
 	protected override void OnFixedUpdate()
@@ -48,5 +50,32 @@ public sealed class Elevator : Component
 		var moveDirection = (_targetPosition - WorldPosition).Normal;
 		var distanceToMove = Math.Min( Speed * Time.Delta, Vector3.DistanceBetween( WorldPosition, _targetPosition ) );
 		WorldPosition += moveDirection * distanceToMove;
+
+		KillCrushedPlayers( moveDirection );
+	}
+
+	private void KillCrushedPlayers( Vector3 moveDirection )
+	{
+		if ( moveDirection.z >= 0f || !_collider.IsValid() )
+		{
+			return;
+		}
+
+		var players = Scene.FindInPhysics( _collider.GetWorldBounds() )
+			.Select( gameObject => gameObject.Root )
+			.Where( gameObject => gameObject.Tags.Has( Constants.PlayerTag ) && gameObject.WorldPosition.z < WorldPosition.z )
+			.Distinct();
+
+		foreach ( var gameObject in players )
+		{
+			var player = gameObject.GetComponent<Player>();
+			if ( !player.IsValid() || !player.Controller.IsValid() || !player.Controller.IsOnGround )
+			{
+				continue;
+			}
+
+			player.HealthComponent.IsGodMode = false;
+			player.HealthComponent.TakeDamageHost( new DamageInfo( this, float.MaxValue, this, player.WorldPosition ) );
+		}
 	}
 }
