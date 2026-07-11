@@ -216,7 +216,7 @@ public sealed class TabMenuSectionRegistry
 			Icon = "account_tree",
 			PanelType = typeof( FactionTabMenuSection ),
 			Order = 60,
-			CanShow = () => Config.Current.Game.FactionsEnabled
+			CanShow = () => FactionSystem.Instance.IsValid()
 		} );
 
 		Register( new TabMenuSectionDefinition

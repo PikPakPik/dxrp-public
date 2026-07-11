@@ -279,6 +279,8 @@ public partial class Player
 
 			Level = initResponse.Level;
 			PlayTime = initResponse.Playtime * 60f;
+			FactionId = initResponse.FactionId;
+			FactionRoleId = initResponse.FactionRoleId;
 		} );
 	}
 
