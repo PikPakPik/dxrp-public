@@ -16,15 +16,9 @@ public class PalletEntity : BaseEntity, Component.ITriggerListener
 	[Property]
 	public required BoxCollider PlacementArea { get; set; }
 
-	// A separate trigger volume covering the placement area (and stack height) used purely to
-	// detect incoming items. Detection can't rely on physical collision, since dropped items are
-	// often unowned/host-spawned and never get their rigidbody physically simulated on a
-	// dedicated server, so they'd never generate a collision event.
-	[Property]
-	public required BoxCollider ItemDetector { get; set; }
-
 	private PalletEntityConfig _config = null!;
 
+	[Property]
 	[Sync( SyncFlags.FromHost )]
 	[Change( nameof( OnItemCountChanged ) )]
 	public int ItemCount { get; private set; }
@@ -33,9 +27,11 @@ public class PalletEntity : BaseEntity, Component.ITriggerListener
 	// placed. Synced so host and clients (including late joiners) derive the same slot
 	// grid/capacity and can (re)build cargo visuals purely from replicated state, with no
 	// per-item RPCs needed.
+	[Property]
 	[Sync( SyncFlags.FromHost )]
 	private Vector3 ItemFootprint { get; set; }
 
+	[Property]
 	[Sync( SyncFlags.FromHost )]
 	[Change( nameof( OnModelPathChanged ) )]
 	private string ModelPath { get; set; } = string.Empty;
@@ -46,6 +42,7 @@ public class PalletEntity : BaseEntity, Component.ITriggerListener
 
 	// Host-only. Gates which items are accepted so cargo stays a single, homogeneous item
 	// type until it's fully sold off.
+	[Property]
 	private string _resourceId = string.Empty;
 
 	// Shown while empty, before any item has defined a real footprint to grid out from.
@@ -65,6 +62,10 @@ public class PalletEntity : BaseEntity, Component.ITriggerListener
 		base.OnStart();
 
 		_config = GetConfig( new PalletEntityConfig() );
+
+		// Snapshot deserialization restores the serialized cargo fields, but the visual pool is
+		// runtime-only. Rebuild it explicitly instead of depending on property change callback order.
+		SyncVisuals();
 	}
 
 	public void OnTriggerEnter( GameObject other )
