@@ -175,6 +175,7 @@ public class SnapshotSystem : GameObjectSystem<SnapshotSystem>, IGameEvents
 			{
 				snapshot.WorldDupe = dupe;
 				savedConstructs = dupe.Items.Count();
+				SaveConstructRuntimeStates( snapshot, dupe );
 			}
 		}
 		catch ( Exception e )
@@ -334,11 +335,16 @@ public class SnapshotSystem : GameObjectSystem<SnapshotSystem>, IGameEvents
 			if ( dupeItemCount > 0 )
 			{
 				Log.Info( $"{LogPrefix} Restoring {dupeItemCount} constructs and {file.WorldDupe.WireConnections.Count()} wire connections." );
+				var runtimeStates = file.ConstructRuntimeStates
+					.GroupBy( state => state.ConstructId )
+					.ToDictionary( group => group.Key, group => group.Last() );
+
 				_ = Construct.Current.SpawnDupeItems(
 					file.WorldDupe,
 					null,
 					enforceLimits: false,
-					addUndo: true
+					addUndo: true,
+					onConstructSpawned: ( dupeItem, construct ) => RestoreConstructRuntimeState( runtimeStates, dupeItem, construct )
 				);
 			}
 			else
@@ -404,6 +410,53 @@ public class SnapshotSystem : GameObjectSystem<SnapshotSystem>, IGameEvents
 		_cleanupSchedule.Remove( 0 );
 
 		Log.Info( $"{LogPrefix} Scheduled cleanup for {_cleanupSchedule.Count} players (grace={Config.Current.Game.GraceReconnectTime}s)" );
+	}
+
+	private void SaveConstructRuntimeStates( Snapshot snapshot, ConstructDupe dupe )
+	{
+		var duplicatedConstructIds = dupe.Items.Select( item => item.Id ).ToHashSet();
+
+		foreach ( var construct in Scene.GetAll<IConstruct>() )
+		{
+			if ( !construct.IsValid() || !duplicatedConstructIds.Contains( construct.Id ) || construct is not IConstructRuntimeState runtimeState )
+			{
+				continue;
+			}
+
+			try
+			{
+				snapshot.ConstructRuntimeStates.Add( new ConstructRuntimeSnapshotData
+				{
+					ConstructId = construct.Id,
+					Type = construct.Type,
+					StateJson = runtimeState.SaveRuntimeState()
+				} );
+			}
+			catch ( Exception e )
+			{
+				Log.Warning( $"{LogPrefix} Failed to save runtime state for construct {construct.Id}: {e.Message}" );
+			}
+		}
+	}
+
+	private void RestoreConstructRuntimeState(
+		IReadOnlyDictionary<Guid, ConstructRuntimeSnapshotData> runtimeStates,
+		ConstructDupeItem dupeItem,
+		IConstruct construct )
+	{
+		if ( !runtimeStates.TryGetValue( dupeItem.Id, out var state ) || state.Type != construct.Type || construct is not IConstructRuntimeState runtimeState )
+		{
+			return;
+		}
+
+		try
+		{
+			runtimeState.LoadRuntimeState( state.StateJson );
+		}
+		catch ( Exception e )
+		{
+			Log.Warning( $"{LogPrefix} Failed to restore runtime state for construct {dupeItem.Id}: {e.Message}" );
+		}
 	}
 
 	public PlayerSnapshotData? TakePlayerData( long steamId )

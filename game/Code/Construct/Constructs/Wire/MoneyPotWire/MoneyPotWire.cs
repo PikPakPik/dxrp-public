@@ -6,7 +6,7 @@ namespace Dxura.RP.Game.Wire;
 [Title( "MoneyPot" )]
 [Category( "Wire" )]
 [Icon( "attach_money" )]
-public class MoneyPotWire() : BaseWireConstruct( ConstructType.MoneyPotWire ), Component.IPressable, Component.ITriggerListener
+public class MoneyPotWire() : BaseWireConstruct( ConstructType.MoneyPotWire ), Component.IPressable, Component.ITriggerListener, IConstructRuntimeState
 {
 	[WireOutput( "total_amount" )]
 	private uint Amount { get; set; }
@@ -197,5 +197,30 @@ public class MoneyPotWire() : BaseWireConstruct( ConstructType.MoneyPotWire ), C
 		}
 
 		base.OnDestroy();
+	}
+
+	string IConstructRuntimeState.SaveRuntimeState()
+	{
+		lock ( MoneyLock )
+		{
+			return Json.Serialize( new MoneyPotWireRuntimeState { Amount = Amount } );
+		}
+	}
+
+	void IConstructRuntimeState.LoadRuntimeState( string stateJson )
+	{
+		var state = Json.Deserialize<MoneyPotWireRuntimeState>( stateJson );
+		if ( state == null )
+		{
+			return;
+		}
+
+		lock ( MoneyLock )
+		{
+			Amount = state.Amount;
+		}
+
+		DisplayAmount = state.Amount;
+		BroadcastDisplayAmount( state.Amount );
 	}
 }

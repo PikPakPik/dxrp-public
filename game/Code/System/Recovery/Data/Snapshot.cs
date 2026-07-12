@@ -3,6 +3,7 @@
 public class Snapshot
 {
 	public ConstructDupe? WorldDupe { get; set; }
+	public List<ConstructRuntimeSnapshotData> ConstructRuntimeStates { get; set; } = new();
 	public List<PlayerSnapshotData> Players { get; set; } = new();
 
 	// Game objects are stored as whole, mostly for entities with too much state.

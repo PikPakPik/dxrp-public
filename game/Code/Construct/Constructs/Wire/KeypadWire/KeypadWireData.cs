@@ -9,3 +9,10 @@ public record KeypadWireData : IConstructData, IWireLabelData
 	public bool Toggle { get; set; }
 	public string Label { get; set; } = string.Empty;
 }
+
+public record KeypadWireRuntimeState
+{
+	public string Code { get; set; } = string.Empty;
+	public bool Initialized { get; set; }
+	public float Output { get; set; }
+}

@@ -656,7 +656,8 @@ public partial class Construct
 		bool addUndo = false,
 		int delayBetweenItems = 0,
 		int delayBetweenWires = 50,
-		CancellationToken cancellationToken = default )
+		CancellationToken cancellationToken = default,
+		Action<ConstructDupeItem, IConstruct>? onConstructSpawned = null )
 	{
 		Assert.True( Networking.IsHost );
 
@@ -704,6 +705,7 @@ public partial class Construct
 			{
 				spawnedItems.Add( construct );
 				idToConstructMap[dupeItem.Id] = construct;
+				onConstructSpawned?.Invoke( dupeItem, construct );
 
 			}
 
