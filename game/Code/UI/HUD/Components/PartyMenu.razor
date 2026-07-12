@@ -146,6 +146,10 @@
 														<div class="browse-member-row flex flex-row items-center gap-2">
 															<div class="browse-avatar" style="background-image: url(avatar:@member.Id)"></div>
 															<label class="browse-name">@member.Name</label>
+															@if ( IsDisconnected( member.Id ) )
+															{
+																<i class="material-icons text-gray-400 text-sm" tooltip="#tabmenu.players.status.disconnected">signal_wifi_off</i>
+															}
 															@if ( member.IsLeader )
 															{
 																<label class="browse-leader">leader</label>
@@ -569,6 +573,12 @@
 			.OrderByDescending( m => m.IsLeader )
 			.ThenBy( m => m.Name );
 
+	private static bool IsDisconnected( long steamId )
+	{
+		var player = GameUtils.GetPlayerById( steamId );
+		return player.IsValid() && !player.IsConnected;
+	}
+
 	public override void Tick()
 	{
 		base.Tick();
@@ -662,6 +672,7 @@
 						hash.Add( member.Id );
 						hash.Add( member.IsLeader );
 						hash.Add( member.Name );
+						hash.Add( IsDisconnected( member.Id ) );
 					}
 				}
 			}

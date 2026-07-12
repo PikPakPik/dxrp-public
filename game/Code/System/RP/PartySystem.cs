@@ -68,7 +68,7 @@ public class PartyData
 /// it, and writes it back into <see cref="Parties"/> so the dictionary marks the key dirty and replicates
 /// (mirrors how <c>RankSystem</c> reassigns <c>Ranks[id] = def</c>).
 /// </summary>
-public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INetworkListener
+public sealed class PartySystem : SingletonComponent<PartySystem>, IGameEvents
 {
 	/// <summary>
 	/// Runtime config. Populated with defaults today; portal "System" config-override plumbing
@@ -949,15 +949,18 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, Component.INe
 		}
 	}
 
-	// ── INetworkListener: clean up parties when a player disconnects ──────────────────────────
-	public void OnDisconnected( Connection channel )
+	/// <summary>
+	/// Removes party membership once the player's grace-reconnect state is actually cleaned up.
+	/// This is also called immediately for explicit cleanup paths such as kicks and bans.
+	/// </summary>
+	public void OnPlayerDisconnectHost( long steamId )
 	{
-		if ( !Networking.IsHost || channel is null )
+		if ( !Networking.IsHost )
 		{
 			return;
 		}
 
-		RemovePlayerInternal( channel.SteamId );
-		ClearInvite( channel.SteamId );
+		RemovePlayerInternal( steamId );
+		ClearInvite( steamId );
 	}
 }
