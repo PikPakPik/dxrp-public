@@ -695,6 +695,12 @@ public sealed class PartySystem : SingletonComponent<PartySystem>, IGameEvents
 			return;
 		}
 
+		if ( !RankSystem.HasPermission( caller.SteamId, Permission.CommandParty ) )
+		{
+			caller.Error( "#generic.no_permission" );
+			return;
+		}
+
 		// ResolvePlayer already messages the caller on a miss/ambiguous name.
 		var target = CommandHelper.ResolvePlayer( caller, name );
 		if ( target.IsValid() )

@@ -116,6 +116,7 @@
 		_instance = this;
 		IsOpen = false;
 		TabMenuSectionRegistry.Reload();
+		PlayerActionRegistry.Reload();
 		RefreshAvailableSections();
 		
 		EnsureSelectedSectionAvailable();
@@ -140,6 +141,7 @@
 				IsOpen = true;
 				_entryLabelOverrides.Clear();
 				TabMenuSectionRegistry.Reload();
+				PlayerActionRegistry.Reload();
 				RefreshAvailableSections();
 				EnsureSelectedSectionAvailable();
 				StateHasChanged();

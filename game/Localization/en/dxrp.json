@@ -414,6 +414,7 @@
   "party.menu_disband": "Disband",
   "party.window_title": "Party Menu",
   "party.menu_invite": "Invite",
+  "party.invite_action": "Invite Party",
   "party.invite_placeholder": "Player name or Steam ID...",
   "party.tab_start": "Start Party",
   "party.tab_join": "Join Party",
