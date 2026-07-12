@@ -2008,6 +2008,7 @@
   "commandwheel.editor.finish": "Zakończ",
   "commandwheel.editor.done": "Gotowe",
   "commandwheel.hint.select": "Przesuń mysz, aby wybrać",
+  "commandwheel.hint.edit": "Naciśnij dwukrotnie {0}, aby edytować",
   "command.xray.help": "/xray [gracz] - Wyświetla nakładkę encji i graczy. Pomiń gracza, aby zobaczyć wszystkich.",
   "command.xray.all": "XRay włączony dla wszystkich encji.",
   "command.xray.enabled": "XRay włączony dla {0}.",

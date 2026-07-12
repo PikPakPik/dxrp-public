@@ -2008,6 +2008,7 @@
   "commandwheel.editor.finish": "완료",
   "commandwheel.editor.done": "적용",
   "commandwheel.hint.select": "마우스를 움직여 선택",
+  "commandwheel.hint.edit": "편집하려면 {0}을(를) 두 번 누르세요",
   "command.xray.help": "/xray [플레이어] - 엔티티와 플레이어 오버레이를 표시합니다. 플레이어를 생략하면 전체를 표시합니다.",
   "command.xray.all": "모든 엔티티에 XRay가 활성화되었습니다.",
   "command.xray.enabled": "{0}의 XRay가 활성화되었습니다.",

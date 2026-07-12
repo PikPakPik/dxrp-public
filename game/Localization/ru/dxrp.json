@@ -2008,6 +2008,7 @@
   "commandwheel.editor.finish": "Готово",
   "commandwheel.editor.done": "Готово",
   "commandwheel.hint.select": "Двигайте мышью для выбора",
+  "commandwheel.hint.edit": "Дважды нажмите {0}, чтобы редактировать",
   "command.xray.help": "/xray [игрок] - Показывает наложение сущностей и игроков. Без игрока — показать всех.",
   "command.xray.all": "XRay включён для всех сущностей.",
   "command.xray.enabled": "XRay включён для {0}.",

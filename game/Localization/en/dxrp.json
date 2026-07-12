@@ -2117,6 +2117,7 @@
   "commandwheel.editor.finish": "Finish",
   "commandwheel.editor.done": "Done",
   "commandwheel.hint.select": "Move mouse to select",
+  "commandwheel.hint.edit": "Double tap {0} to edit",
   "command.xray.help": "/xray [player] - Show an overlay of entities and players. Omit player to see all.",
   "command.xray.all": "XRay enabled for all entities.",
   "command.xray.enabled": "XRay enabled for {0}.",

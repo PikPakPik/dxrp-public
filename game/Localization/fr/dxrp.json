@@ -2008,6 +2008,7 @@
   "commandwheel.editor.finish": "Terminer",
   "commandwheel.editor.done": "Fait",
   "commandwheel.hint.select": "Déplacez la souris pour sélectionner",
+  "commandwheel.hint.edit": "Appuyez deux fois sur {0} pour modifier",
   "command.xray.help": "/xray [joueur] - Affiche un aperçu des entités et des joueurs. Omettez le joueur pour tout voir.",
   "command.xray.all": "XRay activé pour toutes les entités.",
   "command.xray.enabled": "XRay activé pour {0}.",
