@@ -1780,7 +1780,7 @@
   "rollingtable.process": "Przetwórz marihuanę",
   "rollingtable.auto_process": "Automatyczne przetwarzanie",
   "rollingtable.next_process_in": "Następne przetwarzanie za {0}s",
-  "rollingtable.roll_joints": "Skręć jointy (3)",
+  "rollingtable.roll_joints": "Skręć jointy ({0})",
   "rollingtable.pack_bundle": "Zapakuj paczkę ($$$)",
   "rollingtable.pluck": "Oskub marihuanę!",
   "rollingtable.nothing_to_process": "Nie masz nic do przetworzenia...",

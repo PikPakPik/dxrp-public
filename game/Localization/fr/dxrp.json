@@ -1778,7 +1778,7 @@
   "rollingtable.process": "Traiter la Weed",
   "rollingtable.auto_process": "Auto-traitement",
   "rollingtable.next_process_in": "Prochain traitement dans {0}s",
-  "rollingtable.roll_joints": "Rouler Joints (3)",
+  "rollingtable.roll_joints": "Rouler Joints ({0})",
   "rollingtable.pack_bundle": "Faire un paquet ($$$)",
   "rollingtable.pluck": "Cueillir la Weed !",
   "rollingtable.nothing_to_process": "Rien à traiter...",

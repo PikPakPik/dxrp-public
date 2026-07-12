@@ -1883,7 +1883,7 @@
   "rollingtable.process": "Process Weed",
   "rollingtable.auto_process": "Auto Process",
   "rollingtable.next_process_in": "Next process in {0}s",
-  "rollingtable.roll_joints": "Roll Joints (3)",
+  "rollingtable.roll_joints": "Roll Joints ({0})",
   "rollingtable.pack_bundle": "Pack Bundle ($$$)",
   "rollingtable.pluck": "Pluck the Weed!",
   "rollingtable.nothing_to_process": "You can't process nothing...",

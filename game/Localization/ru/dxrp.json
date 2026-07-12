@@ -1778,7 +1778,7 @@
   "rollingtable.process": "Обработать траву",
   "rollingtable.auto_process": "Авто-обработка",
   "rollingtable.next_process_in": "След. обработка через {0} сек.",
-  "rollingtable.roll_joints": "Скрутить косяки (3)",
+  "rollingtable.roll_joints": "Скрутить косяки ({0})",
   "rollingtable.pack_bundle": "Упаковать связку ($$$)",
   "rollingtable.pluck": "Собрать урожай!",
   "rollingtable.nothing_to_process": "Нечего обрабатывать...",

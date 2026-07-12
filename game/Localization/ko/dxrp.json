@@ -1780,7 +1780,7 @@
   "rollingtable.process": "대마 가공",
   "rollingtable.auto_process": "자동 가공",
   "rollingtable.next_process_in": "다음 가공까지 {0}초",
-  "rollingtable.roll_joints": "조인트 말기 (3)",
+  "rollingtable.roll_joints": "조인트 말기 ({0})",
   "rollingtable.pack_bundle": "묶음 포장 ($$$)",
   "rollingtable.pluck": "대마 수확!",
   "rollingtable.nothing_to_process": "가공할 것이 없습니다...",
