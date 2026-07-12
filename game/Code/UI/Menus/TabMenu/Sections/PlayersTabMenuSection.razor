@@ -80,6 +80,14 @@
 				}
 				<span>)</span>
 			</div>
+			@if ( PartySystem.Instance.IsValid() )
+			{
+				<div class="flex-grow"></div>
+				<button class="btn-compact btn-primary flex flex-row items-center gap-1" onclick="@OpenPartyMenu" tooltip="#party.window_title">
+					<i class="material-icons">groups</i>
+					<span>#party.menu_title</span>
+				</button>
+			}
 		</div>
 
 		<div class="player-list overflow-y-scroll">
@@ -285,6 +293,13 @@
 		_searchQuery = string.Empty;
 		if ( _searchTextEntry != null )
 			_searchTextEntry.Text = string.Empty;
+	}
+
+	private static void OpenPartyMenu()
+	{
+		Sound.Play( "pop" );
+		TabMenu.RequestCloseMenu();
+		PartyMenu.SetOpen( true );
 	}
 
 	private void ToggleConstructPermission(long steamId, bool hasPermission)
