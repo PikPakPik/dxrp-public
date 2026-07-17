@@ -3,7 +3,7 @@
 [Title( "Keypad" )]
 [Category( "Wire" )]
 [Icon( "cable" )]
-public class KeypadWire() : BaseWireConstruct( ConstructType.KeypadWire ), IWireEvents
+public class KeypadWire() : BaseWireConstruct( ConstructType.KeypadWire ), IWireEvents, IConstructRuntimeState
 {
 	[Property]
 	private SoundEvent? FailSound { get; set; }
@@ -167,5 +167,30 @@ public class KeypadWire() : BaseWireConstruct( ConstructType.KeypadWire ), IWire
 	}
 
 	public event Action<string>? OnSuccessfulCodeReceived;
+
+	string IConstructRuntimeState.SaveRuntimeState()
+	{
+		return Json.Serialize( new KeypadWireRuntimeState
+		{
+			Code = _code,
+			Initialized = Initialized,
+			Output = Out
+		} );
+	}
+
+	void IConstructRuntimeState.LoadRuntimeState( string stateJson )
+	{
+		var state = Json.Deserialize<KeypadWireRuntimeState>( stateJson );
+		var code = state?.Code ?? string.Empty;
+		if ( state == null || code.Length > Wire.MaxWireStringLength )
+		{
+			return;
+		}
+
+		_code = state.Initialized ? code : string.Empty;
+		Initialized = state.Initialized;
+		Out = state.Initialized ? state.Output : _data.OffValue;
+		BroadcastInitializedState( state.Initialized );
+	}
 
 }
