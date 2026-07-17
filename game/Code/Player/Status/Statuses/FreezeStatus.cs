@@ -10,6 +10,21 @@ public class FreezeStatus : BaseStatus
 	public override bool RemoveOnDeath => true;
 	public override bool ShowOnNameplate => true;
 
+	public override bool BlocksAction( Player player, StatusAction action )
+	{
+		return action == StatusAction.Emote;
+	}
+
+	public override bool BlocksCommand( Player player, ICommand command )
+	{
+		return !command.IsUsableWhileFrozen;
+	}
+
+	public override string? GetCommandBlockMessage( Player player, ICommand command )
+	{
+		return "#command.frozen";
+	}
+
 	public override void OnAddedServer( Player player )
 	{
 		// Holster current weapon

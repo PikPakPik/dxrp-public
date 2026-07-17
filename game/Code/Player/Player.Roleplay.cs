@@ -1,3 +1,4 @@
+using Dxura.RP.Game.Minigame;
 using Dxura.RP.Game.UI;
 using Dxura.RP.Shared;
 using Sandbox.Diagnostics;
@@ -326,12 +327,7 @@ public partial class Player
 
 	private bool CanSit()
 	{
-		if ( Restricted )
-		{
-			return false;
-		}
-
-		if ( HasStatus( Constants.SurrenderStatus ) )
+		if ( Restricted || IsBlockedByStatus( StatusAction.Sit ) )
 		{
 			return false;
 		}

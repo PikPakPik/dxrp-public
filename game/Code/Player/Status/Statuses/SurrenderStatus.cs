@@ -10,6 +10,11 @@ public class SurrenderStatus : BaseStatus
 	public override bool RemoveOnDeath => true;
 	public override bool ShowOnNameplate => false;
 
+	public override bool BlocksAction( Player player, StatusAction action )
+	{
+		return action == StatusAction.Sit;
+	}
+
 	public override void OnAddedServer( Player player )
 	{
 		// Holster current weapon

@@ -95,9 +95,9 @@ public sealed partial class Chat
 			return false;
 		}
 
-		if ( player.HasStatus( Constants.FreezeStatus ) && !command.IsUsableWhileFrozen )
+		if ( player.IsCommandBlockedByStatus( command ) )
 		{
-			player.SendMessage( "#command.frozen" );
+			player.SendMessage( player.GetCommandBlockMessage( command ) ?? "#generic.forbidden" );
 			return false;
 		}
 
@@ -116,7 +116,7 @@ public sealed partial class Chat
 			return false;
 		}
 
-		if ( player.HasStatus( Constants.FreezeStatus ) && !command.IsUsableWhileFrozen )
+		if ( player.IsCommandBlockedByStatus( command ) )
 		{
 			return false;
 		}

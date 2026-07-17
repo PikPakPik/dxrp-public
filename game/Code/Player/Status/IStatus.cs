@@ -34,6 +34,10 @@ public interface IStatus
 
 	// Modifiers
 	bool PreventFallDamage => false;
+	bool BlocksAction( Player player, StatusAction action ) => false;
+	string? GetActionBlockMessage( Player player, StatusAction action ) => null;
+	bool BlocksCommand( Player player, ICommand command ) => BlocksAction( player, StatusAction.Command );
+	string? GetCommandBlockMessage( Player player, ICommand command ) => GetActionBlockMessage( player, StatusAction.Command );
 
 	// Lifecycle
 
@@ -42,6 +46,7 @@ public interface IStatus
 	/// </summary>
 	/// <param name="player">The player this is for</param>
 	void OnAddedServer( Player player ) {}
+	void OnRefreshedServer( Player player ) {}
 	/// <summary>
 	/// Called on the player's client instance when the status is added.
 	/// </summary>

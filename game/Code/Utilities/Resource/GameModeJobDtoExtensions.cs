@@ -220,6 +220,12 @@ public static class GameModeJobDtoExtensions
 			return false;
 		}
 
+		if ( player.IsBlockedByStatus( StatusAction.JobSwitch ) )
+		{
+			player.Error( player.GetStatusBlockMessage( StatusAction.JobSwitch ) ?? "#generic.forbidden" );
+			return false;
+		}
+
 		if ( job.MaxCount != 0 && GameUtils.GetPlayersByJob( job ).Count() >= job.MaxCount )
 		{
 			player.Error( "#notify.job.full" );
