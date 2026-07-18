@@ -123,26 +123,22 @@
 
 	TextEntry? _searchTextEntry;
 	private string _searchQuery = string.Empty;
+	private const float OwnershipRefreshInterval = 1f;
 
 	private static bool CanUseAdminMode => RankSystem.HasLocalPermission( Permission.CommandSpawnEntity );
 
 	protected override int BuildHash()
 	{
-		var ownedWorldCount = Player.Local.IsValid()
-			? Scene.GetAllComponents<BaseEntity>().Count( entity => entity.IsValid() &&
-				entity.EntityId != Guid.Empty &&
-				entity.Owner == Player.Local.SteamId )
-			: 0;
-		var ownedEquipmentCount = Player.Local.IsValid()
-			? Player.Local.Equipment.Count( equipment => equipment.IsValid() && equipment.Enabled && equipment.MarketItemId != Guid.Empty )
-			: 0;
 		var collapsedHash = 0;
 		foreach ( var category in _collapsedCategories )
 		{
 			collapsedHash = HashCode.Combine( collapsedHash, category.GetHashCode() );
 		}
 
-		return HashCode.Combine( Player.Local.Job, _showLocked, _adminMode, ownedWorldCount, ownedEquipmentCount, collapsedHash, _searchQuery );
+		// BuildHash is evaluated every UI tick. Entity ownership is only needed to refresh item
+		// limits, so schedule that refresh instead of enumerating the entire scene every frame.
+		var ownershipRefresh = (int)(Time.Now / OwnershipRefreshInterval);
+		return HashCode.Combine( Player.Local.Job, _showLocked, _adminMode, collapsedHash, _searchQuery, ownershipRefresh );
 	}
 
 	private void ClearSearch()
