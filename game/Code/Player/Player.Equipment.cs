@@ -44,6 +44,7 @@ public partial class Player
 	public TimeSince TimeSinceWeaponDeployed { get; private set; }
 
 	public bool CantSwitch = false;
+	private bool IsEquipmentSwitchLocked => CantSwitch || IsEmoting;
 
 
 	public void OnEquipmentDeployed( Equipment equipment )
@@ -191,6 +192,11 @@ public partial class Player
 
 	public void SetCurrentEquipment( Equipment? weapon )
 	{
+		if ( weapon.IsValid() && IsEquipmentSwitchLocked )
+		{
+			return;
+		}
+
 		if ( weapon == CurrentEquipment )
 		{
 			return;
@@ -301,6 +307,11 @@ public partial class Player
 		var callerId = Rpc.CallerId;
 		Assert.True( Networking.IsHost );
 
+		if ( IsEmoting && !forceRemove )
+		{
+			return;
+		}
+
 		if ( Cooldown.Current.CheckAndStartCooldown( $"{callerId}:equipment:drop", Config.Current.Game.EquipmentDropCooldown, true ) )
 		{
 			return;
@@ -354,13 +365,18 @@ public partial class Player
 
 	private void OnUpdateEquipment()
 	{
+		if ( IsEquipmentSwitchLocked )
+		{
+			return;
+		}
+
 		if ( Input.Pressed( "Drop" ) && CurrentEquipment.IsValid() )
 		{
 			Drop( CurrentEquipment );
 			return;
 		}
 
-		if ( CantSwitch || _isFreeLooking || HasStatus( Constants.SurrenderStatus ) )
+		if ( _isFreeLooking || HasStatus( Constants.SurrenderStatus ) )
 		{
 			return;
 		}
@@ -472,7 +488,7 @@ public partial class Player
 	{
 		Assert.True( IsLocalPlayer || Networking.IsHost );
 
-		if ( !Equipment.Contains( equipment ) )
+		if ( IsEquipmentSwitchLocked || !Equipment.Contains( equipment ) )
 		{
 			return;
 		}
@@ -488,7 +504,7 @@ public partial class Player
 		Assert.True( Networking.IsHost );
 
 		var hands = ResolveHandsEquipment();
-		if ( !hands.IsValid() || CantSwitch )
+		if ( !hands.IsValid() || IsEquipmentSwitchLocked )
 		{
 			return;
 		}
@@ -609,7 +625,7 @@ public partial class Player
 		component.CanDrop = canDrop;
 		gameObject.NetworkSpawn( Network.Owner );
 
-		if ( makeActive && !CantSwitch )
+		if ( makeActive && !IsEquipmentSwitchLocked )
 		{
 			SetCurrentEquipment( component );
 		}
@@ -747,7 +763,7 @@ public partial class Player
 			return PickupResult.None;
 		}
 		
-		if ( CantSwitch )
+		if ( IsEquipmentSwitchLocked )
 		{
 			return PickupResult.None;
 		}

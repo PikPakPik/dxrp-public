@@ -96,7 +96,7 @@ public abstract class InputWeaponComponent : WeaponComponent,
 
 	private bool ShouldProcess()
 	{
-		if ( !Equipment.IsValid() || !Equipment.IsDeployed || !Equipment.Owner.IsValid() )
+		if ( !Equipment.IsValid() || !Equipment.IsDeployed || !Equipment.Owner.IsValid() || Equipment.Owner.IsEmoting )
 		{
 			return false;
 		}

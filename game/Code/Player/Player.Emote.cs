@@ -7,6 +7,8 @@ public partial class Player
 	[Change( nameof( OnEmoteChanged ) )]
 	public EmoteResource? CurrentEmote { get; set; }
 
+	public bool IsEmoting => CurrentEmote.IsValid();
+
 	private TimeUntil _emoteTimeRemaining;
 	private TimeUntil _emotePositionCheck;
 	private Vector3 _emoteLastPosition;
